@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Class Give_Addon_Activation_Banner
  */
-class Give_Addon_Activation_Banner {
+class Give_Addon_Activation_Banner  {
 
 	/**
 	 * Class constructor.
@@ -23,32 +23,45 @@ class Give_Addon_Activation_Banner {
 	 * @since  1.0
 	 * @access public
 	 *
-	 * @param array $_banner_details {
-	 *                               'file'              => __FILE__, // (required) Directory path to the main plugin file
-	 *                               'name'              => __( 'Authorize.net Gateway', 'give-authorize' ), // (required) Name of the Add-on
-	 *                               'version'           => GIVE_AUTHORIZE_VERSION, // (required)The most current version
-	 *                               'documentation_url' => 'http://docs.givewp.com/addon-authorize',// (required)
-	 *                               'support_url'       => 'https://givewp.com/support/', // (required)Location of Add-on settings page, leave blank to hide
-	 *                               'testing'           => false, // (required) Never leave as "true" in production!!!
-	 *                               }
+	 * @param array $_banner_details
+     * {
+	 *  'file'              => __FILE__, // (required) Directory path to the main plugin file
+	 *  'name'              => __( 'Authorize.net Gateway', 'give-authorize' ), // (required) Name of the Add-on
+	 *  'version'           => GIVE_AUTHORIZE_VERSION, // (required)The most current version
+	 *  'documentation_url' => 'http://docs.givewp.com/addon-authorize',// (required)
+	 *  'support_url'       => 'https://givewp.com/support/', // (required)Location of Add-on settings page, leave blank to hide
+	 *  'testing'           => false, // (required) Never leave as "true" in production!!!
+	 * }
 	 */
-	function __construct( $_banner_details ) {
+	public function __construct( $_banner_details = array() ) {
 		$current_user = wp_get_current_user();
 
+//		$this->push_to_array($_banner_details);
+
 		$this->plugin_activate_by   = 0;
-		$this->banner_details       = $_banner_details;
-		$this->test_mode            = ( $this->banner_details['testing'] == 'true' ) ? true : false;
+		$this->addon_details[]      = $_banner_details;
+		$this->test_mode            = 'true' == $this->banner_details['testing'] ? true : false;
 		$this->nag_meta_key         = 'give_addon_activation_ignore_' . sanitize_title( $this->banner_details['name'] );
 		$this->activate_by_meta_key = 'give_addon_' . sanitize_title( $this->banner_details['name'] ) . '_active_by_user';
 
 		//Get current user
 		$this->user_id = $current_user->ID;
 
-		// Set up hooks.
-		$this->init();
+
+//		add_action( 'admin_notices', array( $this, 'init' ) );
 
 		// Store user id who activate plugin.
 		$this->add_addon_activate_meta();
+	}
+
+	function push_to_array( $_banner_details ) {
+
+		$this->banner_details['add_ons'][] = $_banner_details;
+
+//		echo '<pre style="margin-left:300px">';
+//		var_dump($this->banner_details);
+//		echo '</pre>';
+
 	}
 
 	/**
@@ -60,22 +73,23 @@ class Give_Addon_Activation_Banner {
 	 * @return void
 	 */
 	public function init() {
-
+		echo '<pre>';
+		var_dump( $this->banner_details );
+		echo '</pre>';
 		//Testing?
-		if ( $this->test_mode ) {
-			delete_user_meta( $this->user_id, $this->nag_meta_key );
-		}
+//		if ( $this->test_mode ) {
+//			delete_user_meta( $this->user_id, $this->nag_meta_key );
+//		}
 
 		//Get the current page to add the notice to
-		add_action( 'current_screen', array( $this, 'give_addon_notice_ignore' ) );
-		add_action( 'admin_notices', array( $this, 'give_addon_activation_admin_notice' ) );
+//		add_action( 'current_screen', array( $this, 'give_addon_notice_ignore' ) );
 
 		// File path of addon must be included in banner detail other addon activate meta will not delete.
-		$file_name = $this->get_plugin_file_name();
-
-		if ( ! empty( $file_name ) ) {
-			add_action( 'deactivate_' . $file_name, array( $this, 'remove_addon_activate_meta' ) );
-		}
+//		$file_name = $this->get_plugin_file_name();
+//
+//		if ( ! empty( $file_name ) ) {
+//			add_action( 'deactivate_' . $file_name, array( $this, 'remove_addon_activate_meta' ) );
+//		}
 	}
 
 
@@ -117,12 +131,13 @@ class Give_Addon_Activation_Banner {
 			ob_start();
 			?>
 
-			<div class="updated give-addon-alert give-notice" style="display: none">
+            <div class="updated give-addon-alert give-notice" style="display: none">
 
-				<img src="<?php echo GIVE_PLUGIN_URL; ?>assets/dist/images/give-icon-full-circle.svg" class="give-logo" />
+                <img src="<?php echo GIVE_PLUGIN_URL; ?>assets/dist/images/give-icon-full-circle.svg"
+                     class="give-logo"/>
 
-				<div class="give-alert-message">
-					<h3><?php
+                <div class="give-alert-message">
+                    <h3><?php
 						printf(
 						/* translators: %s: Add-on name */
 							esc_html__( "Thank you for installing Give's %s Add-on!", 'give' ),
@@ -130,26 +145,26 @@ class Give_Addon_Activation_Banner {
 						);
 						?></h3>
 
-					<a href="<?php
+                    <a href="<?php
 					//The Dismiss Button.
 					$nag_admin_dismiss_url = 'plugins.php?' . $this->nag_meta_key . '=0';
 					echo admin_url( $nag_admin_dismiss_url ); ?>" class="dismiss"><span
-								class="dashicons dashicons-dismiss"></span></a>
+                                class="dashicons dashicons-dismiss"></span></a>
 
-					<div class="alert-actions">
+                    <div class="alert-actions">
 
 						<?php //Point them to your settings page.
 						if ( isset( $this->banner_details['settings_url'] ) ) { ?>
-							<a href="<?php echo $this->banner_details['settings_url']; ?>">
-								<span class="dashicons dashicons-admin-settings"></span><?php esc_html_e( 'Go to Settings', 'give' ); ?>
-							</a>
+                            <a href="<?php echo $this->banner_details['settings_url']; ?>">
+                                <span class="dashicons dashicons-admin-settings"></span><?php esc_html_e( 'Go to Settings', 'give' ); ?>
+                            </a>
 						<?php } ?>
 
 						<?php
 						// Show them how to configure the Addon.
 						if ( isset( $this->banner_details['documentation_url'] ) ) { ?>
-							<a href="<?php echo $this->banner_details['documentation_url'] ?>" target="_blank">
-								<span class="dashicons dashicons-media-text"></span><?php
+                            <a href="<?php echo $this->banner_details['documentation_url'] ?>" target="_blank">
+                                <span class="dashicons dashicons-media-text"></span><?php
 								printf(
 								/* translators: %s: Add-on name */
 									esc_html__( 'Documentation: %s Add-on', 'give' ),
@@ -161,15 +176,15 @@ class Give_Addon_Activation_Banner {
 						//Let them signup for plugin updates
 						if ( isset( $this->banner_details['support_url'] ) ) { ?>
 
-							<a href="<?php echo $this->banner_details['support_url'] ?>" target="_blank">
-								<span class="dashicons dashicons-sos"></span><?php esc_html_e( 'Get Support', 'give' ); ?>
-							</a>
+                            <a href="<?php echo $this->banner_details['support_url'] ?>" target="_blank">
+                                <span class="dashicons dashicons-sos"></span><?php esc_html_e( 'Get Support', 'give' ); ?>
+                            </a>
 
 						<?php } ?>
 
-					</div>
-				</div>
-			</div>
+                    </div>
+                </div>
+            </div>
 			<?php
 
 			$notice_html = ob_get_clean();
@@ -194,74 +209,74 @@ class Give_Addon_Activation_Banner {
 	 */
 	private function print_css() {
 		?>
-		<style>
-			div.give-addon-alert.updated {
-				padding: 20px;
-				position: relative;
-				border-color: #66BB6A;
-			}
+        <style>
+            div.give-addon-alert.updated {
+                padding: 20px;
+                position: relative;
+                border-color: #66BB6A;
+            }
 
-			div.give-alert-message {
-				margin-left: 70px;
-			}
+            div.give-alert-message {
+                margin-left: 70px;
+            }
 
-			div.give-addon-alert img.give-logo {
-				max-width: 50px;
-				float: left;
-			}
+            div.give-addon-alert img.give-logo {
+                max-width: 50px;
+                float: left;
+            }
 
-			div.give-addon-alert h3 {
-				margin: -5px 0 10px;
-				font-size: 22px;
-				font-weight: 300;
-				line-height: 30px;
-			}
+            div.give-addon-alert h3 {
+                margin: -5px 0 10px;
+                font-size: 22px;
+                font-weight: 300;
+                line-height: 30px;
+            }
 
-			div.give-addon-alert h3 span {
-				font-weight: 700;
-				color: #66BB6A;
-			}
+            div.give-addon-alert h3 span {
+                font-weight: 700;
+                color: #66BB6A;
+            }
 
-			div.give-addon-alert .alert-actions {
-			}
+            div.give-addon-alert .alert-actions {
+            }
 
-			div.give-addon-alert a {
-				color: #66BB6A;
-			}
+            div.give-addon-alert a {
+                color: #66BB6A;
+            }
 
-			div.give-addon-alert .alert-actions a {
-				margin-right: 2em;
-			}
+            div.give-addon-alert .alert-actions a {
+                margin-right: 2em;
+            }
 
-			div.give-addon-alert .alert-actions a {
-				text-decoration: underline;
-			}
+            div.give-addon-alert .alert-actions a {
+                text-decoration: underline;
+            }
 
-			div.give-addon-alert .alert-actions a:hover {
-				color: #555555;
-			}
+            div.give-addon-alert .alert-actions a:hover {
+                color: #555555;
+            }
 
-			div.give-addon-alert .alert-actions a span {
-				text-decoration: none;
-				margin-right: 5px;
-			}
+            div.give-addon-alert .alert-actions a span {
+                text-decoration: none;
+                margin-right: 5px;
+            }
 
-			div.give-addon-alert .dismiss {
-				position: absolute;
-				right: 20px;
-				height: 100%;
-				top: 50%;
-				margin-top: -10px;
-				outline: none;
-				box-shadow: none;
-				text-decoration: none;
-				color: #AAA;
-			}
+            div.give-addon-alert .dismiss {
+                position: absolute;
+                right: 20px;
+                height: 100%;
+                top: 50%;
+                margin-top: -10px;
+                outline: none;
+                box-shadow: none;
+                text-decoration: none;
+                color: #AAA;
+            }
 
-			div.give-addon-alert .dismiss:hover {
-				color: #333;
-			}
-		</style>
+            div.give-addon-alert .dismiss:hover {
+                color: #333;
+            }
+        </style>
 		<?php
 	}
 

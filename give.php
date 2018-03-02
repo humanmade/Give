@@ -527,6 +527,8 @@ if ( ! class_exists( 'Give' ) ) :
 				require_once GIVE_PLUGIN_DIR . 'includes/admin/plugins.php';
 				require_once GIVE_PLUGIN_DIR . 'includes/admin/dashboard-widgets.php';
 				require_once GIVE_PLUGIN_DIR . 'includes/admin/class-blank-slate.php';
+				require_once GIVE_PLUGIN_DIR . 'includes/admin/class-addon-activation-banner.php';
+				require_once GIVE_PLUGIN_DIR . 'includes/admin/class-addon-welcome-banner.php';
 
 				require_once GIVE_PLUGIN_DIR . 'includes/admin/payments/actions.php';
 				require_once GIVE_PLUGIN_DIR . 'includes/admin/payments/payments-history.php';
