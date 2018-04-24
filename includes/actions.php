@@ -25,11 +25,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function give_get_actions() {
 
-	$_get_action = ! empty( $_GET['give_action'] ) ? $_GET['give_action'] : null;
+	$_get_action = ! empty( $_GET['give_action'] ) ? sanitize_text_field( wp_unslash( $_GET['give_action'] ) ) : null;
 
 	// Add backward compatibility to give-action param ( $_GET )
 	if ( empty( $_get_action ) ) {
-		$_get_action = ! empty( $_GET['give-action'] ) ? $_GET['give-action'] : null;
+		$_get_action = ! empty( $_GET['give-action'] ) ? sanitize_text_field( wp_unslash( $_GET['give-action'] ) ) : null;
 	}
 
 	if ( isset( $_get_action ) ) {
@@ -58,11 +58,11 @@ add_action( 'init', 'give_get_actions' );
  */
 function give_post_actions() {
 
-	$_post_action = ! empty( $_POST['give_action'] ) ? $_POST['give_action'] : null;
+	$_post_action = ! empty( $_POST['give_action'] ) ? sanitize_text_field( wp_unslash( $_POST['give_action'] ) ) : null;
 
 	// Add backward compatibility to give-action param ( $_POST ).
 	if ( empty( $_post_action ) ) {
-		$_post_action = ! empty( $_POST['give-action'] ) ? $_POST['give-action'] : null;
+		$_post_action = ! empty( $_POST['give-action'] ) ? sanitize_text_field( wp_unslash( $_POST['give-action'] ) ) : null;
 	}
 
 	if ( isset( $_post_action ) ) {
@@ -99,7 +99,8 @@ function give_connect_donor_to_wpuser( $user_id, $user_data ) {
 
 		// Update donor user_id.
 		if ( $donor->update( array( 'user_id' => $user_id ) ) ) {
-			$donor_note = sprintf( esc_html__( 'WordPress user #%d is connected to #%d', 'give' ), $user_id, $donor->id );
+			/* translators: 1: User ID. 2: Donor ID. */
+			$donor_note = sprintf( esc_html__( 'WordPress user #%1$d is connected to #%2$d', 'give' ), $user_id, $donor->id );
 			$donor->add_note( $donor_note );
 
 			// Update user_id meta in payments.
@@ -127,9 +128,9 @@ add_action( 'give_insert_user', 'give_connect_donor_to_wpuser', 10, 2 );
  */
 function give_validate_license_when_site_migrated() {
 	// Store current site address if not already stored.
-	$home_url_parts              = parse_url( home_url() );
+	$home_url_parts              = wp_parse_url( home_url() );
 	$home_url                    = isset( $home_url_parts['host'] ) ? $home_url_parts['host'] : false;
-	$home_url                    .= isset( $home_url_parts['path'] ) ? $home_url_parts['path'] : '';
+	$home_url                   .= isset( $home_url_parts['path'] ) ? $home_url_parts['path'] : '';
 	$site_address_before_migrate = get_option( 'give_site_address_before_migrate' );
 
 	// Need $home_url to proceed.
@@ -147,7 +148,7 @@ function give_validate_license_when_site_migrated() {
 
 	// Backwards compat. for before when we were storing URL scheme.
 	if ( strpos( $site_address_before_migrate, 'http' ) ) {
-		$site_address_before_migrate = parse_url( $site_address_before_migrate );
+		$site_address_before_migrate = wp_parse_url( $site_address_before_migrate );
 		$site_address_before_migrate = isset( $site_address_before_migrate['host'] ) ? $site_address_before_migrate['host'] : false;
 
 		// Add path for multisite installs.
@@ -190,7 +191,7 @@ function give_donor_batch_export_complete( $data ) {
 add_action( 'give_file_export_complete', 'give_donor_batch_export_complete' );
 
 /**
- * Print css for wordpress setting pages.
+ * Print css for WordPress setting pages.
  *
  * @since 1.8.7
  */
@@ -253,9 +254,11 @@ add_action( 'admin_head', 'give_admin_quick_css' );
  * @return void
  */
 function give_set_donation_levels_max_min_amount( $form_id ) {
+	$price_option = isset( $_POST['_give_price_option'] ) ? sanitize_text_field( wp_unslash( $_POST['_give_price_option'] ) ) : '';
+
 	if (
-		( 'set' === $_POST['_give_price_option'] ) ||
-		( in_array( '_give_donation_levels', $_POST ) && count( $_POST['_give_donation_levels'] ) <= 0 ) ||
+		( 'set' === $price_option ) ||
+		( isset( $_POST['_give_donation_levels'] ) && count( $_POST['_give_donation_levels'] ) <= 0 ) ||
 		! ( $donation_levels_amounts = wp_list_pluck( $_POST['_give_donation_levels'], '_give_amount' ) )
 	) {
 		// Delete old meta.
@@ -287,13 +290,12 @@ add_action( 'give_pre_process_give_forms_meta', 'give_set_donation_levels_max_mi
  * @param int $payment_id
  */
 function _give_save_donor_billing_address( $payment_id ) {
-	$donor_id  = absint( give_get_payment_donor_id( $payment_id ));
+	$donor_id = absint( give_get_payment_donor_id( $payment_id ) );
 
 	// Bailout
 	if ( ! $donor_id ) {
 		return;
 	}
-
 
 	/* @var Give_Donor $donor */
 	$donor = new Give_Donor( $donor_id );
