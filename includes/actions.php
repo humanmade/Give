@@ -254,13 +254,11 @@ add_action( 'admin_head', 'give_admin_quick_css' );
  * @return void
  */
 function give_set_donation_levels_max_min_amount( $form_id ) {
-	$price_option = isset( $_POST['_give_price_option'] ) ? sanitize_text_field( wp_unslash( $_POST['_give_price_option'] ) ) : '';
+	$price_option            = isset( $_POST['_give_price_option'] ) ? give_clean( $_POST['_give_price_option'] ) : '';
+	$donation_levels_data    = isset( $_POST['_give_donation_levels'] ) ? give_clean( $_POST['_give_donation_levels'] ) : [];
+	$donation_levels_amounts = ! empty( $donation_levels_data ) && is_array( $donation_levels_data ) ? wp_list_pluck( $donation_levels_data, '_give_amount' ) : false;
 
-	if (
-		( 'set' === $price_option ) ||
-		( isset( $_POST['_give_donation_levels'] ) && count( $_POST['_give_donation_levels'] ) <= 0 ) ||
-		! ( $donation_levels_amounts = wp_list_pluck( $_POST['_give_donation_levels'], '_give_amount' ) )
-	) {
+	if ( 'set' === $price_option || ! $donation_levels_amounts ) {
 		// Delete old meta.
 		give_delete_meta( $form_id, '_give_levels_minimum_amount' );
 		give_delete_meta( $form_id, '_give_levels_maximum_amount' );
