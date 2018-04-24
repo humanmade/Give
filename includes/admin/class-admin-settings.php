@@ -86,7 +86,7 @@ if ( ! class_exists( 'Give_Admin_Settings' ) ) :
 		 * @return bool
 		 */
 		public static function verify_nonce() {
-			if ( empty( $_REQUEST['_give-save-settings'] ) || ! wp_verify_nonce( $_REQUEST['_give-save-settings'], 'give-save-settings' ) ) {
+			if ( empty( $_REQUEST['_give-save-settings'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_give-save-settings'] ) ), 'give-save-settings' ) ) {
 				return false;
 			}
 
@@ -103,14 +103,15 @@ if ( ! class_exists( 'Give_Admin_Settings' ) ) :
 			$current_tab = give_get_current_setting_tab();
 
 			if ( ! self::verify_nonce() ) {
-				echo '<div class="notice error"><p>' . __( 'Action failed. Please refresh the page and retry.', 'give' ) . '</p></div>';
+				echo '<div class="notice error"><p>' . esc_html__( 'Action failed. Please refresh the page and retry.', 'give' ) . '</p></div>';
 				die();
 			}
 
 			// Show error message if Akismet not configured and Admin try to save 'enabled' option.
-			if ( isset( $_POST['akismet_spam_protection'] )
-			     && give_is_setting_enabled( $_POST['akismet_spam_protection'] )
-			     && ! give_check_akismet_key()
+			if (
+				isset( $_POST['akismet_spam_protection'] ) &&
+				give_is_setting_enabled( sanitize_text_field( wp_unslash( $_POST['akismet_spam_protection'] ) ) ) &&
+				! give_check_akismet_key()
 			) {
 				self::add_error( 'give-akismet-protection', __( 'Please properly configure Akismet to enable SPAM protection.', 'give' ) );
 
@@ -185,17 +186,27 @@ if ( ! class_exists( 'Give_Admin_Settings' ) ) :
 
 			if ( 0 < count( self::$errors ) ) {
 				foreach ( self::$errors as $code => $message ) {
-					$notice_html .= '<div id="setting-error-' . $code . '" class="' . $classes . ' error"><p><strong>' . $message . '</strong></p></div>';
+					$notice_html .= sprintf(
+						'<div id="setting-error-%s" class="%s error"><p><strong>%s</strong></p></div>',
+						esc_attr( $code ),
+						esc_attr( $classes ),
+						esc_html( $message )
+					);
 				}
 			}
 
 			if ( 0 < count( self::$messages ) ) {
 				foreach ( self::$messages as $code => $message ) {
-					$notice_html .= '<div id="setting-error-' . $code . '" class="' . $classes . ' updated"><p><strong>' . $message . '</strong></p></div>';
+					$notice_html .= sprintf(
+						'<div id="setting-error-%s" class="%s updated"><p><strong>%s</strong></p></div>',
+						esc_attr( $code ),
+						esc_attr( $classes ),
+						esc_html( $message )
+					);
 				}
 			}
 
-			echo $notice_html;
+			echo wp_kses_post( $notice_html );
 		}
 
 		/**
@@ -318,14 +329,14 @@ if ( ! class_exists( 'Give_Admin_Settings' ) ) :
 
 			// Field Default values.
 			$defaults = array(
-				'id'                  => '',
-				'class'               => '',
-				'css'                 => '',
-				'default'             => '',
-				'desc'                => '',
-				'table_html'          => true,
-				'repeat'              => false,
-				'repeat_btn_title'    => __( 'Add Field', 'give' ),
+				'id'               => '',
+				'class'            => '',
+				'css'              => '',
+				'default'          => '',
+				'desc'             => '',
+				'table_html'       => true,
+				'repeat'           => false,
+				'repeat_btn_title' => __( 'Add Field', 'give' ),
 			);
 
 			foreach ( $options as $value ) {
@@ -342,7 +353,6 @@ if ( ! class_exists( 'Give_Admin_Settings' ) ) :
 				// Colorpicker field.
 				$value['class'] = ( 'colorpicker' === $value['type'] ? trim( $value['class'] ) . ' give-colorpicker' : $value['class'] );
 				$value['type']  = ( 'colorpicker' === $value['type'] ? 'text' : $value['type'] );
-
 
 				// Custom attribute handling.
 				$custom_attributes = array();
@@ -363,21 +373,21 @@ if ( ! class_exists( 'Give_Admin_Settings' ) ) :
 					case 'title':
 						if ( ! empty( $value['title'] ) || ! empty( $value['desc'] ) ) {
 							?>
-							<div class="give-setting-tab-header give-setting-tab-header-<?php echo $current_tab; ?>">
+							<div class="give-setting-tab-header give-setting-tab-header-<?php echo esc_attr( $current_tab ); ?>">
 								<?php if ( ! empty( $value['title'] ) ) : ?>
-									<h2><?php echo self::get_field_title( $value ); ?></h2>
+									<h2><?php echo esc_html( self::get_field_title( $value ) ); ?></h2>
 									<hr>
 								<?php endif; ?>
 
 								<?php if ( ! empty( $value['desc'] ) ) : ?>
-									<?php echo wpautop( wptexturize( wp_kses_post( $value['desc'] ) ) ); ?>
+									<?php echo wp_kses_post( wpautop( wptexturize( $value['desc'] ) ) ); ?>
 								<?php endif; ?>
 							</div>
 							<?php
 						}
 
 						if ( $value['table_html'] ) {
-							echo '<table class="form-table give-setting-tab-body give-setting-tab-body-' . $current_tab . '">' . "\n\n";
+							echo '<table class="form-table give-setting-tab-body give-setting-tab-body-' . esc_attr( $current_tab ) . '">' . "\n\n";
 						}
 
 						if ( ! empty( $value['id'] ) ) {
@@ -428,13 +438,18 @@ if ( ! class_exists( 'Give_Admin_Settings' ) ) :
 
 					// Standard text inputs and subtypes like 'number'.
 					case 'colorpicker':
-					case 'hidden' :
+						// No break for 'colorpicker'.
+					case 'hidden':
 						$value['wrapper_class'] = empty( $value['wrapper_class'] ) ? 'give-hidden' : trim( $value['wrapper_class'] ) . ' give-hidden';
+						// No break for 'colorpicker'.
 					case 'text':
+						// No break for 'text'.
 					case 'email':
+						// No break for 'email'.
 					case 'number':
-					case 'password' :
-						$type = $value['type'];
+						// No break for 'number'.
+					case 'password':
+						$type         = $value['type'];
 						$option_value = self::get_option( $option_name, $value['id'], $value['default'] );
 
 						// Set default value for repeater field if not any value set yet.
@@ -442,74 +457,79 @@ if ( ! class_exists( 'Give_Admin_Settings' ) ) :
 							$option_value = array( $value['default'] );
 						}
 						?>
-					<tr valign="top" <?php echo ! empty( $value['wrapper_class'] ) ? 'class="' . $value['wrapper_class'] . '"' : '' ?>>
+					<tr valign="top" <?php echo ! empty( $value['wrapper_class'] ) ? 'class="' . esc_attr( $value['wrapper_class'] ) . '"' : ''; ?>>
 						<th scope="row" class="titledesc">
-							<label
-								for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo self::get_field_title( $value ); ?></label>
+							<label for="<?php echo esc_attr( $value['id'] ); ?>">
+								<?php echo esc_html( self::get_field_title( $value ) ); ?>
+							</label>
 						</th>
-						<td class="give-forminp give-forminp-<?php echo sanitize_title( $value['type'] ) ?>">
-							<?php if ( $value['repeat'] ) : ?>
-								<?php foreach ( $option_value as $index => $field_value ) : ?>
-									<p>
-										<input
-											name="<?php echo esc_attr( $value['id'] ); ?>[]"
-											type="<?php echo esc_attr( $type ); ?>"
-											style="<?php echo esc_attr( $value['css'] ); ?>"
-											value="<?php echo esc_attr( $field_value ); ?>"
-											class="give-input-field<?php echo( empty( $value['class'] ) ? '' : ' ' . esc_attr( $value['class'] ) ); ?> <?php echo esc_attr( $value['id'] ); ?>"
-											<?php echo implode( ' ', $custom_attributes ); ?>
-										/>
-										<span class="give-remove-setting-field"
-										      title="<?php esc_html_e( 'Remove setting field', 'give' ); ?>">-</span>
-									</p>
-								<?php endforeach; ?>
-								<a href="#" data-id="<?php echo $value['id']; ?>"
-								   class="give-repeat-setting-field button-secondary"><?php echo $value['repeat_btn_title']; ?></a>
-							<?php else : ?>
-								<input
-									name="<?php echo esc_attr( $value['id'] ); ?>"
-									id="<?php echo esc_attr( $value['id'] ); ?>"
-									type="<?php echo esc_attr( $type ); ?>"
-									style="<?php echo esc_attr( $value['css'] ); ?>"
-									value="<?php echo esc_attr( $option_value ); ?>"
-									class="give-input-field<?php echo( empty( $value['class'] ) ? '' : ' ' . esc_attr( $value['class'] ) ); ?>"
-									<?php echo implode( ' ', $custom_attributes ); ?>
-								/>
-							<?php endif; ?>
-							<?php echo $description; ?>
+						<td class="give-forminp give-forminp-<?php echo esc_attr( sanitize_title( $value['type'] ) ); ?>">
+							<?php if ( $value['repeat'] ) :
+								foreach ( $option_value as $index => $field_value ) :
+									printf(
+										'<p><input name="%s[]" type="%s" style="%s" value="%s" class="give-input-field %s %s" %s /><span class="give-remove-setting-field" title="%s">-</span></p>',
+										esc_attr( $value['id'] ),
+										esc_attr( $type ),
+										esc_attr( $value['css'] ),
+										esc_attr( $field_value ),
+										! empty( $value['class'] ) ? esc_attr( $value['class'] ) : '',
+										esc_attr( $value['id'] ),
+										esc_html( implode( ' ', $custom_attributes ) ),
+										esc_html( 'Remove setting field', 'give' )
+									);
+								endforeach;
+								printf( '<a href="#" data-id="%s" class="give-repeat-setting-field button-secondary">%s</a>', esc_attr( $value['id'] ), esc_html( $value['repeat_btn_title'] ) );
+							else :
+								printf(
+									'<p><input name="%1$s" id="%1$s" type="%2$s" style="%3$s" value="%4$s" class="give-input-field %5$s" %6$s /></p>',
+									esc_attr( $value['id'] ),
+									esc_attr( $type ),
+									esc_attr( $value['css'] ),
+									esc_attr( $field_value ),
+									! empty( $value['class'] ) ? esc_attr( $value['class'] ) : '',
+									esc_attr( $value['id'] ),
+									esc_html( implode( ' ', $custom_attributes ) )
+								);
+							endif;
+
+							echo wp_kses_post( $description );
+							?>
 						</td>
-						</tr><?php
+						</tr>
+						<?php
 						break;
 
 					// Textarea.
 					case 'textarea':
-
 						$option_value = self::get_option( $option_name, $value['id'], $value['default'] );
 
 						?>
-						<tr valign="top" <?php echo ! empty( $value['wrapper_class'] ) ? 'class="' . $value['wrapper_class'] . '"' : '' ?>>
+						<tr valign="top" <?php echo ! empty( $value['wrapper_class'] ) ? 'class="' . esc_attr( $value['wrapper_class'] ) . '"' : ''; ?>>
 							<th scope="row" class="titledesc">
-								<label
-									for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo self::get_field_title( $value ); ?></label>
+								<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( self::get_field_title( $value ) ); ?></label>
 							</th>
-							<td class="give-forminp give-forminp-<?php echo sanitize_title( $value['type'] ) ?>">
-									<textarea
-										name="<?php echo esc_attr( $value['id'] ); ?>"
-										id="<?php echo esc_attr( $value['id'] ); ?>"
-										style="<?php echo esc_attr( $value['css'] ); ?>"
-										class="<?php echo esc_attr( $value['class'] ); ?>"
-										rows="10"
-										cols="60"
-										<?php echo implode( ' ', $custom_attributes ); ?>
-									><?php echo esc_textarea( $option_value ); ?></textarea>
-								<?php echo $description; ?>
+							<td class="give-forminp give-forminp-<?php echo esc_attr( sanitize_title( $value['type'] ) ); ?>">
+								<?php
+									printf(
+										'<textarea name="%1$s" id="%1$s" style="%2$s" value="%3$s" class="%4$s" rows="10" cols="60" %5$s>%6$s</textarea>',
+										esc_attr( $value['id'] ),
+										esc_attr( $value['css'] ),
+										esc_attr( $field_value ),
+										! empty( $value['class'] ) ? esc_attr( $value['class'] ) : '',
+										esc_textarea( $option_value ),
+										esc_html( implode( ' ', $custom_attributes ) )
+									);
+									echo wp_kses_post( $description );
+								?>
 							</td>
-						</tr><?php
+						</tr>
+						<?php
 						break;
 
 					// Select boxes.
-					case 'select' :
-					case 'multiselect' :
+					case 'select':
+						// No break for 'select'.
+					case 'multiselect':
 						$option_value = self::get_option( $option_name, $value['id'], $value['default'] );
 
 						/**
@@ -517,65 +537,62 @@ if ( ! class_exists( 'Give_Admin_Settings' ) ) :
 						 *
 						 * check success_page setting in general settings.
 						 */
-						if(
-							isset( $value['attributes' ] ) &&
+						if (
+							isset( $value['attributes'] ) &&
 							false !== strpos( $value['class'], 'give-select-chosen' ) &&
-							in_array( 'data-search-type', array_keys( $value['attributes' ] ) ) &&
-							'pages' == $value['attributes' ]['data-search-type'] &&
-							! in_array( $option_value, array_keys( $value['options'] ) )
+							in_array( 'data-search-type', array_keys( $value['attributes'] ), true ) &&
+							'pages' === $value['attributes']['data-search-type'] &&
+							! in_array( $option_value, array_keys( $value['options'] ), true )
 						) {
-							$value['options'][$option_value] = get_the_title( $option_value );
+							$value['options'][ $option_value ] = get_the_title( $option_value );
 						}
 						?>
-						<tr valign="top" <?php echo ! empty( $value['wrapper_class'] ) ? 'class="' . $value['wrapper_class'] . '"' : '' ?>>
+						<tr valign="top" <?php echo ! empty( $value['wrapper_class'] ) ? 'class="' . esc_attr( $value['wrapper_class'] ) . '"' : ''; ?>>
 							<th scope="row" class="titledesc">
-								<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo self::get_field_title( $value ); ?></label>
+								<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( self::get_field_title( $value ) ); ?></label>
 							</th>
-							<td class="give-forminp give-forminp-<?php echo sanitize_title( $value['type'] ) ?>">
+							<td class="give-forminp give-forminp-<?php echo esc_attr( sanitize_title( $value['type'] ) ); ?>">
 								<select
-									name="<?php echo esc_attr( $value['id'] ); ?><?php if ( $value['type'] == 'multiselect' ) echo '[]'; ?>"
+									name="<?php echo esc_attr( $value['id'] ) . ( 'multiselect' === $value['type'] ? '[]' : '' ); ?>"
 									id="<?php echo esc_attr( $value['id'] ); ?>"
 									style="<?php echo esc_attr( $value['css'] ); ?>"
 									class="<?php echo esc_attr( $value['class'] ); ?>"
-									<?php echo implode( ' ', $custom_attributes ); ?>
-									<?php echo ( 'multiselect' == $value['type'] ) ? 'multiple="multiple"' : ''; ?>
+									<?php echo esc_html( implode( ' ', $custom_attributes ) ); ?>
+									<?php echo ( 'multiselect' === $value['type'] ) ? 'multiple="multiple"' : ''; ?>
 								>
 
 									<?php
 									if ( ! empty( $value['options'] ) ) {
 										foreach ( $value['options'] as $key => $val ) {
-											?>
-											<option value="<?php echo esc_attr( $key ); ?>" <?php
-
-											if ( is_array( $option_value ) ) {
-												selected( in_array( $key, $option_value ), true );
-											} else {
-												selected( $option_value, $key );
-											}
-
-											?>><?php echo $val ?></option>
-											<?php
+											printf(
+												'<option value="%s" %s>%s</option',
+												esc_attr( $key ),
+												is_array( $option_value ) ? selected( in_array( $key, $option_value, true ), true ) : selected( $option_value, $key ),
+												esc_html( $val )
+											);
 										}
 									}
 									?>
 
-								</select> <?php echo $description; ?>
+								</select> <?php echo wp_kses_post( $description ); ?>
 							</td>
-						</tr><?php
+						</tr>
+						<?php
 						break;
 
 					// Radio inputs.
-					case 'radio_inline' :
+					case 'radio_inline':
 						$value['class'] = empty( $value['class'] ) ? 'give-radio-inline' : $value['class'] . ' give-radio-inline';
-					case 'radio' :
+						// No break for 'radio_inline'.
+					case 'radio':
 						$option_value = self::get_option( $option_name, $value['id'], $value['default'] );
 						?>
-						<tr valign="top" <?php echo ! empty( $value['wrapper_class'] ) ? 'class="' . $value['wrapper_class'] . '"' : '' ?>>
+						<tr valign="top" <?php echo ! empty( $value['wrapper_class'] ) ? 'class="' . esc_attr( $value['wrapper_class'] ) . '"' : ''; ?>>
 							<th scope="row" class="titledesc">
 								<label
-									for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo self::get_field_title( $value ); ?></label>
+									for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( self::get_field_title( $value ) ); ?></label>
 							</th>
-							<td class="give-forminp give-forminp-<?php echo sanitize_title( $value['type'] ) ?> <?php echo( ! empty( $value['class'] ) ? $value['class'] : '' ); ?>">
+							<td class="give-forminp give-forminp-<?php echo esc_attr( sanitize_title( $value['type'] ) ); ?> <?php echo ! empty( $value['class'] ) ? esc_attr( $value['class'] ) : ''; ?>">
 								<fieldset>
 									<ul>
 										<?php
@@ -584,81 +601,75 @@ if ( ! class_exists( 'Give_Admin_Settings' ) ) :
 											<li>
 												<label><input
 														name="<?php echo esc_attr( $value['id'] ); ?>"
-														value="<?php echo $key; ?>"
+														value="<?php echo esc_attr( $key ); ?>"
 														type="radio"
 														style="<?php echo esc_attr( $value['css'] ); ?>"
-														<?php echo implode( ' ', $custom_attributes ); ?>
+														<?php echo esc_html( implode( ' ', $custom_attributes ) ); ?>
 														<?php checked( $key, $option_value ); ?>
-													/> <?php echo $val ?></label>
+													/> <?php echo esc_html( $val ); ?></label>
 											</li>
 											<?php
 										}
 										?>
-										<?php echo $description; ?>
+										<?php echo wp_kses_post( $description ); ?>
 								</fieldset>
 							</td>
-						</tr><?php
+						</tr>
+						<?php
 						break;
 
 					// Checkbox input.
-					case 'checkbox' :
+					case 'checkbox':
 						$option_value = self::get_option( $option_name, $value['id'], $value['default'] );
 						?>
-						<tr valign="top" <?php echo ! empty( $value['wrapper_class'] ) ? 'class="' . $value['wrapper_class'] . '"' : '' ?>>
+						<tr valign="top" <?php echo ! empty( $value['wrapper_class'] ) ? 'class="' . esc_attr( $value['wrapper_class'] ) . '"' : ''; ?>>
 							<th scope="row" class="titledesc">
 								<label
-									for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo self::get_field_title( $value ); ?></label>
+									for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( self::get_field_title( $value ) ); ?></label>
 							</th>
 							<td class="give-forminp">
 								<input
 									name="<?php echo esc_attr( $value['id'] ); ?>"
 									id="<?php echo esc_attr( $value['id'] ); ?>"
 									type="checkbox"
-									class="<?php echo esc_attr( isset( $value['class'] ) ? $value['class'] : '' ); ?>"
+									class="<?php echo isset( $value['class'] ) ? esc_attr( $value['class'] ) : ''; ?>"
 									value="1"
 									<?php checked( $option_value, 'on' ); ?>
-									<?php echo implode( ' ', $custom_attributes ); ?>
+									<?php echo esc_html( implode( ' ', $custom_attributes ) ); ?>
 								/>
-								<?php echo $description; ?>
+								<?php echo wp_kses_post( $description ); ?>
 							</td>
 						</tr>
 						<?php
 						break;
 
 					// Multi Checkbox input.
-					case 'multicheck' :
+					case 'multicheck':
 						$option_value = self::get_option( $option_name, $value['id'], $value['default'] );
 						$option_value = is_array( $option_value ) ? $option_value : array();
 						?>
-						<tr valign="top" <?php echo ! empty( $value['wrapper_class'] ) ? 'class="' . $value['wrapper_class'] . '"' : '' ?>>
+						<tr valign="top" <?php echo ! empty( $value['wrapper_class'] ) ? 'class="' . esc_attr( $value['wrapper_class'] ) . '"' : ''; ?>>
 							<th scope="row" class="titledesc">
 								<label
-									for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo self::get_field_title( $value ); ?></label>
+									for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( self::get_field_title( $value ) ); ?></label>
 							</th>
-							<td class="give-forminp give-forminp-<?php echo sanitize_title( $value['type'] ) ?> <?php echo( ! empty( $value['class'] ) ? $value['class'] : '' ); ?>">
+							<td class="give-forminp give-forminp-<?php echo esc_html( sanitize_title( $value['type'] ) ); ?> <?php echo ! empty( $value['class'] ) ? esc_attr( $value['class'] ) : ''; ?>">
 								<fieldset>
 									<ul>
 										<?php
 										foreach ( $value['options'] as $key => $val ) {
-											?>
-											<li>
-												<label>
-													<input
-														name="<?php echo esc_attr( $value['id'] ); ?>[]"
-														value="<?php echo $key; ?>"
-														type="checkbox"
-														style="<?php echo esc_attr( $value['css'] ); ?>"
-														<?php echo implode( ' ', $custom_attributes ); ?>
-														<?php if ( in_array( $key, $option_value ) ) {
-															echo 'checked="checked"';
-														} ?>
-													/> <?php echo $val ?>
-												</label>
-											</li>
-											<?php
+											printf(
+												'<li><label><input name="%s[]" value="%s" type ="checkbox" style="%s" %s %s /> %s </label></li>',
+												esc_attr( $value['id'] ),
+												esc_attr( $key ),
+												esc_attr( $value['css'] ),
+												esc_html( implode( ' ', $custom_attributes ) ),
+												( in_array( $key, $option_value, true ) ) ? 'checked="checked"' : '',
+												esc_html( $val )
+											);
 										}
 										?>
-										<?php echo $description; ?>
+										<?php echo wp_kses_post( $description ); ?>
 								</fieldset>
 							</td>
 						</tr>
@@ -666,42 +677,42 @@ if ( ! class_exists( 'Give_Admin_Settings' ) ) :
 						break;
 
 					// File input field.
-					case 'file' :
-					case 'media' :
+					case 'file':
+					case 'media':
 						$option_value = self::get_option( $option_name, $value['id'], $value['default'] );
-						$button_label = sprintf( __( 'Add or Upload %s', 'give' ), ( 'file' === $value['type'] ? __( 'File', 'give' ) : __( 'Image', 'give' ) ) );
+						$button_label = __( 'Add or Upload', 'give' ) . ' ' . ( 'file' === $value['type'] ? __( 'File', 'give' ) : __( 'Image', 'give' ) );
 						$fvalue       = empty( $value['fvalue'] ) ? 'url' : $value['fvalue'];
 
 						$allow_media_preview_tags = array( 'jpg', 'jpeg', 'png', 'gif', 'ico' );
 						$preview_image_src        = $option_value ? ( 'id' === $fvalue ? wp_get_attachment_url( $option_value ) : $option_value ) : '';
 						$preview_image_extension  = $preview_image_src ? pathinfo( $preview_image_src, PATHINFO_EXTENSION ) : '';
-						$is_show_preview          = in_array( $preview_image_extension, $allow_media_preview_tags );
+						$is_show_preview          = in_array( $preview_image_extension, $allow_media_preview_tags, true );
 						?>
-						<tr valign="top" <?php echo ! empty( $value['wrapper_class'] ) ? 'class="' . $value['wrapper_class'] . '"' : '' ?>>
+						<tr valign="top" <?php echo ! empty( $value['wrapper_class'] ) ? 'class="' . esc_attr( $value['wrapper_class'] ) . '"' : ''; ?>>
 							<th scope="row" class="titledesc">
 								<label
-									for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo self::get_field_title( $value ); ?></label>
+									for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( self::get_field_title( $value ) ); ?></label>
 							</th>
 							<td class="give-forminp">
 								<div class="give-field-wrap">
-									<label for="<?php echo $value['id'] ?>">
+									<label for="<?php echo esc_attr( $value['id'] ); ?>">
 										<input
 											name="<?php echo esc_attr( $value['id'] ); ?>"
 											id="<?php echo esc_attr( $value['id'] ); ?>"
 											type="text"
-											class="give-input-field<?php echo esc_attr( isset( $value['class'] ) ? ' ' . $value['class'] : '' ); ?>"
-											value="<?php echo $option_value; ?>"
+											class="give-input-field<?php echo isset( $value['class'] ) ? ' ' . esc_attr( $value['class'] ) : ''; ?>"
+											value="<?php echo esc_attr( $option_value ); ?>"
 											style="<?php echo esc_attr( $value['css'] ); ?>"
-											<?php echo implode( ' ', $custom_attributes ); ?>
+											<?php echo esc_html( implode( ' ', $custom_attributes ) ); ?>
 										/>&nbsp;&nbsp;&nbsp;&nbsp;<input class="give-upload-button button" type="button"
-										                                 data-fvalue="<?php echo $fvalue; ?>"
-										                                 data-field-type="<?php echo $value['type']; ?>"
-										                                 value="<?php echo $button_label; ?>">
-										<?php echo $description ?>
+																		data-fvalue="<?php echo esc_attr( $fvalue ); ?>"
+																		data-field-type="<?php echo esc_attr( $value['type'] ); ?>"
+																		value="<?php echo esc_attr( $button_label ); ?>">
+										<?php echo wp_kses_post( $description ); ?>
 										<div
 											class="give-image-thumb<?php echo ! $option_value || ! $is_show_preview ? ' give-hidden' : ''; ?>">
 											<span class="give-delete-image-thumb dashicons dashicons-no-alt"></span>
-											<img src="<?php echo $preview_image_src; ?>" alt="">
+											<img src="<?php echo esc_url( $preview_image_src ); ?>" alt="">
 										</div>
 									</label>
 								</div>
@@ -711,91 +722,94 @@ if ( ! class_exists( 'Give_Admin_Settings' ) ) :
 						break;
 
 					// WordPress Editor.
-					case 'wysiwyg' :
+					case 'wysiwyg':
 						// Get option value.
 						$option_value = self::get_option( $option_name, $value['id'], $value['default'] );
 
 						// Get editor settings.
 						$editor_settings = ! empty( $value['options'] ) ? $value['options'] : array();
 						?>
-					<tr valign="top" <?php echo ! empty( $value['wrapper_class'] ) ? 'class="' . $value['wrapper_class'] . '"' : '' ?>>
+					<tr valign="top" <?php echo ! empty( $value['wrapper_class'] ) ? 'class="' . esc_attr( $value['wrapper_class'] ) . '"' : ''; ?>>
 						<th scope="row" class="titledesc">
 							<label
-								for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo self::get_field_title( $value ); ?></label>
+								for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( self::get_field_title( $value ) ); ?></label>
 						</th>
 						<td class="give-forminp">
 							<?php wp_editor( $option_value, $value['id'], $editor_settings ); ?>
-							<?php echo $description; ?>
+							<?php echo wp_kses_post( $description ); ?>
 						</td>
-						</tr><?php
+						</tr>
+						<?php
 						break;
 
 					// Custom: Default gateways setting field.
-					case 'default_gateway' :
+					case 'default_gateway':
 						$option_value = self::get_option( $option_name, $value['id'], $value['default'] );
 						?>
-					<tr valign="top" <?php echo ! empty( $value['wrapper_class'] ) ? 'class="' . $value['wrapper_class'] . '"' : '' ?>>
+					<tr valign="top" <?php echo ! empty( $value['wrapper_class'] ) ? 'class="' . esc_attr( $value['wrapper_class'] ) . '"' : ''; ?>>
 						<th scope="row" class="titledesc">
 							<label
-								for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo self::get_field_title( $value ); ?></label>
+								for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( self::get_field_title( $value ) ); ?></label>
 						</th>
 						<td class="give-forminp">
 							<?php give_default_gateway_callback( $value, $option_value ); ?>
-							<?php echo $description; ?>
+							<?php echo wp_kses_post( $description ); ?>
 						</td>
-						</tr><?php
+						</tr>
+						<?php
 						break;
 
 					// Custom: Email preview buttons field.
-					case 'email_preview_buttons' :
+					case 'email_preview_buttons':
 						?>
-					<tr valign="top" <?php echo ! empty( $value['wrapper_class'] ) ? 'class="' . $value['wrapper_class'] . '"' : '' ?>>
+					<tr valign="top" <?php echo ! empty( $value['wrapper_class'] ) ? 'class="' . esc_attr( $value['wrapper_class'] ) . '"' : ''; ?>>
 						<th scope="row" class="titledesc">
 							<label
-								for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo self::get_field_title( $value ); ?></label>
+								for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( self::get_field_title( $value ) ); ?></label>
 						</th>
 						<td class="give-forminp">
 							<?php give_email_preview_buttons_callback( $value ); ?>
-							<?php echo $description; ?>
+							<?php echo wp_kses_post( $description ); ?>
 						</td>
-						</tr><?php
+						</tr>
+						<?php
 						break;
 
 					// Custom: API field.
-					case 'api' :
+					case 'api':
 						give_api_callback();
-						echo $description;
+						echo wp_kses_post( $description );
 						break;
 
 					// Custom: Gateway API key.
-					case 'api_key' :
+					case 'api_key':
 						$option_value = self::get_option( $option_name, $value['id'], $value['default'] );
 						$type         = ! empty( $option_value ) ? 'password' : 'text';
 						?>
-					<tr valign="top" <?php echo ! empty( $value['wrapper_class'] ) ? 'class="' . $value['wrapper_class'] . '"' : '' ?>>
+					<tr valign="top" <?php echo ! empty( $value['wrapper_class'] ) ? 'class="' . esc_attr( $value['wrapper_class'] ) . '"' : ''; ?>>
 						<th scope="row" class="titledesc">
 							<label
-								for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo self::get_field_title( $value ); ?></label>
+								for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( self::get_field_title( $value ) ); ?></label>
 						</th>
-						<td class="give-forminp give-forminp-<?php echo sanitize_title( $value['type'] ) ?>">
+						<td class="give-forminp give-forminp-<?php echo esc_attr( sanitize_title( $value['type'] ) ); ?>">
 							<input
 								name="<?php echo esc_attr( $value['id'] ); ?>"
 								id="<?php echo esc_attr( $value['id'] ); ?>"
 								type="<?php echo esc_attr( $type ); ?>"
 								style="<?php echo esc_attr( $value['css'] ); ?>"
 								value="<?php echo esc_attr( trim( $option_value ) ); ?>"
-								class="give-input-field<?php echo( empty( $value['class'] ) ? '' : ' ' . esc_attr( $value['class'] ) ); ?>"
-								<?php echo implode( ' ', $custom_attributes ); ?>
-							/> <?php echo $description; ?>
+								class="give-input-field<?php echo empty( $value['class'] ) ? '' : ' ' . esc_attr( $value['class'] ); ?>"
+								<?php echo esc_html( implode( ' ', $custom_attributes ) ); ?>
+							/> <?php echo wp_kses_post( $description ); ?>
 						</td>
-						</tr><?php
+						</tr>
+						<?php
 						break;
 
 					// Custom: Log field.
-					case 'logs' :
-
+					case 'logs':
 						// Get current section.
-						$current_section = $_GET['section'] = give_get_current_setting_section();
+						$current_section = give_get_current_setting_section();
 
 						/**
 						 * Fires for each tab of logs view.
@@ -804,30 +818,32 @@ if ( ! class_exists( 'Give_Admin_Settings' ) ) :
 						 */
 						do_action( "give_logs_view_{$current_section}" );
 
-						echo $description;
+						echo wp_kses_post( $description );
 						break;
 
 					// Custom: Data field.
-					case 'data' :
-
+					case 'data':
 						include GIVE_PLUGIN_DIR . 'includes/admin/tools/views/html-admin-page-data.php';
 
-						echo $description;
+						echo wp_kses_post( $description );
 						break;
 
 					// Custom: Give Docs Link field type.
-					case 'give_docs_link' :
+					case 'give_docs_link':
 						?>
-					<tr valign="top" <?php echo ! empty( $value['wrapper_class'] ) ? 'class="' . $value['wrapper_class'] . '"' : '' ?>>
+					<tr valign="top" <?php echo ! empty( $value['wrapper_class'] ) ? 'class="' . esc_attr( $value['wrapper_class'] ) . '"' : ''; ?>>
 						<td class="give-docs-link" colspan="2">
 							<?php
-							echo '<p class="give-docs-link"><a href="' . esc_url( $value['url'] )
-							     . '" target="_blank">'
-							     . sprintf( esc_html__( 'Need Help? See docs on "%s"', 'give' ), $value['title'] )
-							     . '<span class="dashicons dashicons-editor-help"></span></a></p>';
+							printf(
+								'<p class="give-docs-link"><a href="%s" target="_blank">%s<span class="dashicons dashicons-editor-help"></span></a></p>',
+								esc_url( $value['url'] ),
+								/* translators: %s: Title of section. */
+								sprintf( esc_html__( 'Need Help? See docs on "%s"', 'give' ), esc_html( $value['title'] ) )
+							);
 							?>
 						</td>
-						</tr><?php
+						</tr>
+						<?php
 						break;
 
 					// Default: run an action
@@ -927,17 +943,17 @@ if ( ! class_exists( 'Give_Admin_Settings' ) ) :
 
 				// Format the value based on option type.
 				switch ( $option['type'] ) {
-					case 'checkbox' :
+					case 'checkbox':
 						$value = is_null( $raw_value ) ? '' : 'on';
 						break;
-					case 'wysiwyg'  :
-					case 'textarea' :
+					case 'wysiwyg':
+					case 'textarea':
 						$value = wp_kses_post( trim( $raw_value ) );
 						break;
-					case 'multiselect' :
+					case 'multiselect':
 						$value = array_filter( array_map( 'give_clean', (array) $raw_value ) );
 						break;
-					default :
+					default:
 						$value = give_clean( $raw_value );
 						break;
 				}
@@ -989,7 +1005,8 @@ if ( ! class_exists( 'Give_Admin_Settings' ) ) :
 					do_action( "give_save_option_{$name}", $value, $name );
 				}
 			} else {
-				$old_options    = ( $old_options = get_option( $option_name ) ) ? $old_options : array();
+				$old_options    = get_option( $option_name );
+				$old_options    = ! empty( $old_options ) ? $old_options : array();
 				$update_options = array_merge( $old_options, $update_options );
 
 				update_option( $option_name, $update_options );
@@ -1033,14 +1050,14 @@ if ( ! class_exists( 'Give_Admin_Settings' ) ) :
 		public static function is_setting_page( $tab = '', $section = '' ) {
 			$is_setting_page = false;
 
-			// Check fo setting tab.
+			// Check for setting tab.
 			if ( ! empty( $tab ) ) {
-				$is_setting_page = ( $tab === give_get_current_setting_tab() );
+				$is_setting_page = ( give_get_current_setting_tab() === $tab );
 			}
 
-			// Check fo setting section.
+			// Check for setting section.
 			if ( ! empty( $section ) ) {
-				$is_setting_page = ( $section === give_get_current_setting_section() );
+				$is_setting_page = ( give_get_current_setting_section() === $section );
 			}
 
 			return $is_setting_page;
