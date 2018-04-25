@@ -30,6 +30,8 @@ function give_process_batch_export_form() {
 
 	require_once GIVE_PLUGIN_DIR . 'includes/admin/tools/export/class-batch-export.php';
 
+	$class = isset( $_REQUEST['class'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['class'] ) ) : '';
+
 	/**
 	 * Fires before batch export.
 	 *
@@ -37,10 +39,12 @@ function give_process_batch_export_form() {
 	 *
 	 * @param string $class Export class.
 	 */
-	do_action( 'give_batch_export_class_include', $_REQUEST['class'] );
+	do_action( 'give_batch_export_class_include', $class );
 
-	$export = new $_REQUEST['class'];
-	$export->export();
+	if ( class_exists( $class ) ) {
+		$export = new $class;
+		$export->export();
+	}
 
 }
 
