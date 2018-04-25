@@ -72,7 +72,7 @@ class Give_Shortcode_Totals extends Give_Shortcode_Generator {
 			array(
 				'type' => 'container',
 				'html' => sprintf( '<p class="give-totals-shortcode-container-message">%s</p>',
-					 __( 'This shortcode shows the total amount raised towards a custom goal for one or several forms regardless of whether they have goals enabled or not.', 'give' )
+					__( 'This shortcode shows the total amount raised towards a custom goal for one or several forms regardless of whether they have goals enabled or not.', 'give' )
 				),
 			),
 			array(
@@ -80,10 +80,10 @@ class Give_Shortcode_Totals extends Give_Shortcode_Generator {
 				'html' => sprintf( '<p class="strong margin-top">%s</p>', __( 'Shortcode Configuration', 'give' ) ),
 			),
 			array(
-				'type'        => 'textbox',
-				'name'        => 'ids',
-				'label'       => __( 'Donation Form IDs:', 'give' ),
-				'tooltip'     => __( 'Enter the IDs separated by commas for the donation forms you would like to combine within the totals.', 'give' ),
+				'type'    => 'textbox',
+				'name'    => 'ids',
+				'label'   => __( 'Donation Form IDs:', 'give' ),
+				'tooltip' => __( 'Enter the IDs separated by commas for the donation forms you would like to combine within the totals.', 'give' ),
 			),
 			$category_lists,
 			$tag_lists,
