@@ -125,14 +125,13 @@ function give_edit_donor( $args ) {
 		header( 'Content-Type: application/json' );
 		echo wp_json_encode( $output );
 		wp_die();
+		exit;
 	}
 
 	if ( $output['success'] ) {
 		wp_safe_redirect( admin_url( "edit.php?post_type=give_forms&page=give-donors&view=overview&id={$donor_id}&give-message=profile-updated" ) );
+		exit;
 	}
-
-	exit;
-
 }
 
 add_action( 'give_edit-donor', 'give_edit_donor', 10, 1 );
@@ -200,20 +199,14 @@ function give_donor_save_note( $args ) {
 	do_action( 'give_pre_insert_donor_note', $donor_id, $new_note );
 
 	if ( ! empty( $new_note ) && ! empty( $donor->id ) ) {
-
-		ob_start();
-		?>
-		<div class="donor-note-wrapper dashboard-comment-wrap comment-item">
-			<span class="note-content-wrap">
-				<?php echo wp_kses_post( $new_note ); ?>
-			</span>
-		</div>
-		<?php
-		$output = ob_get_contents();
-		ob_end_clean();
-
 		if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
-			echo $output;
+			?>
+			<div class="donor-note-wrapper dashboard-comment-wrap comment-item">
+				<span class="note-content-wrap">
+					<?php echo wp_kses_post( $new_note ); ?>
+				</span>
+			</div>
+			<?php
 			exit;
 		}
 
@@ -522,6 +515,7 @@ function give_add_donor_email( $args ) {
 		header( 'Content-Type: application/json' );
 		echo wp_json_encode( $output );
 		wp_die();
+		exit;
 	}
 
 	return $output;
@@ -547,6 +541,7 @@ function give_remove_donor_email() {
 				'response' => 403,
 			)
 		);
+		exit;
 	}
 
 	// Bail if no ID is passed in.
@@ -566,7 +561,7 @@ function give_remove_donor_email() {
 		return false;
 	}
 
-	$donor = new Give_Donor( $id );
+	$donor = new Give_Donor( $donor_id );
 	if ( $donor->remove_email( $email ) ) {
 		$url        = add_query_arg( 'give-message', 'email-removed', admin_url( 'edit.php?post_type=give_forms&page=give-donors&view=overview&id=' . $donor->id ) );
 		$user       = wp_get_current_user();
@@ -603,6 +598,7 @@ function give_set_donor_primary_email() {
 				'response' => 403,
 			)
 		);
+		exit;
 	}
 
 	// Bail if no ID or invalid ID.
@@ -622,7 +618,7 @@ function give_set_donor_primary_email() {
 		return false;
 	}
 
-	$donor = new Give_Donor( $id );
+	$donor = new Give_Donor( $donor_id );
 
 	if ( $donor->set_primary_email( $email ) ) {
 		$url        = add_query_arg( 'give-message', 'primary-email-updated', admin_url( 'edit.php?post_type=give_forms&page=give-donors&view=overview&id=' . $donor->id ) );
@@ -663,6 +659,7 @@ function give_delete_donor( $args ) {
 				'response' => 403,
 			)
 		);
+		exit;
 	}
 
 	// Verify Nonce for deleting bulk donors.
@@ -674,6 +671,7 @@ function give_delete_donor( $args ) {
 				'response' => 400,
 			)
 		);
+		exit;
 	}
 
 	$give_args            = array();
@@ -730,7 +728,7 @@ function give_delete_donor( $args ) {
 		}
 
 		wp_safe_redirect( add_query_arg( $give_args, admin_url( 'edit.php?post_type=give_forms&page=give-donors' ) ) );
-		give_die();
+		exit;
 	}
 }
 
