@@ -37,7 +37,7 @@ class Give_Shortcode_Donation_Form_Goal extends Give_Shortcode_Generator {
 	public function define_fields() {
 
 		$create_form_link = sprintf(
-		/* translators: %s: create new form URL */
+			/* translators: %s: create new form URL */
 			__( '<a href="%s">Create</a> a new Donation Form.', 'give' ),
 			admin_url( 'post-new.php?post_type=give_forms' )
 		);
@@ -47,8 +47,8 @@ class Give_Shortcode_Donation_Form_Goal extends Give_Shortcode_Generator {
 				'type'        => 'post',
 				'query_args'  => array(
 					'post_type'  => 'give_forms',
-					'meta_key'   => '_give_goal_option',
-					'meta_value' => 'enabled',
+					'meta_key'   => '_give_goal_option', // WPCS: slow query ok.
+					'meta_value' => 'enabled', // WPCS: slow query ok.
 				),
 				'name'        => 'id',
 				'tooltip'     => esc_attr__( 'Select a Donation Form', 'give' ),
