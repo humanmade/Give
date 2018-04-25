@@ -33,12 +33,12 @@ do_action( 'give_pre_featured_thumbnail' );
 		$image_size = give_get_option( 'featured_image_size' );
 		$image      = get_the_post_thumbnail( $post->ID, apply_filters( 'single_give_form_large_thumbnail_size', ( ! empty( $image_size ) ? $image_size : 'large' ) ) );
 
-		echo apply_filters( 'single_give_form_image_html', $image );
+		echo wp_kses_post( apply_filters( 'single_give_form_image_html', $image ) );
 
 	} else {
 
 		//Placeholder Image
-		echo apply_filters( 'single_give_form_image_html', sprintf( '<img src="%s" alt="%s" />', give_get_placeholder_img_src(), esc_attr__( 'Placeholder', 'give' ) ), $post->ID );
+		echo wp_kses_post( apply_filters( 'single_give_form_image_html', sprintf( '<img src="%s" alt="%s" />', give_get_placeholder_img_src(), esc_attr__( 'Placeholder', 'give' ) ), $post->ID ) );
 
 	} ?>
 </div>

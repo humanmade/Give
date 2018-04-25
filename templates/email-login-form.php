@@ -52,12 +52,12 @@ Give()->notices->render_frontend_notices();
 ?>
 	<div class="give-form">
 		<form method="post" id="give-email-access-form">
-			<p><?php echo apply_filters( 'give_email_access_welcome_message', __( 'Please verify your email to access your donation history.', 'give' ) ); ?></p>
+			<p><?php echo wp_kses_post( apply_filters( 'give_email_access_welcome_message', __( 'Please verify your email to access your donation history.', 'give' ) ) ); ?></p>
 
-			<label for="give-email"><?php _e( 'Donation Email:', 'give' ); ?></label>
+			<label for="give-email"><?php esc_html_e( 'Donation Email:', 'give' ); ?></label>
 			<input id="give-email" type="email" name="give_email" value=""
-				   placeholder="<?php _e( 'Email Address', 'give' ); ?>"/>
-			<input type="hidden" name="_wpnonce" value="<?php echo wp_create_nonce( 'give' ); ?>"/>
+				   placeholder="<?php esc_attr_e( 'Email Address', 'give' ); ?>"/>
+			<input type="hidden" name="_wpnonce" value="<?php echo esc_attr( wp_create_nonce( 'give' ) ); ?>"/>
 			<input type="hidden" name="give_action" value="email_access_form_login"/>
 
 			<?php
@@ -76,11 +76,11 @@ Give()->notices->render_frontend_notices();
 				</script>
 
 				<script src='https://www.google.com/recaptcha/api.js'></script>
-				<div class="g-recaptcha" data-sitekey="<?php echo $recaptcha_key; ?>"></div>
+				<div class="g-recaptcha" data-sitekey="<?php echo esc_attr( $recaptcha_key ); ?>"></div>
 				<input type="hidden" name="give_ip" class="give_ip" value=""/>
 			<?php endif; ?>
 
-			<input type="submit" class="give-submit" value="<?php _e( 'Verify Email', 'give' ); ?>"/>
+			<input type="submit" class="give-submit" value="<?php esc_html_e( 'Verify Email', 'give' ); ?>"/>
 		</form>
 	</div>
 <?php
