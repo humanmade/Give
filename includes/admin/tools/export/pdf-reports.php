@@ -28,22 +28,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 function give_generate_pdf( $data ) {
 
 	if ( ! current_user_can( 'view_give_reports' ) ) {
-		wp_die( __( 'You do not have permission to generate PDF sales reports.', 'give' ), __( 'Error', 'give' ), array( 'response' => 403 ) );
+		wp_die( esc_html__( 'You do not have permission to generate PDF sales reports.', 'give' ), esc_html__( 'Error', 'give' ), array( 'response' => 403 ) );
 	}
 
-	if ( ! wp_verify_nonce( $_GET['_wpnonce'], 'give_generate_pdf' ) ) {
-		wp_die( __( 'Nonce verification failed.', 'give' ), __( 'Error', 'give' ), array( 'response' => 403 ) );
+	if ( ! isset( $_GET['_wpnonce'] ) || ! wp_verify_nonce( sanitize_key( $_GET['_wpnonce'] ), 'give_generate_pdf' ) ) {
+		wp_die( esc_html__( 'Nonce verification failed.', 'give' ), esc_html__( 'Error', 'give' ), array( 'response' => 403 ) );
 	}
 
 	if ( ! file_exists( GIVE_PLUGIN_DIR . '/includes/libraries/give-pdf.php' ) ) {
-		wp_die( __( 'Dependency missing.', 'give' ), __( 'Error', 'give' ), array( 'response' => 403 ) );
+		wp_die( esc_html__( 'Dependency missing.', 'give' ), esc_html__( 'Error', 'give' ), array( 'response' => 403 ) );
 	}
 
 	require_once GIVE_PLUGIN_DIR . '/includes/libraries/give-pdf.php';
 
 	$daterange = utf8_decode(
 		sprintf(
-		/* translators: 1: start date 2: end date */
+			/* translators: 1: start date 2: end date */
 			__( '%1$s to %2$s', 'give' ),
 			date_i18n( give_date_format(), mktime( 0, 0, 0, 1, 1, date( 'Y' ) ) ),
 			date_i18n( give_date_format() )
@@ -62,7 +62,7 @@ function give_generate_pdf( $data ) {
 		file_exists( GIVE_PLUGIN_DIR . '/includes/libraries/tcpdf/fonts/CODE2000.TTF' ) &&
 
 		// RIAL exist for backward compatibility.
-		in_array( give_get_currency(), array( 'RIAL', 'RUB', 'IRR' ) )
+		in_array( give_get_currency(), array( 'RIAL', 'RUB', 'IRR' ), true )
 	) {
 		TCPDF_FONTS::addTTFfont( GIVE_PLUGIN_DIR . '/includes/libraries/tcpdf/fonts/CODE2000.TTF', '' );
 		$custom_font = 'CODE2000';
@@ -142,14 +142,14 @@ function give_generate_pdf( $data ) {
 			$categories = array();
 			if ( $categories_enabled ) {
 				$categories = get_the_term_list( $form->ID, 'give_forms_category', '', ', ', '' );
-				$categories = ! is_wp_error( $categories ) ? strip_tags( $categories ) : '';
+				$categories = ! is_wp_error( $categories ) ? wp_strip_all_tags( $categories ) : '';
 			}
 
 			// Display Tags Data only, if user has opted for it.
 			$tags = array();
 			if ( $tags_enabled ) {
 				$tags = get_the_term_list( $form->ID, 'give_forms_tag', '', ', ', '' );
-				$tags = ! is_wp_error( $tags ) ? strip_tags( $tags ) : '';
+				$tags = ! is_wp_error( $tags ) ? wp_strip_all_tags( $tags ) : '';
 			}
 
 			$sales    = give_get_form_sales_stats( $form->ID );
