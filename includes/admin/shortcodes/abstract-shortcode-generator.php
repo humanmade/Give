@@ -179,7 +179,7 @@ abstract class Give_Shortcode_Generator {
 		if ( ! empty( $this->errors ) ) {
 			foreach ( $this->required as $name => $alert ) {
 				// Using WordPress function in place of array_column wp_list_pluck as it support older version as well.
-				if ( false === array_search( $name, give_list_pluck( $generated_fields, 'name' ) ) ) {
+				if ( false === array_search( $name, give_list_pluck( $generated_fields, 'name' ), true ) ) {
 
 					$errors[] = $this->errors[ $name ];
 				}
@@ -236,7 +236,7 @@ abstract class Give_Shortcode_Generator {
 			'tooltip'  => '',
 			'type'     => '',
 			'value'    => '',
-			'classes'  => ''
+			'classes'  => '',
 		), $field );
 
 		if ( $this->validate( $field ) ) {
@@ -245,17 +245,15 @@ abstract class Give_Shortcode_Generator {
 
 			foreach ( $listbox as $key => $value ) {
 
-				if ( $key == 'value' && empty( $value ) ) {
+				if ( 'value' === $key && empty( $value ) ) {
 					$new_listbox[ $key ] = $listbox['name'];
-				} else if ( $value ) {
+				} elseif ( $value ) {
 					$new_listbox[ $key ] = $value;
 				}
 			}
 
 			// do not reindex array!
-			$field['options'] = array(
-				                    '' => ( $field['placeholder'] ? $field['placeholder'] : esc_attr__( '- Select -', 'give' ) ),
-			                    ) + $field['options'];
+			$field['options'] = array( '' => ( isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : esc_attr__( '- Select -', 'give' ) ) ) + $field['options'];
 
 			foreach ( $field['options'] as $value => $text ) {
 				$new_listbox['values'][] = array(
@@ -295,9 +293,12 @@ abstract class Give_Shortcode_Generator {
 		if ( $posts->have_posts() ) {
 			while ( $posts->have_posts() ) {
 				$posts->the_post();
+
 				$post_title = get_the_title();
-				$post_id = get_the_ID();
-				$options[ absint( $post_id ) ] = ( empty( $post_title ) ? sprintf( __( 'Untitled (#%s)', 'give' ), $post_id ) : $post_title );
+				$post_id    = get_the_ID();
+
+				/* translators: %s: Post ID. */
+				$options[ absint( $post_id ) ] = empty( $post_title ) ? sprintf( esc_html__( 'Untitled (#%s)', 'give' ), $post_id ) : $post_title;
 			}
 
 			$field['type']    = 'listbox';
@@ -333,7 +334,7 @@ abstract class Give_Shortcode_Generator {
 			'tooltip'   => '',
 			'type'      => '',
 			'value'     => '',
-			'classes'   => ''
+			'classes'   => '',
 		), $field );
 
 		if ( $this->validate( $field ) ) {
@@ -351,7 +352,7 @@ abstract class Give_Shortcode_Generator {
 	 * @return bool
 	 */
 	function return_textbox_value( $value ) {
-		return $value !== '';
+		return '' !== $value;
 	}
 
 	/**
@@ -368,13 +369,15 @@ abstract class Give_Shortcode_Generator {
 	 */
 	protected function validate( $field ) {
 
-		extract( shortcode_atts(
-				array(
-					'name'     => false,
-					'required' => false,
-					'label'    => '',
-				), $field )
-		);
+		$args = shortcode_atts( array(
+			'name'     => false,
+			'required' => false,
+			'label'    => '',
+		), $field );
+
+		$name     = $args['name'];
+		$required = $args['required'];
+		$label    = $args['label'];
 
 		if ( $name ) {
 
@@ -396,10 +399,10 @@ abstract class Give_Shortcode_Generator {
 
 					$alert = $required['alert'];
 
-				} else if ( ! empty( $label ) ) {
+				} elseif ( ! empty( $label ) ) {
 
 					$alert = sprintf(
-					/* translators: %s: option label */
+						/* translators: %s: option label */
 						esc_html__( 'The "%s" option is required.', 'give' ),
 						str_replace( ':', '', $label )
 					);
