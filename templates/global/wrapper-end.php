@@ -57,6 +57,6 @@ switch ( $template ) {
 		echo '</div>';
 		break;
 	default :
-		echo apply_filters( 'give_default_wrapper_end', '</div></div>' );
+		echo wp_kses_post( apply_filters( 'give_default_wrapper_end', '</div></div>' ) );
 		break;
 }

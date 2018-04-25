@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 do_action( 'give_before_single_form' );
 
 if ( post_password_required() ) {
-	echo get_the_password_form();
+	echo get_the_password_form(); // WPCS: XSS ok.
 	return;
 }
 ?>
@@ -40,7 +40,7 @@ if ( post_password_required() ) {
 		do_action( 'give_before_single_form_summary' );
 		?>
 
-		<div class="<?php echo apply_filters( 'give_forms_single_summary_classes', 'summary entry-summary' ); ?>">
+		<div class="<?php echo esc_attr( apply_filters( 'give_forms_single_summary_classes', 'summary entry-summary' ) ); ?>">
 
 			<?php
 			/**
