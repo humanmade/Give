@@ -46,7 +46,7 @@ function give_get_templates_url() {
  */
 function give_get_template( $template_name, $args = array(), $template_path = '', $default_path = '' ) {
 	if ( ! empty( $args ) && is_array( $args ) ) {
-		extract( $args );
+		extract( $args ); // @codingStandardsIgnoreLine
 	}
 
 	$template_names = "{$template_name}.php";
@@ -280,7 +280,7 @@ function give_get_theme_template_dir_name() {
  * @return void
  */
 function give_version_in_header() {
-	echo '<meta name="generator" content="Give v' . GIVE_VERSION . '" />' . "\n";
+	echo '<meta name="generator" content="Give v' . esc_attr( GIVE_VERSION ) . '" />' . "\n";
 }
 
 add_action( 'wp_head', 'give_version_in_header' );
@@ -428,13 +428,13 @@ if ( ! function_exists( 'give_output_content_wrapper_end' ) ) {
  */
 if ( ! function_exists( 'give_left_sidebar_pre_wrap' ) ) {
 	function give_left_sidebar_pre_wrap() {
-		echo apply_filters( 'give_left_sidebar_pre_wrap', '<div id="give-sidebar-left" class="give-sidebar give-single-form-sidebar-left">' );
+		echo apply_filters( 'give_left_sidebar_pre_wrap', '<div id="give-sidebar-left" class="give-sidebar give-single-form-sidebar-left">' ); // @codingStandardsIgnoreLine
 	}
 }
 
 if ( ! function_exists( 'give_left_sidebar_post_wrap' ) ) {
 	function give_left_sidebar_post_wrap() {
-		echo apply_filters( 'give_left_sidebar_post_wrap', '</div>' );
+		echo apply_filters( 'give_left_sidebar_post_wrap', '</div>' ); // @codingStandardsIgnoreLine
 	}
 }
 

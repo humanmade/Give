@@ -109,7 +109,7 @@ class Give_Tools_Reset_Stats extends Give_Batch_Export {
 					continue;
 				}
 
-				$ids = implode( ',', $ids );
+				$ids = implode( ',', array_map( 'absint', $ids ) );
 
 				switch ( $type ) {
 					case 'customers':
@@ -140,7 +140,7 @@ class Give_Tools_Reset_Stats extends Give_Batch_Export {
 
 			if ( ! empty( $sql ) ) {
 				foreach ( $sql as $query ) {
-					$wpdb->query( $query );
+					$wpdb->query( $query ); // @codingStandardsIgnoreLine
 				}
 			}
 

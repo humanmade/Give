@@ -362,7 +362,7 @@ function give_ajax_store_payment_note() {
 	}
 
 	$note_id = give_insert_payment_note( $payment_id, $note );
-	die( give_get_payment_note_html( $note_id ) );
+	die( give_get_payment_note_html( $note_id ) ); // @codingStandardsIgnoreLine
 }
 
 add_action( 'wp_ajax_give_insert_payment_note', 'give_ajax_store_payment_note' );
@@ -404,11 +404,11 @@ add_action( 'give_delete_payment_note', 'give_trigger_payment_note_deletion' );
  */
 function give_ajax_delete_payment_note() {
 
-	if ( ! current_user_can( 'edit_give_payments', $_POST['payment_id'] ) ) {
+	if ( ! current_user_can( 'edit_give_payments', intval( $_POST['payment_id'] ) ) ) {
 		wp_die( __( 'You do not have permission to edit payments.', 'give' ), __( 'Error', 'give' ), array( 'response' => 403 ) );
 	}
 
-	if ( give_delete_payment_note( $_POST['note_id'], $_POST['payment_id'] ) ) {
+	if ( give_delete_payment_note( intval( $_POST['note_id'] ), intval( $_POST['payment_id'] ) ) ) {
 		die( '1' );
 	} else {
 		die( '-1' );

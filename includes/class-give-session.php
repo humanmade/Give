@@ -141,7 +141,7 @@ class Give_Session {
 	public function init() {
 
 		if ( $this->use_php_sessions ) {
-			$this->session = isset( $_SESSION[ 'give' . $this->prefix ] ) && is_array( $_SESSION[ 'give' . $this->prefix ] ) ? $_SESSION[ 'give' . $this->prefix ] : array();
+			$this->session = isset( $_SESSION[ 'give' . $this->prefix ] ) && is_array( $_SESSION[ 'give' . $this->prefix ] ) ? $_SESSION[ 'give' . $this->prefix ] : array(); // @codingStandardsIgnoreLine
 		} else {
 			$this->session = WP_Session::get_instance();
 		}
@@ -199,7 +199,7 @@ class Give_Session {
 				if ( is_null( $maybe_json ) ) {
 					$is_serialized = is_serialized( $this->session[ $key ] );
 					if ( $is_serialized ) {
-						$value = @unserialize( $this->session[ $key ] );
+						$value = unserialize( $this->session[ $key ] );
 						$this->set( $key, (array) $value );
 						$return = $value;
 					} else {
@@ -240,7 +240,7 @@ class Give_Session {
 		}
 
 		if ( $this->use_php_sessions ) {
-			$_SESSION[ 'give' . $this->prefix ] = $this->session;
+			$_SESSION[ 'give' . $this->prefix ] = $this->session; // @codingStandardsIgnoreLine
 		}
 
 		return $this->session[ $key ];
@@ -258,10 +258,10 @@ class Give_Session {
 	 * @hook
 	 */
 	public function set_session_cookies() {
-		if ( ! headers_sent() ) {
+		if ( ! headers_sent() && $this->use_php_sessions ) {
 			$lifetime = current_time( 'timestamp' ) + $this->set_expiration_time();
-			@setcookie( session_name(), session_id(), $lifetime, COOKIEPATH, COOKIE_DOMAIN, false );
-			@setcookie( session_name() . '_expiration', $lifetime, $lifetime, COOKIEPATH, COOKIE_DOMAIN, false );
+			setcookie( session_name(), session_id(), $lifetime, COOKIEPATH, COOKIE_DOMAIN, false ); // @codingStandardsIgnoreLine
+			setcookie( session_name() . '_expiration', $lifetime, $lifetime, COOKIEPATH, COOKIE_DOMAIN, false ); // @codingStandardsIgnoreLine
 		}
 	}
 
@@ -368,7 +368,7 @@ class Give_Session {
 				'feed/atom',
 				'comments/feed/',
 			) );
-			$uri       = ltrim( $_SERVER['REQUEST_URI'], '/' );
+			$uri       = ltrim( esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ), '/' );
 			$uri       = untrailingslashit( $uri );
 			if ( in_array( $uri, $blacklist ) ) {
 				$start_session = false;
@@ -401,8 +401,8 @@ class Give_Session {
 			return;
 		}
 
-		if ( ! session_id() && ! headers_sent() ) {
-			session_start();
+		if ( ! session_id() && ! headers_sent() ) { // @codingStandardsIgnoreLine
+			session_start(); // @codingStandardsIgnoreLine
 		}
 
 	}
@@ -420,9 +420,9 @@ class Give_Session {
 
 		$expiration = false;
 
-		if ( session_id() && isset( $_COOKIE[ session_name() . '_expiration' ] ) ) {
+		if ( session_id() && isset( $_COOKIE[ session_name() . '_expiration' ] ) ) { // @codingStandardsIgnoreLine
 
-			$expiration = date( 'D, d M Y h:i:s', intval( $_COOKIE[ session_name() . '_expiration' ] ) );
+			$expiration = date( 'D, d M Y h:i:s', intval( $_COOKIE[ session_name() . '_expiration' ] ) ); // @codingStandardsIgnoreLine
 
 		}
 

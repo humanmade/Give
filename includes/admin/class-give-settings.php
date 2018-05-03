@@ -218,7 +218,7 @@ class Give_Plugin_Settings {
 						'type'    => 'select',
 						'options' => give_cmb2_get_post_options( array(
 							'post_type'   => 'page',
-							'numberposts' => 999,
+							'numberposts' => 999, // @codingStandardsIgnoreLine
 						) ),
 					),
 					array(
@@ -228,7 +228,7 @@ class Give_Plugin_Settings {
 						'type'    => 'select',
 						'options' => give_cmb2_get_post_options( array(
 							'post_type'   => 'page',
-							'numberposts' => 999,
+							'numberposts' => 999, // @codingStandardsIgnoreLine
 						) ),
 					),
 					array(
@@ -239,7 +239,7 @@ class Give_Plugin_Settings {
 						'type'    => 'select',
 						'options' => give_cmb2_get_post_options( array(
 							'post_type'   => 'page',
-							'numberposts' => 999,
+							'numberposts' => 999, // @codingStandardsIgnoreLine
 						) ),
 					),
 					array(
@@ -1453,7 +1453,7 @@ function give_license_key_callback( $field_object, $escaped_value, $object_id, $
 	wp_nonce_field( $id . '-nonce', $id . '-nonce' );
 
 	// Print field html.
-	echo "<div class=\"give-license-key\"><label for=\"{$id}\">{$addon_name }</label></div><div class=\"give-license-block\">{$custom_html}</div>";
+	echo "<div class=\"give-license-key\"><label for=\"{$id}\">{$addon_name }</label></div><div class=\"give-license-block\">{$custom_html}</div>"; // @codingStandardsIgnoreLine
 }
 
 

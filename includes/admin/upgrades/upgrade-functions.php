@@ -407,7 +407,7 @@ function give_v132_upgrade_give_payment_customer_id() {
 
 	// UPDATE DB METAKEYS.
 	$sql   = "UPDATE $wpdb->postmeta SET meta_key = '_give_payment_customer_id' WHERE meta_key = '_give_payment_donor_id'";
-	$query = $wpdb->query( $sql );
+	$query = $wpdb->query( $sql ); // @codingStandardsIgnoreLine
 
 	$give_updates->percentage = 100;
 	give_set_upgrade_complete( 'upgrade_give_payment_customer_id' );
@@ -435,7 +435,7 @@ function give_v134_upgrade_give_offline_status() {
 	$where  .= "AND ( m.meta_key = '_give_payment_gateway' AND m.meta_value = 'offline' )";
 
 	$sql            = $select . $join . $where;
-	$found_payments = $wpdb->get_col( $sql );
+	$found_payments = $wpdb->get_col( $sql ); // @codingStandardsIgnoreLine
 
 	foreach ( $found_payments as $payment ) {
 
@@ -638,7 +638,7 @@ function give_v17_upgrade_addon_license_data() {
 		$response = wp_remote_post(
 			$api_url,
 			array(
-				'timeout'   => 15,
+				'timeout'   => 15, // @codingStandardsIgnoreLine
 				'sslverify' => false,
 				'body'      => $api_params,
 			)
@@ -744,7 +744,7 @@ function give_v18_upgrades_core_setting() {
 
 			// Continue: If setting already set.
 			if (
-				array_key_exists( $new_setting_name, $give_settings )
+				array_key_exists( $new_setting_name, $give_settings ) // @codingStandardsIgnoreLine
 				&& in_array( $give_settings[ $new_setting_name ], array( 'enabled', 'disabled' ) )
 			) {
 				continue;
@@ -1986,7 +1986,7 @@ function give_v20_move_metadata_into_new_table_callback() {
 			if ( ! empty( $meta_data ) ) {
 				foreach ( $meta_data as $index => $data ) {
 					// Check for duplicate meta values.
-					if ( $result = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM " . ( 'give_forms' === $post->post_type ? $wpdb->formmeta : $wpdb->paymentmeta ) . " WHERE meta_id=%d", $data['meta_id'] ), ARRAY_A ) ) {
+					if ( $result = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM " . ( 'give_forms' === $post->post_type ? $wpdb->formmeta : $wpdb->paymentmeta ) . " WHERE meta_id=%d", $data['meta_id'] ), ARRAY_A ) ) { // @codingStandardsIgnoreLine
 						continue;
 					}
 
@@ -2168,10 +2168,10 @@ function give_v20_rename_donor_tables_callback() {
 			$wpdb->query( $wpdb->prepare( "SHOW TABLES LIKE %s", $old_table ) ) &&
 			! $wpdb->query( $wpdb->prepare( "SHOW TABLES LIKE %s", $new_table ) )
 		) {
-			$wpdb->query( "ALTER TABLE {$old_table} RENAME TO {$new_table}" );
+			$wpdb->query( "ALTER TABLE {$old_table} RENAME TO {$new_table}" ); // @codingStandardsIgnoreLine
 
 			if ( "{$wpdb->prefix}give_donormeta" === $new_table ) {
-				$wpdb->query( "ALTER TABLE {$new_table} CHANGE COLUMN customer_id donor_id bigint(20)" );
+				$wpdb->query( "ALTER TABLE {$new_table} CHANGE COLUMN customer_id donor_id bigint(20)" ); // @codingStandardsIgnoreLine
 			}
 		}
 	}
@@ -2226,6 +2226,7 @@ function give_v201_upgrades_payment_metadata_callback() {
 	$give_updates = Give_Updates::get_instance();
 	give_v201_create_tables();
 
+	// @codingStandardsIgnoreStart
 	$payments = $wpdb->get_col(
 		"
 			SELECT ID FROM $wpdb->posts
@@ -2234,11 +2235,12 @@ function give_v201_upgrades_payment_metadata_callback() {
   				$wpdb->posts.post_date >= '2018-01-08 00:00:00'
 			)
 			AND $wpdb->posts.post_type = 'give_payment'
-			AND {$wpdb->posts}.post_status IN ('" . implode( "','", array_keys( give_get_payment_statuses() ) ) . "')
+			AND {$wpdb->posts}.post_status IN ('" . implode( "','", array_map( 'sanitize_key', array_keys( give_get_payment_statuses() ) ) ) . "')
 			ORDER BY $wpdb->posts.post_date ASC 
 			LIMIT 100
 			OFFSET " . $give_updates->get_offset( 100 )
 	);
+	// @codingStandardsIgnoreEnd
 
 	if ( ! empty( $payments ) ) {
 		$give_updates->set_percentage( give_get_total_post_type_count( 'give_payment' ), ( $give_updates->step * 100 ) );
@@ -2322,6 +2324,7 @@ function give_v201_move_metadata_into_new_table_callback() {
 	$give_updates = Give_Updates::get_instance();
 	give_v201_create_tables();
 
+	// @codingStandardsIgnoreStart
 	$payments = $wpdb->get_col(
 		"
 			SELECT ID FROM $wpdb->posts 
@@ -2332,6 +2335,7 @@ function give_v201_move_metadata_into_new_table_callback() {
 			LIMIT 100
 			OFFSET " . $give_updates->get_offset( 100 )
 	);
+	// @codingStandardsIgnoreEnd
 
 	if ( ! empty( $payments ) ) {
 		$give_updates->set_percentage( give_get_total_post_type_count( array(
@@ -2354,7 +2358,7 @@ function give_v201_move_metadata_into_new_table_callback() {
 			if ( ! empty( $meta_data ) ) {
 				foreach ( $meta_data as $index => $data ) {
 					// Check for duplicate meta values.
-					if ( $result = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM " . ( 'give_forms' === $post->post_type ? $wpdb->formmeta : $wpdb->paymentmeta ) . " WHERE meta_id=%d", $data['meta_id'] ), ARRAY_A ) ) {
+					if ( $result = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM " . ( 'give_forms' === $post->post_type ? $wpdb->formmeta : $wpdb->paymentmeta ) . " WHERE meta_id=%d", $data['meta_id'] ), ARRAY_A ) ) { // @codingStandardsIgnoreLine
 						continue;
 					}
 
@@ -2404,6 +2408,7 @@ function give_v201_logs_upgrades_callback() {
 	$give_updates = Give_Updates::get_instance();
 	give_v201_create_tables();
 
+	// @codingStandardsIgnoreStart
 	$logs = $wpdb->get_col(
 		"
 			SELECT ID FROM $wpdb->posts 
@@ -2414,6 +2419,7 @@ function give_v201_logs_upgrades_callback() {
 			LIMIT 100
 			OFFSET " . $give_updates->get_offset( 100 )
 	);
+	// @codingStandardsIgnoreEnd
 
 	if ( ! empty( $logs ) ) {
 		$give_updates->set_percentage( give_get_total_post_type_count( 'give_log' ), $give_updates->step * 100 );

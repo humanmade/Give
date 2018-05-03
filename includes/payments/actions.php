@@ -436,7 +436,7 @@ add_filter( 'get_post_metadata', 'give_bc_v20_get_payment_meta', 999, 4 );
  * @param int $payment_id Payment id for which the meta value should be updated.
  */
 function give_payment_save_page_data( $payment_id ) {
-	$page_url = ( ! empty( $_REQUEST['give-current-url'] ) ? esc_url( $_REQUEST['give-current-url'] ) : false );
+	$page_url = ( ! empty( $_REQUEST['give-current-url'] ) ? esc_url_raw( wp_unslash( $_REQUEST['give-current-url'] ) ) : false );
 
 	// Check $page_url is not empty.
 	if ( $page_url ) {

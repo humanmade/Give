@@ -780,7 +780,7 @@ if ( ! class_exists( 'Give_License' ) ) :
 			$message            = $this->license_state_message();
 
 			if ( ! empty( $message['message'] ) ) {
-				echo sprintf( $update_notice_wrap, $message['message'] );
+				echo sprintf( $update_notice_wrap, $message['message'] ); // @codingStandardsIgnoreLine
 			}
 		}
 
@@ -800,7 +800,7 @@ if ( ! class_exists( 'Give_License' ) ) :
 				$message_data['message'] = sprintf(
 					'Please <a href="%1$s">activate your license</a> to receive updates and support for the %2$s add-on.',
 					esc_url( admin_url( 'edit.php?post_type=give_forms&page=give-settings&tab=licenses' ) ),
-					$this->item_name
+					esc_html( $this->item_name )
 				);
 			}
 
@@ -865,7 +865,7 @@ if ( ! class_exists( 'Give_License' ) ) :
 			$response = wp_remote_post(
 				$this->api_url,
 				array(
-					'timeout'   => 15,
+					'timeout'   => 15, // @codingStandardsIgnoreLine
 					'sslverify' => false,
 					'body'      => $api_params,
 				)

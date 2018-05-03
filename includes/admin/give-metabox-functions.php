@@ -268,19 +268,19 @@ function give_text_input( $field ) {
 
 	?>
 	<p class="give-field-wrap <?php echo esc_attr( $field['id'] ); ?>_field <?php echo esc_attr( $field['wrapper_class'] ); ?>">
-	<label for="<?php echo give_get_field_name( $field ); ?>"><?php echo wp_kses_post( $field['name'] ); ?></label>
-	<?php echo $field['before_field']; ?>
+	<label for="<?php echo esc_attr( esgive_get_field_name( $field ) ); ?>"><?php echo wp_kses_post( $field['name'] ); ?></label>
+	<?php echo $field['before_field']; // @codingStandardsIgnoreLine ?>
 	<input
 			type="<?php echo esc_attr( $field['type'] ); ?>"
 			style="<?php echo esc_attr( $field['style'] ); ?>"
-			name="<?php echo give_get_field_name( $field ); ?>"
+			name="<?php echo esc_attr( give_get_field_name( $field ) ); ?>"
 			id="<?php echo esc_attr( $field['id'] ); ?>"
 			value="<?php echo esc_attr( $field['value'] ); ?>"
-		<?php echo give_get_custom_attributes( $field ); ?>
+		<?php echo give_get_custom_attributes( $field ); // @codingStandardsIgnoreLine ?>
 	/>
-	<?php echo $field['after_field']; ?>
+	<?php echo $field['after_field']; // @codingStandardsIgnoreLine ?>
 	<?php
-	echo give_get_field_description( $field );
+	echo give_get_field_description( $field ); // @codingStandardsIgnoreLine
 	echo '</p>';
 }
 
@@ -350,7 +350,7 @@ function give_range_slider( $field ) {
 		: $field_options['options']['maximum'];
 	?>
 	<p class="give-field-wrap <?php echo esc_attr( $field_options['id'] ); ?>_field <?php echo esc_attr( $field_options['wrapper_class'] ); ?>">
-	<label for="<?php echo give_get_field_name( $field_options ); ?>"><?php echo wp_kses_post( $field_options['name'] ); ?></label>
+	<label for="<?php echo esc_attr( give_get_field_name( $field_options ) ); ?>"><?php echo wp_kses_post( $field_options['name'] ); ?></label>
 	<span class="give_range_slider_display">
 		<?php
 
@@ -397,26 +397,26 @@ function give_range_slider( $field ) {
 					break;
 			}
 
-			echo isset( $before_html ) ? $before_html : '';
+			echo isset( $before_html ) ? $before_html : ''; // @codingStandardsIgnoreLine
 			?>
 			<input
-					name="<?php echo give_get_field_name( $field_options ); ?>[<?php echo esc_attr( $amount_range ); ?>]"
+					name="<?php echo esc_attr( give_get_field_name( $field_options ) ); ?>[<?php echo esc_attr( $amount_range ); ?>]"
 					type="text"
-					id="<?php echo $field_options['id']; ?> _give_range_slider_<?php echo $amount_range; ?>"
+					id="<?php echo esc_attr( $field_options['id'] ); ?> _give_range_slider_<?php echo esc_attr( $amount_range ); ?>"
 					data-range_type="<?php echo esc_attr( $amount_range ); ?>"
 					value="<?php echo esc_attr( $field_options['value'][ $amount_range ] ); ?>"
-					placeholder="<?php echo $field_options['options'][ $amount_range ]; ?>"
+					placeholder="<?php echo esc_attr( $field_options['options'][ $amount_range ] ); ?>"
 				<?php echo give_get_custom_attributes( $field_options ); ?>
 			/>
 			<?php
-			echo isset( $after_html ) ? $after_html : '';
+			echo isset( $after_html ) ? $after_html : ''; // @codingStandardsIgnoreLine
 		}
 		?>
 	</span>
 		<span
 				id="<?php echo esc_attr( $field_options['id'] ); ?>"
 				style="display: block; <?php echo esc_attr( $field_options['style'] ); ?>"
-				class="<?php echo apply_filters( "give_range_slider_{$field['id']}_classes", "give-range_slider_field" ); ?>"
+				class="<?php echo esc_attr( apply_filters( "give_range_slider_{$field['id']}_classes", "give-range_slider_field" ) ); ?>"
 		></span>
 		<?php echo give_get_field_description( $field_options ); ?>
 	</p>
@@ -460,7 +460,7 @@ function give_hidden_input( $field ) {
 
 	<input
 			type="hidden"
-			name="<?php echo give_get_field_name( $field ); ?>"
+			name="<?php echo esc_attr( give_get_field_name( $field ) ); ?>"
 			id="<?php echo esc_attr( $field['id'] ); ?>"
 			value="<?php echo esc_attr( $field['value'] ); ?>"
 		<?php echo give_get_custom_attributes( $field ); ?>
@@ -499,10 +499,10 @@ function give_textarea_input( $field ) {
 
 	?>
 	<p class="give-field-wrap <?php echo esc_attr( $field['id'] ); ?>_field <?php echo esc_attr( $field['wrapper_class'] ); ?>">
-	<label for="<?php echo give_get_field_name( $field ); ?>"><?php echo wp_kses_post( $field['name'] ); ?></label>
+	<label for="<?php echo esc_attr( give_get_field_name( $field ) ); ?>"><?php echo wp_kses_post( $field['name'] ); ?></label>
 	<textarea
 			style="<?php echo esc_attr( $field['style'] ); ?>"
-			name="<?php echo give_get_field_name( $field ); ?>"
+			name="<?php echo esc_attr( give_get_field_name( $field ) ); ?>"
 			id="<?php echo esc_attr( $field['id'] ); ?>"
 			rows="10"
 			cols="20"
@@ -548,14 +548,14 @@ function give_wysiwyg( $field ) {
 		'editor_css'    => esc_attr( $field['style'] ),
 		'editor_class'  => $field['attributes']['class'],
 	);
-	$data_wp_editor           = ' data-wp-editor="' . base64_encode( json_encode( array(
+	$data_wp_editor           = ' data-wp-editor="' . esc_attr( base64_encode( json_encode( array(
 			$field['value'],
 			$field['unique_field_id'],
 			$editor_attributes,
-		) ) ) . '"';
+		) ) ) ) . '"';
 	$data_wp_editor           = isset( $field['repeatable_field_id'] ) ? $data_wp_editor : '';
 
-	echo '<div class="give-field-wrap ' . $field['unique_field_id'] . '_field ' . esc_attr( $field['wrapper_class'] ) . '"' . $data_wp_editor . '><label for="' . $field['unique_field_id'] . '">' . wp_kses_post( $field['name'] ) . '</label>';
+	echo '<div class="give-field-wrap ' . esc_attr( $field['unique_field_id'] . '_field ' . $field['wrapper_class'] ) . '"' . $data_wp_editor . '><label for="' . esc_attr( $field['unique_field_id'] ) . '">' . wp_kses_post( $field['name'] ) . '</label>'; // @codingStandardsIgnoreLine
 
 	wp_editor(
 		$field['value'],
@@ -599,11 +599,11 @@ function give_checkbox( $field ) {
 	$field['name']          = isset( $field['name'] ) ? $field['name'] : $field['id'];
 	?>
 	<p class="give-field-wrap <?php echo esc_attr( $field['id'] ); ?>_field <?php echo esc_attr( $field['wrapper_class'] ); ?>">
-	<label for="<?php echo give_get_field_name( $field ); ?>"><?php echo wp_kses_post( $field['name'] ); ?></label>
+	<label for="<?php echo esc_attr( give_get_field_name( $field ) ); ?>"><?php echo wp_kses_post( $field['name'] ); ?></label>
 	<input
 			type="checkbox"
 			style="<?php echo esc_attr( $field['style'] ); ?>"
-			name="<?php echo give_get_field_name( $field ); ?>"
+			name="<?php echo esc_attr( give_get_field_name( $field ) ); ?>"
 			id="<?php echo esc_attr( $field['id'] ); ?>"
 			value="<?php echo esc_attr( $field['cbvalue'] ); ?>"
 		<?php echo checked( $field['value'], $field['cbvalue'], false ); ?>
@@ -646,10 +646,10 @@ function give_select( $field ) {
 	$field['name']          = isset( $field['name'] ) ? $field['name'] : $field['id'];
 	?>
 	<p class="give-field-wrap <?php echo esc_attr( $field['id'] ); ?>_field <?php echo esc_attr( $field['wrapper_class'] ); ?>">
-	<label for="<?php echo give_get_field_name( $field ); ?>"><?php echo wp_kses_post( $field['name'] ); ?></label>
+	<label for="<?php echo esc_attr( give_get_field_name( $field ) ); ?>"><?php echo wp_kses_post( $field['name'] ); ?></label>
 	<select
 	id="<?php echo esc_attr( $field['id'] ); ?>"
-	name="<?php echo give_get_field_name( $field ); ?>"
+	name="<?php echo esc_attr( give_get_field_name( $field ) ); ?>"
 	style="<?php echo esc_attr( $field['style'] ) ?>"
 	<?php echo give_get_custom_attributes( $field ); ?>
 	>
@@ -699,7 +699,7 @@ function give_radio( $field ) {
 	foreach ( $field['options'] as $key => $value ) {
 
 		echo '<li><label><input
-				name="' . give_get_field_name( $field ) . '"
+				name="' . esc_attr( give_get_field_name( $field ) ) . '"
 				value="' . esc_attr( $key ) . '"
 				type="radio"
 				style="' . esc_attr( $field['style'] ) . '"
@@ -745,11 +745,11 @@ function give_colorpicker( $field ) {
 	$field['type']          = 'text';
 	?>
 	<p class="give-field-wrap <?php echo esc_attr( $field['id'] ); ?>_field <?php echo esc_attr( $field['wrapper_class'] ); ?>">
-	<label for="<?php echo give_get_field_name( $field ); ?>"><?php echo wp_kses_post( $field['name'] ); ?></label>
+	<label for="<?php echo esc_attr( give_get_field_name( $field ) ); ?>"><?php echo wp_kses_post( $field['name'] ); ?></label>
 	<input
 			type="<?php echo esc_attr( $field['type'] ); ?>"
 			style="<?php echo esc_attr( $field['style'] ); ?>"
-			name="<?php echo give_get_field_name( $field ); ?>"
+			name="<?php echo esc_attr( give_get_field_name( $field ) ); ?>"
 			id="' . esc_attr( $field['id'] ) . '" value="<?php echo esc_attr( $field['value'] ); ?>"
 		<?php echo give_get_custom_attributes( $field ); ?>
 	/>
@@ -798,19 +798,19 @@ function give_media( $field ) {
 	$is_show_preview          = in_array( $preview_image_extension, $allow_media_preview_tags );
 	?>
 	<fieldset class="give-field-wrap <?php echo esc_attr( $field['id'] ); ?>_field <?php echo esc_attr( $field['wrapper_class'] ); ?>">
-		<label for="<?php echo give_get_field_name( $field ) ?>"><?php echo wp_kses_post( $field['name'] ); ?></label>
+		<label for="<?php echo esc_attr( give_get_field_name( $field ) ) ?>"><?php echo wp_kses_post( $field['name'] ); ?></label>
 		<input
-				name="<?php echo give_get_field_name( $field ); ?>"
+				name="<?php echo esc_attr( give_get_field_name( $field ) ); ?>"
 				id="<?php echo esc_attr( $field['id'] ); ?>"
 				type="text"
-				value="<?php echo $field['value']; ?>"
+				value="<?php echo esc_attr( $field['value'] ); ?>"
 				style="<?php echo esc_attr( $field['style'] ); ?>"
 			<?php echo give_get_custom_attributes( $field ); ?>
-		/>&nbsp;&nbsp;&nbsp;&nbsp;<input class="give-upload-button button" type="button" value="<?php echo $button_label; ?>" data-fvalue="<?php echo $field['fvalue']; ?>" data-field-type="<?php echo $field['type']; ?>">
+		/>&nbsp;&nbsp;&nbsp;&nbsp;<input class="give-upload-button button" type="button" value="<?php echo esc_attr( $button_label ); ?>" data-fvalue="<?php echo esc_attr( $field['fvalue'] ); ?>" data-field-type="<?php echo esc_attr( $field['type'] ); ?>">
 		<?php echo give_get_field_description( $field ); ?>
 		<div class="give-image-thumb<?php echo ! $field['value'] || ! $is_show_preview ? ' give-hidden' : ''; ?>">
 			<span class="give-delete-image-thumb dashicons dashicons-no-alt"></span>
-			<img src="<?php echo $preview_image_src; ?>" alt="">
+			<img src="<?php echo esc_url_raw( $preview_image_src ); ?>" alt="">
 		</div>
 	</fieldset>
 	<?php
@@ -873,7 +873,7 @@ function give_docs_link( $field ) {
 
 	echo '<p class="give-docs-link"><a href="' . esc_url( $field['url'] )
 	     . '" target="_blank">'
-	     . sprintf( esc_html__( 'Need Help? See docs on "%s"', 'give' ), $field['title'] )
+	     . sprintf( esc_html__( 'Need Help? See docs on "%s"', 'give' ), esc_html( $field['title'] ) )
 	     . '<span class="dashicons dashicons-editor-help"></span></a></p>';
 }
 
@@ -893,11 +893,11 @@ function give_email_preview_buttons( $field ) {
 
 	ob_start();
 
-	echo '<p class="give-field-wrap ' . esc_attr( $field['id'] ) . '_field"><label for="' . give_get_field_name( $field ) . '">' . wp_kses_post( $field['name'] ) . '</label>';
+	echo '<p class="give-field-wrap ' . esc_attr( $field['id'] ) . '_field"><label for="' . esc_attr( give_get_field_name( $field ) ) . '">' . wp_kses_post( $field['name'] ) . '</label>';
 
 	echo sprintf(
 		'<a href="%1$s" class="button-secondary" target="_blank">%2$s</a>',
-		wp_nonce_url(
+		esc_url( wp_nonce_url(
 			add_query_arg(
 				array(
 					'give_action' => 'preview_email',
@@ -906,13 +906,13 @@ function give_email_preview_buttons( $field ) {
 				),
 				home_url()
 			), 'give-preview-email'
-		),
-		$field['name']
+		) ),
+		esc_html( $field['name'] )
 	);
 
 	echo sprintf(
 		' <a href="%1$s" aria-label="%2$s" class="button-secondary">%3$s</a>',
-		wp_nonce_url(
+		esc_url( wp_nonce_url(
 			add_query_arg(
 				array(
 					'give_action'  => 'send_preview_email',
@@ -920,7 +920,7 @@ function give_email_preview_buttons( $field ) {
 					'give-message' => 'sent-test-email',
 					'form_id'      => $post->ID,
 				)
-			), 'give-send-preview-email' ),
+			), 'give-send-preview-email' ) ),
 		esc_attr__( 'Send Test Email.', 'give' ),
 		esc_html__( 'Send Test Email', 'give' )
 	);
@@ -931,7 +931,7 @@ function give_email_preview_buttons( $field ) {
 
 	echo '</p>';
 
-	echo ob_get_clean();
+	echo ob_get_clean(); // @codingStandardsIgnoreLine
 }
 
 /**
@@ -1145,14 +1145,14 @@ function _give_metabox_form_data_repeater_fields( $fields ) {
 	$close_tabs      = isset( $fields['options']['close_tabs'] ) ? (int) $fields['options']['close_tabs'] : 0;
 	$wrapper_class   = isset( $fields['wrapper_class'] ) ? $fields['wrapper_class'] : '';
 	?>
-	<div class="give-repeatable-field-section <?php echo esc_attr( $wrapper_class ); ?>" id="<?php echo "{$fields['id']}_field"; ?>"
-	     data-group-numbering="<?php echo $group_numbering; ?>" data-close-tabs="<?php echo $close_tabs; ?>">
+	<div class="give-repeatable-field-section <?php echo esc_attr( $wrapper_class ); ?>" id="<?php echo esc_attr( "{$fields['id']}_field" ); ?>"
+	     data-group-numbering="<?php echo esc_attr( $group_numbering ); ?>" data-close-tabs="<?php echo esc_attr( $close_tabs ); ?>">
 		<?php if ( ! empty( $fields['name'] ) ) : ?>
-			<p class="give-repeater-field-name"><?php echo $fields['name']; ?></p>
+			<p class="give-repeater-field-name"><?php echo esc_html( $fields['name'] ); ?></p>
 		<?php endif; ?>
 
 		<?php if ( ! empty( $fields['description'] ) ) : ?>
-			<p class="give-repeater-field-description"><?php echo $fields['description']; ?></p>
+			<p class="give-repeater-field-description"><?php echo esc_html( $fields['description'] ); ?></p>
 		<?php endif; ?>
 
 		<table class="give-repeatable-fields-section-wrapper" cellspacing="0">
@@ -1172,7 +1172,7 @@ function _give_metabox_form_data_repeater_fields( $fields ) {
 				$add_default_donation_field = true;
 			}
 			?>
-			<tbody class="container"<?php echo " data-rf-row-count=\"{$fields_count}\""; ?>>
+			<tbody class="container"<?php echo " data-rf-row-count=\"{$fields_count}\""; // @codingStandardsIgnoreLine ?>>
 			<!--Repeater field group template-->
 			<tr class="give-template give-row">
 				<td class="give-repeater-field-wrap give-column" colspan="2">
@@ -1181,7 +1181,7 @@ function _give_metabox_form_data_repeater_fields( $fields ) {
 						</button>
 						<span class="give-remove" title="<?php esc_html_e( 'Remove Group', 'give' ); ?>">-</span>
 						<h2>
-							<span data-header-title="<?php echo $header_title; ?>"><?php echo $header_title; ?></span>
+							<span data-header-title="<?php echo esc_attr( $header_title ); ?>"><?php echo esc_html( $header_title ); ?></span>
 						</h2>
 					</div>
 					<div class="give-row-body">
@@ -1217,7 +1217,7 @@ function _give_metabox_form_data_repeater_fields( $fields ) {
 								<span class="give-remove" title="<?php esc_html_e( 'Remove Group', 'give' ); ?>">-
 								</span>
 								<h2>
-									<span data-header-title="<?php echo $header_title; ?>"><?php echo $header_title; ?></span>
+									<span data-header-title="<?php echo esc_attr( $header_title ); ?>"><?php echo esc_html( $header_title ); ?></span>
 								</h2>
 							</div>
 							<div class="give-row-body">
@@ -1252,7 +1252,7 @@ function _give_metabox_form_data_repeater_fields( $fields ) {
 							<span class="give-remove" title="<?php esc_html_e( 'Remove Group', 'give' ); ?>">-
 							</span>
 							<h2>
-								<span data-header-title="<?php echo $header_title; ?>"><?php echo $header_title; ?></span>
+								<span data-header-title="<?php echo esc_attr( $header_title ); ?>"><?php echo esc_html( $header_title ); ?></span>
 							</h2>
 						</div>
 						<div class="give-row-body">
@@ -1292,7 +1292,7 @@ function _give_metabox_form_data_repeater_fields( $fields ) {
 					: esc_html__( 'Add Row', 'give' );
 				?>
 				<td colspan="2" class="give-add-repeater-field-section-row-wrap">
-					<span class="button button-primary give-add-repeater-field-section-row"><?php echo $add_row_btn_title; ?></span>
+					<span class="button button-primary give-add-repeater-field-section-row"><?php echo esc_html( $add_row_btn_title ); ?></span>
 				</td>
 			</tr>
 			</tfoot>
@@ -1322,7 +1322,7 @@ function give_get_current_setting_tab() {
 	$default_current_tab = apply_filters( "give_default_setting_tab_{$current_setting_page}", 'general' );
 
 	// Get current tab.
-	$current_tab = empty( $_GET['tab'] ) ? $default_current_tab : urldecode( $_GET['tab'] );
+	$current_tab = empty( $_GET['tab'] ) ? $default_current_tab : urldecode( sanitize_key( $_GET['tab'] ) );
 
 	// Output.
 	return $current_tab;
@@ -1349,7 +1349,7 @@ function give_get_current_setting_section() {
 	$default_current_section = apply_filters( "give_default_setting_tab_section_{$current_tab}", '' );
 
 	// Get current section.
-	$current_section = empty( $_REQUEST['section'] ) ? $default_current_section : urldecode( $_REQUEST['section'] );
+	$current_section = empty( $_REQUEST['section'] ) ? $default_current_section : urldecode( sanitize_text_field( $_REQUEST['section'] ) );
 
 	// Output.
 	return $current_section;
@@ -1363,7 +1363,7 @@ function give_get_current_setting_section() {
  */
 function give_get_current_setting_page() {
 	// Get current page.
-	$setting_page = ! empty( $_GET['page'] ) ? urldecode( $_GET['page'] ) : '';
+	$setting_page = ! empty( $_GET['page'] ) ? urldecode( sanitize_text_field( $_GET['page'] ) ) : '';
 
 	// Output.
 	return $setting_page;

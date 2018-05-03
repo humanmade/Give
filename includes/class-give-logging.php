@@ -244,7 +244,7 @@ class Give_Logging {
 			global $wpdb;
 
 			// Backward Compatibility.
-			if ( ! $wpdb->get_var( "SELECT ID from {$this->log_db->table_name} ORDER BY id DESC LIMIT 1" ) ) {
+			if ( ! $wpdb->get_var( "SELECT ID from {$this->log_db->table_name} ORDER BY id DESC LIMIT 1" ) ) { // @codingStandardsIgnoreLine
 				$latest_log_id = $wpdb->get_var( "SELECT ID from $wpdb->posts ORDER BY id DESC LIMIT 1" );
 				$latest_log_id = empty( $latest_log_id ) ? 1 : ++ $latest_log_id;
 
@@ -710,6 +710,7 @@ class Give_Logging {
 			return $check;
 		}
 
+		// @codingStandardsIgnoreStart
 		$form_id = $wpdb->get_var(
 			$wpdb->prepare(
 				"
@@ -719,6 +720,7 @@ class Give_Logging {
 				$log_id
 			)
 		);
+		// @codingStandardsIgnoreEnd
 
 		if ( $form_id ) {
 			$this->logmeta_db->delete_meta( $log_id, '_give_log_payment_id' );

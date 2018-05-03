@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function give_process_gateway_select( $data ) {
 	if ( isset( $_POST['gateway_submit'] ) ) {
-		wp_redirect( esc_url( add_query_arg( 'payment-mode', $_POST['payment-mode'] ) ) );
+		wp_redirect( esc_url( add_query_arg( 'payment-mode', sanitize_text_field( $_POST['payment-mode'] ) ) ) );
 		exit;
 	}
 }
@@ -44,7 +44,7 @@ function give_load_ajax_gateway() {
 		 *
 		 * @since 1.7
 		 */
-		do_action( 'give_donation_form', $_POST['give_form_id'] );
+		do_action( 'give_donation_form', absint( $_POST['give_form_id'] ) );
 
 		exit();
 	}

@@ -109,7 +109,7 @@ class Give_Export {
 		$cols = $this->get_csv_cols();
 		$i    = 1;
 		foreach ( $cols as $col_id => $column ) {
-			echo '"' . addslashes( $column ) . '"';
+			echo '"' . addslashes( $column ) . '"'; // @codingStandardsIgnoreLine
 			echo $i == count( $cols ) ? '' : ',';
 			$i ++;
 		}
@@ -160,7 +160,7 @@ class Give_Export {
 			foreach ( $row as $col_id => $column ) {
 				// Make sure the column is valid
 				if ( array_key_exists( $col_id, $cols ) ) {
-					echo '"' . addslashes( $column ) . '"';
+					echo '"' . addslashes( $column ) . '"'; // @codingStandardsIgnoreLine
 					echo $i == count( $cols ) ? '' : ',';
 					$i ++;
 				}

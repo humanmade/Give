@@ -167,12 +167,12 @@ class Give_Payment_History_Table extends WP_List_Table {
 					<label for="start-date"
 					       class="give-start-date-label"><?php _e( 'Start Date', 'give' ); ?></label>
 					<input type="text" id="start-date" name="start-date" class="give_datepicker"
-					       value="<?php echo $start_date; ?>" placeholder="mm/dd/yyyy"/>
+					       value="<?php echo esc_attr( $start_date ); ?>" placeholder="mm/dd/yyyy"/>
 				</div>
 				<div class="give-filter give-filter-half">
 					<label for="end-date" class="give-end-date-label"><?php _e( 'End Date', 'give' ); ?></label>
 					<input type="text" id="end-date" name="end-date" class="give_datepicker"
-					       value="<?php echo $end_date; ?>" placeholder="mm/dd/yyyy"/>
+					       value="<?php echo esc_attr( $end_date ); ?>" placeholder="mm/dd/yyyy"/>
 				</div>
 			</div>
 			<div id="give-payment-form-filter" class="give-filter">
@@ -180,12 +180,12 @@ class Give_Payment_History_Table extends WP_List_Table {
 				       class="give-donation-forms-filter-label"><?php _e( 'Form', 'give' ); ?></label>
 				<?php
 				// Filter Donations by Donation Forms.
-				echo Give()->html->forms_dropdown(
+				echo Give()->html->forms_dropdown( // @codingStandardsIgnoreLine
 					array(
 						'name'     => 'form_id',
 						'id'       => 'give-donation-forms-filter',
 						'class'    => 'give-donation-forms-filter',
-						'selected' => $form_id, // Make sure to have $form_id set to 0, if there is no selection.
+						'selected' => $form_id, // Make sure to have $form_id set to 0, if there is no selection. @codingStandardsIgnoreLine
 						'chosen'   => true,
 						'number'   => - 1,
 					)
@@ -217,7 +217,7 @@ class Give_Payment_History_Table extends WP_List_Table {
 				// Clear active filters button.
 				if ( ! empty( $start_date ) || ! empty( $end_date ) || ! empty( $donor ) || ! empty( $search ) || ! empty( $status ) || ! empty( $form_id ) ) :
 					?>
-					<a href="<?php echo admin_url( 'edit.php?post_type=give_forms&page=give-payment-history' ); ?>"
+					<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=give_forms&page=give-payment-history' ) ); ?>"
 					   class="button give-clear-filters-button"><?php _e( 'Clear Filters', 'give' ); ?></a>
 				<?php endif; ?>
 			</div>
@@ -245,10 +245,10 @@ class Give_Payment_History_Table extends WP_List_Table {
 		$input_id = $input_id . '-search-input';
 
 		if ( ! empty( $_REQUEST['orderby'] ) ) {
-			echo '<input type="hidden" name="orderby" value="' . esc_attr( $_REQUEST['orderby'] ) . '" />';
+			echo '<input type="hidden" name="orderby" value="' . esc_attr( sanitize_key( $_REQUEST['orderby'] ) ) . '" />';
 		}
 		if ( ! empty( $_REQUEST['order'] ) ) {
-			echo '<input type="hidden" name="order" value="' . esc_attr( $_REQUEST['order'] ) . '" />';
+			echo '<input type="hidden" name="order" value="' . esc_attr( sanitize_key( $_REQUEST['order'] ) ) . '" />';
 		}
 		?>
 		<div class="give-filter give-filter-search" role="search">
@@ -262,8 +262,8 @@ class Give_Payment_History_Table extends WP_List_Table {
 			 */
 			do_action( 'give_payment_history_search' );
 			?>
-			<label class="screen-reader-text" for="<?php echo $input_id ?>"><?php echo $text; ?>:</label>
-			<input type="search" id="<?php echo $input_id ?>" name="s" value="<?php _admin_search_query(); ?>"/>
+			<label class="screen-reader-text" for="<?php echo esc_attr( $input_id ) ?>"><?php echo esc_html( $text ); ?>:</label>
+			<input type="search" id="<?php echo esc_attr( $input_id ) ?>" name="s" value="<?php _admin_search_query(); ?>"/>
 			<?php submit_button( $text, 'button', false, false, array(
 				'ID' => 'search-submit',
 			) ); ?><br/>
@@ -281,7 +281,7 @@ class Give_Payment_History_Table extends WP_List_Table {
 	 */
 	public function get_views() {
 
-		$current = isset( $_GET['status'] ) ? $_GET['status'] : '';
+		$current = isset( $_GET['status'] ) ? sanitize_key( $_GET['status'] ) : '';
 		$views   = array();
 		$tabs    = array(
 			'all'         => array(
@@ -573,7 +573,7 @@ class Give_Payment_History_Table extends WP_List_Table {
 		$email   = give_get_payment_user_email( $payment->ID );
 
 		// Add search term string back to base URL.
-		$search_terms = ( isset( $_GET['s'] ) ? trim( $_GET['s'] ) : '' );
+		$search_terms = ( isset( $_GET['s'] ) ? trim( sanitize_text_field( wp_unslash( $_GET['s'] ) ) ) : '' );
 		if ( ! empty( $search_terms ) ) {
 			$this->base_url = add_query_arg( 's', $search_terms, $this->base_url );
 		}
@@ -752,12 +752,14 @@ class Give_Payment_History_Table extends WP_List_Table {
 	 * @return void
 	 */
 	public function process_bulk_action() {
-		$ids    = isset( $_GET['payment'] ) ? $_GET['payment'] : false;
+		$ids    = isset( $_GET['payment'] ) ? $_GET['payment'] : false; // @codingStandardsIgnoreLine
 		$action = $this->current_action();
 
 		if ( ! is_array( $ids ) ) {
 			$ids = array( $ids );
 		}
+
+		$ids = array_map( 'absint', $ids );
 
 		if ( empty( $action ) ) {
 			return;
@@ -843,13 +845,13 @@ class Give_Payment_History_Table extends WP_List_Table {
 		$args = array();
 
 		if ( isset( $_GET['user'] ) ) {
-			$args['user'] = urldecode( $_GET['user'] );
+			$args['user'] = sanitize_text_field( urldecode( $_GET['user'] ) ); // @codingStandardsIgnoreLine
 		} elseif ( isset( $_GET['donor'] ) ) {
 			$args['donor'] = absint( $_GET['donor'] );
 		} elseif ( isset( $_GET['s'] ) ) {
-			$is_user = strpos( $_GET['s'], strtolower( 'user:' ) ) !== false;
+			$is_user = strpos( sanitize_text_field( $_GET['s'] ), strtolower( 'user:' ) ) !== false;
 			if ( $is_user ) {
-				$args['user'] = absint( trim( str_replace( 'user:', '', strtolower( $_GET['s'] ) ) ) );
+				$args['user'] = absint( trim( str_replace( 'user:', '', strtolower( sanitize_text_field( $_GET['s'] ) ) ) ) );
 				unset( $args['s'] );
 			} else {
 				$args['s'] = sanitize_text_field( $_GET['s'] );
@@ -857,11 +859,11 @@ class Give_Payment_History_Table extends WP_List_Table {
 		}
 
 		if ( ! empty( $_GET['start-date'] ) ) {
-			$args['start-date'] = urldecode( $_GET['start-date'] );
+			$args['start-date'] = sanitize_text_field( urldecode( $_GET['start-date'] ) ); // @codingStandardsIgnoreLine
 		}
 
 		if ( ! empty( $_GET['end-date'] ) ) {
-			$args['end-date'] = urldecode( $_GET['end-date'] );
+			$args['end-date'] = sanitize_text_field( urldecode( $_GET['end-date'] ) ); // @codingStandardsIgnoreLine
 		}
 
 		$args['form_id'] = ! empty( $_GET['form_id'] ) ? absint( $_GET['form_id'] ) : null;
@@ -896,15 +898,15 @@ class Give_Payment_History_Table extends WP_List_Table {
 	public function payments_data() {
 
 		$per_page   = $this->per_page;
-		$orderby    = isset( $_GET['orderby'] ) ? urldecode( $_GET['orderby'] ) : 'ID';
-		$order      = isset( $_GET['order'] ) ? $_GET['order'] : 'DESC';
-		$user       = isset( $_GET['user'] ) ? $_GET['user'] : null;
-		$donor      = isset( $_GET['donor'] ) ? $_GET['donor'] : null;
-		$status     = isset( $_GET['status'] ) ? $_GET['status'] : give_get_payment_status_keys();
-		$meta_key   = isset( $_GET['meta_key'] ) ? $_GET['meta_key'] : null;
-		$year       = isset( $_GET['year'] ) ? $_GET['year'] : null;
-		$month      = isset( $_GET['m'] ) ? $_GET['m'] : null;
-		$day        = isset( $_GET['day'] ) ? $_GET['day'] : null;
+		$orderby    = isset( $_GET['orderby'] ) ? urldecode( sanitize_key( $_GET['orderby'] ) ) : 'ID';
+		$order      = isset( $_GET['order'] ) ? sanitize_key( $_GET['order'] ) : 'DESC';
+		$user       = isset( $_GET['user'] ) ? sanitize_text_field( $_GET['user'] ) : null;
+		$donor      = isset( $_GET['donor'] ) ? absint( $_GET['donor'] ) : null;
+		$status     = isset( $_GET['status'] ) ? sanitize_key( $_GET['status'] ) : give_get_payment_status_keys();
+		$meta_key   = isset( $_GET['meta_key'] ) ? sanitize_key( $_GET['meta_key'] ) : null;
+		$year       = isset( $_GET['year'] ) ? absint( $_GET['year'] ) : null;
+		$month      = isset( $_GET['m'] ) ? absint( $_GET['m'] ) : null;
+		$day        = isset( $_GET['day'] ) ? absint( $_GET['day'] ) : null;
 		$search     = isset( $_GET['s'] ) ? sanitize_text_field( $_GET['s'] ) : null;
 		$start_date = isset( $_GET['start-date'] ) ? sanitize_text_field( $_GET['start-date'] ) : null;
 		$end_date   = isset( $_GET['end-date'] ) ? sanitize_text_field( $_GET['end-date'] ) : $start_date;
@@ -914,7 +916,7 @@ class Give_Payment_History_Table extends WP_List_Table {
 		$args = array(
 			'output'     => 'payments',
 			'number'     => $per_page,
-			'page'       => isset( $_GET['paged'] ) ? $_GET['paged'] : null,
+			'page'       => isset( $_GET['paged'] ) ? absint( $_GET['paged'] ) : null,
 			'orderby'    => $orderby,
 			'order'      => $order,
 			'user'       => $user,
@@ -970,7 +972,7 @@ class Give_Payment_History_Table extends WP_List_Table {
 		$hidden   = array(); // No hidden columns.
 		$sortable = $this->get_sortable_columns();
 		$data     = $this->payments_data();
-		$status   = isset( $_GET['status'] ) ? $_GET['status'] : 'any';
+		$status   = isset( $_GET['status'] ) ? sanitize_key( $_GET['status'] ) : 'any';
 
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 

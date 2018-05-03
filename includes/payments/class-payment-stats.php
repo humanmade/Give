@@ -150,7 +150,7 @@ class Give_Payment_Stats extends Give_Stats {
 					WHERE meta_key='_give_payment_total'
 					AND payment_id IN ('". implode( '\',\'', $payments ) ."')";
 
-				$payments = $wpdb->get_results($query, ARRAY_A);
+				$payments = $wpdb->get_results($query, ARRAY_A); // @codingStandardsIgnoreLine
 
 				if( ! empty( $payments ) ) {
 					foreach ( $payments as $payment ) {
@@ -277,12 +277,14 @@ class Give_Payment_Stats extends Give_Stats {
 
 		$meta_table = __give_v20_bc_table_details( 'form' );
 
+		// @codingStandardsIgnoreStart
 		$give_forms = $wpdb->get_results( $wpdb->prepare(
 			"SELECT {$meta_table['column']['id']} as form_id, max(meta_value) as sales
 				FROM {$meta_table['name']} WHERE meta_key='_give_form_sales' AND meta_value > 0
 				GROUP BY meta_value+0
 				DESC LIMIT %d;", $number
 		) );
+		// @codingStandardsIgnoreEnd
 
 		return $give_forms;
 	}

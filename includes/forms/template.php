@@ -503,7 +503,7 @@ function give_output_levels( $form_id ) {
 
 				$output .= '<li>';
 				$output .= '<button type="button" data-price-id="' . esc_attr( $price['_give_id']['level_id'] ) . '" class=" ' . esc_attr( $level_classes ) . '" value="' . esc_attr( give_format_amount( $price['_give_amount'], array( 'sanitize' => false ) ) ) . '">';
-				$output .= $level_text;
+				$output .= esc_html( $level_text );
 				$output .= '</button>';
 				$output .= '</li>';
 
@@ -531,8 +531,8 @@ function give_output_levels( $form_id ) {
 				$level_classes = apply_filters( 'give_form_level_classes', 'give-radio-input give-radio-input-level give-radio-level-' . $price['_give_id']['level_id'] . ( ( isset( $price['_give_default'] ) && $price['_give_default'] === 'default' ) ? ' give-default-level' : '' ), $form_id, $price );
 
 				$output .= '<li>';
-				$output .= '<input type="radio" data-price-id="' . $price['_give_id']['level_id'] . '" class="' . $level_classes . '" name="give-radio-donation-level" id="give-radio-level-' . $price['_give_id']['level_id'] . '" ' . ( ( isset( $price['_give_default'] ) && $price['_give_default'] === 'default' ) ? 'checked="checked"' : '' ) . ' value="' . give_format_amount( $price['_give_amount'], array( 'sanitize' => false ) ) . '">';
-				$output .= '<label for="give-radio-level-' . $price['_give_id']['level_id'] . '">' . $level_text . '</label>';
+				$output .= '<input type="radio" data-price-id="' . esc_attr( $price['_give_id']['level_id'] ) . '" class="' . esc_attr( $level_classes ) . '" name="give-radio-donation-level" id="give-radio-level-' . esc_attr( $price['_give_id']['level_id'] ) . '" ' . ( ( isset( $price['_give_default'] ) && $price['_give_default'] === 'default' ) ? 'checked="checked"' : '' ) . ' value="' . esc_attr( give_format_amount( $price['_give_amount'], array( 'sanitize' => false ) ) ) . '">';
+				$output .= '<label for="give-radio-level-' . esc_attr( $price['_give_id']['level_id'] ) . '">' . wp_kses_post( $level_text ) . '</label>';
 				$output .= '</li>';
 
 			}
@@ -541,7 +541,7 @@ function give_output_levels( $form_id ) {
 			if ( give_is_setting_enabled( $custom_amount ) && ! empty( $custom_amount_text ) ) {
 				$output .= '<li>';
 				$output .= '<input type="radio" data-price-id="custom" class="give-radio-input give-radio-input-level give-radio-level-custom" name="give-radio-donation-level" id="give-radio-level-custom" value="custom">';
-				$output .= '<label for="give-radio-level-custom">' . $custom_amount_text . '</label>';
+				$output .= '<label for="give-radio-level-custom">' . wp_kses_post( $custom_amount_text ) . '</label>';
 				$output .= '</li>';
 			}
 
@@ -567,7 +567,7 @@ function give_output_levels( $form_id ) {
 
 			//Custom Amount.
 			if ( give_is_setting_enabled( $custom_amount ) && ! empty( $custom_amount_text ) ) {
-				$output .= '<option data-price-id="custom" class="give-donation-level-custom" value="custom">' . $custom_amount_text . '</option>';
+				$output .= '<option data-price-id="custom" class="give-donation-level-custom" value="custom">' . wp_kses_post( $custom_amount_text ) . '</option>';
 			}
 
 			$output .= '</select>';
@@ -575,7 +575,7 @@ function give_output_levels( $form_id ) {
 			break;
 	}
 
-	echo apply_filters( 'give_form_level_output', $output, $form_id );
+	echo apply_filters( 'give_form_level_output', $output, $form_id ); // @codingStandardsIgnoreLine
 }
 
 /**
@@ -864,7 +864,7 @@ function give_get_cc_form( $form_id ) {
 	 */
 	do_action( 'give_after_cc_fields', $form_id );
 
-	echo ob_get_clean();
+	echo ob_get_clean(); // @codingStandardsIgnoreLine
 }
 
 add_action( 'give_cc_form', 'give_get_cc_form' );
@@ -1080,7 +1080,7 @@ function give_default_cc_address_fields( $form_id ) {
 		?>
 	</fieldset>
 	<?php
-	echo ob_get_clean();
+	echo ob_get_clean(); // @codingStandardsIgnoreLine
 }
 
 add_action( 'give_after_cc_fields', 'give_default_cc_address_fields' );
@@ -1206,7 +1206,7 @@ function give_get_register_fields( $form_id ) {
 
 	</fieldset>
 	<?php
-	echo ob_get_clean();
+	echo ob_get_clean(); // @codingStandardsIgnoreLine
 }
 
 add_action( 'give_donation_form_register_fields', 'give_get_register_fields' );
@@ -1316,7 +1316,7 @@ function give_get_login_fields( $form_id ) {
 		?>
 	</fieldset><!--end #give-login-fields-->
 	<?php
-	echo ob_get_clean();
+	echo ob_get_clean(); // @codingStandardsIgnoreLine
 }
 
 add_action( 'give_donation_form_login_fields', 'give_get_login_fields', 10, 1 );
@@ -1392,10 +1392,10 @@ function give_payment_mode_select( $form_id ) {
 					//Determine the default gateway.
 					$checked = checked( $gateway_id, $selected_gateway, false );
 					$checked_class = $checked ? ' class="give-gateway-option-selected"' : ''; ?>
-					<li<?php echo $checked_class ?>>
+					<li<?php echo $checked_class // @codingStandardsIgnoreLine ?>>
 						<input type="radio" name="payment-mode" class="give-gateway"
 							   id="give-gateway-<?php echo esc_attr( $gateway_id . '-' . $form_id ); ?>"
-							   value="<?php echo esc_attr( $gateway_id ); ?>"<?php echo $checked; ?>>
+							   value="<?php echo esc_attr( $gateway_id ); ?>"<?php echo $checked; // @codingStandardsIgnoreLine ?>>
 
 						<?php
 						$label = $gateway['checkout_label'];
@@ -1621,7 +1621,7 @@ function give_checkout_submit( $form_id ) {
 
 		give_checkout_hidden_fields( $form_id );
 
-		echo give_get_donation_form_submit_button( $form_id );
+		echo give_get_donation_form_submit_button( $form_id ); // @codingStandardsIgnoreLine
 
 		/**
 		 * Fire after donation form submit.
@@ -1681,7 +1681,7 @@ function give_show_goal_progress( $form_id, $args = array() ) {
 	 *
 	 * @since 2.0
 	 */
-	echo apply_filters( 'give_goal_output', ob_get_clean(), $form_id, $args );
+	echo apply_filters( 'give_goal_output', ob_get_clean(), $form_id, $args ); // @codingStandardsIgnoreLine
 
 	return true;
 }
@@ -1708,7 +1708,7 @@ function give_show_goal_totals_progress( $total, $total_goal ) {
 	ob_start();
 	give_get_template( 'shortcode-totals-progress', array( 'total' => $total, 'total_goal' => $total_goal ) );
 
-	echo apply_filters( 'give_total_progress_output', ob_get_clean() );
+	echo apply_filters( 'give_total_progress_output', ob_get_clean() ); // @codingStandardsIgnoreLine
 
 	return true;
 }
@@ -2079,7 +2079,7 @@ function give_is_form_grid_page_hidden_field( $id, $args, $form ) {
 function give_redirect_and_popup_form( $redirect, $args ) {
 
 	// Check the page has Form Grid.
-	$is_form_grid = isset( $_POST['is-form-grid'] ) ? give_clean( $_POST['is-form-grid'] ) : '';
+	$is_form_grid = isset( $_POST['is-form-grid'] ) ? give_clean( $_POST['is-form-grid'] ) : ''; // @codingStandardsIgnoreLine
 
 	if ( 'true' === $is_form_grid ) {
 

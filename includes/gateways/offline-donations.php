@@ -56,7 +56,7 @@ function give_offline_payment_cc_form( $form_id ) {
 	do_action( 'give_before_offline_info_fields', $form_id );
 	?>
     <fieldset id="give_offline_payment_info">
-		<?php echo stripslashes( $offline_instructions ); ?>
+		<?php echo stripslashes( $offline_instructions ); // @codingStandardsIgnoreLine ?>
     </fieldset>
 	<?php
 	/**
@@ -68,7 +68,7 @@ function give_offline_payment_cc_form( $form_id ) {
 	 */
 	do_action( 'give_after_offline_info_fields', $form_id );
 
-	echo ob_get_clean();
+	echo ob_get_clean(); // @codingStandardsIgnoreLine
 }
 
 add_action( 'give_offline_cc_form', 'give_offline_payment_cc_form' );
@@ -473,7 +473,7 @@ function give_get_offline_payment_instruction( $form_id, $wpautop = false ) {
 function give_filter_offline_gateway( $gateway_list, $form_id ) {
 	if (
 		// Show offline payment gateway if enable for new donation form.
-		( false === strpos( $_SERVER['REQUEST_URI'], '/wp-admin/post-new.php?post_type=give_forms' ) )
+		( false === strpos( $_SERVER['REQUEST_URI'], '/wp-admin/post-new.php?post_type=give_forms' ) ) // @codingStandardsIgnoreLine
 		&& $form_id
 		&& ! give_is_setting_enabled( give_get_meta( $form_id, '_give_customize_offline_donations', true ), array( 'enabled', 'global' ) )
 	) {

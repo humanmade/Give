@@ -61,7 +61,7 @@ function give_get_users_donations( $user = 0, $number = 20, $pagination = false,
 	if ( $pagination ) {
 		$args['page'] = $paged;
 	} else {
-		$args['nopaging'] = true;
+		$args['nopaging'] = true; // @codingStandardsIgnoreLine
 	}
 
 	$by_user_id = is_numeric( $user ) ? true : false;
@@ -626,7 +626,7 @@ function give_is_additional_email( $email ) {
 
 	$meta_table = Give()->donor_meta->table_name;
 	$meta_type  = Give()->donor_meta->meta_type;
-	$donor_id   = $wpdb->get_var( $wpdb->prepare( "SELECT {$meta_type}_id FROM {$meta_table} WHERE meta_key = 'additional_email' AND meta_value = %s LIMIT 1", $email ) );
+	$donor_id   = $wpdb->get_var( $wpdb->prepare( "SELECT {$meta_type}_id FROM {$meta_table} WHERE meta_key = 'additional_email' AND meta_value = %s LIMIT 1", $email ) ); // @codingStandardsIgnoreLine
 
 	if ( empty( $donor_id ) ) {
 		return false;

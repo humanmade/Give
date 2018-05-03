@@ -239,21 +239,21 @@ class Give_Notices {
 			$css_class = 'give-notice notice ' . ( empty( $notice['dismissible'] ) ? 'non' : 'is' ) . "-dismissible {$notice['type']} notice-{$notice['type']}";
 			$output    .= sprintf(
 				'<div id="%1$s" class="%2$s" data-dismissible="%3$s" data-dismissible-type="%4$s" data-dismiss-interval="%5$s" data-notice-id="%6$s" data-security="%7$s" data-dismiss-interval-time="%8$s" style="display: none">' . " \n",
-				$css_id,
-				$css_class,
+				esc_attr( $css_id ),
+				esc_attr( $css_class ),
 				give_clean( $notice['dismissible'] ),
-				$notice['dismissible_type'],
-				$notice['dismiss_interval'],
-				$notice['id'],
-				empty( $notice['dismissible_type'] ) ? '' : wp_create_nonce( "give_edit_{$notice_id}_notice" ),
-				$notice['dismiss_interval_time']
+				esc_attr( $notice['dismissible_type'] ),
+				esc_attr( $notice['dismiss_interval'] ),
+				esc_attr( $notice['id'] ),
+				esc_attr( empty( $notice['dismissible_type'] ) ? '' : wp_create_nonce( "give_edit_{$notice_id}_notice" ) ),
+				esc_attr( $notice['dismiss_interval_time'] )
 			);
 
 			$output .= ( 0 === strpos( $notice['description'], '<div' ) || 0 === strpos( $notice['description'], '<p' ) ? $notice['description'] : "<p>{$notice['description']}</p>" );
 			$output .= "</div> \n";
 		}
 
-		echo $output;
+		echo $output; // @codingStandardsIgnoreLine
 
 		$this->print_js();
 	}
@@ -353,7 +353,7 @@ class Give_Notices {
 						}
 
 						jQuery.post(
-							'<?php echo admin_url(); ?>admin-ajax.php',
+							'<?php echo esc_url( admin_url() ); ?>admin-ajax.php',
 							data,
 							function (response) {
 
@@ -545,7 +545,7 @@ class Give_Notices {
 		// Note: we will remove give_errors class in future.
 		$classes = apply_filters( 'give_error_class', array( 'give_notices', 'give_errors' ) );
 
-		echo sprintf( '<div class="%s">', implode( ' ', $classes ) );
+		echo sprintf( '<div class="%s">', esc_attr( implode( ' ', $classes ) ) );
 
 		// Loop error codes and display errors.
 		foreach ( $errors as $error_id => $error ) {
@@ -570,11 +570,11 @@ class Give_Notices {
 				'<div class="give_error give_notice" id="give_error_%1$s" data-dismissible="%2$s" data-dismiss-interval="%3$d">
 						<p><strong>%4$s</strong>: %5$s</p>
 					</div>',
-				$error_id,
-				give_clean( $notice_args['dismissible'] ),
+				esc_attr( $error_id ),
+				esc_attr( give_clean( $notice_args['dismissible'] ) ),
 				absint( $notice_args['dismiss_interval'] ),
 				esc_html__( 'Error', 'give' ),
-				$error['message']
+				$error['message'] // @codingStandardsIgnoreLine
 			);
 		}
 
@@ -639,7 +639,7 @@ class Give_Notices {
 						</p>
 						%6$s
 					</div>',
-			$notice_type,
+			esc_attr( $notice_type ),
 			give_clean( $notice_args['dismissible'] ),
 			absint( $notice_args['dismiss_interval'] ),
 			give_clean( $notice_args['dismiss_type'] ),
@@ -652,7 +652,7 @@ class Give_Notices {
 			return $error;
 		}
 
-		echo $error;
+		echo $error; // @codingStandardsIgnoreLine
 	}
 
 	/**
@@ -688,8 +688,8 @@ class Give_Notices {
 		$css_class .= ( $notice_args['dismissible'] ) ? ' is-dismissible' : '';
 		$output    .= sprintf(
 			'<div id="%1$s" class="%2$s"><p>%3$s</p></div>',
-			$css_id,
-			$css_class,
+			esc_attr( $css_id ),
+			esc_attr( $css_class ),
 			$notice_args['description']
 		);
 
@@ -697,6 +697,6 @@ class Give_Notices {
 			return $output;
 		}
 
-		echo $output;
+		echo $output; // @codingStandardsIgnoreLine
 	}
 }

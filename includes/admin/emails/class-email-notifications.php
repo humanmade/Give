@@ -241,10 +241,10 @@ class Give_Email_Notifications {
 		}
 
 		// Security check.
-		give_validate_nonce( $_GET['_wpnonce'], 'give-preview-email' );
+		give_validate_nonce( sanitize_text_field( $_GET['_wpnonce'] ), 'give-preview-email' );
 
 		// Get email type.
-		$email_type = isset( $_GET['email_type'] ) ? esc_attr( $_GET['email_type'] ) : '';
+		$email_type = isset( $_GET['email_type'] ) ? sanitize_email( $_GET['email_type'] ) : '';
 
 		/* @var Give_Email_Notification $email */
 		foreach ( $this->get_email_notifications() as $email ) {
@@ -297,7 +297,7 @@ class Give_Email_Notifications {
 				 * @param array                   $email_preview_data
 				 * @param Give_Email_Notification $email
 				 */
-				echo apply_filters( "give_{$email_type}_email_preview_message", $email_message, $email_preview_data, $email );
+				echo apply_filters( "give_{$email_type}_email_preview_message", $email_message, $email_preview_data, $email ); // @codingStandardsIgnoreLine
 
 				exit();
 			}
@@ -323,7 +323,7 @@ class Give_Email_Notifications {
 		 */
 		$email_preview_header = apply_filters( 'give_email_preview_header', give_get_preview_email_header(), $email );
 
-		echo $email_preview_header;
+		echo $email_preview_header; // @codingStandardsIgnoreLine
 	}
 
 	/**
@@ -379,7 +379,7 @@ class Give_Email_Notifications {
 		}
 
 		// Security check.
-		give_validate_nonce( $_GET['_wpnonce'], 'give-send-preview-email' );
+		give_validate_nonce( sanitize_text_field( $_GET['_wpnonce'] ), 'give-send-preview-email' );
 
 		// Get email type.
 		$email_type = give_check_variable( give_clean( $_GET ), 'isset', '', 'email_type' );
@@ -429,7 +429,7 @@ class Give_Email_Notifications {
 		$email_type = give_get_current_setting_section();
 
 		if ( ! empty( $_POST["{$email_type}_recipient"] ) ) {
-			$_POST["{$email_type}_recipient"] = array_unique( array_filter( $_POST["{$email_type}_recipient"] ) );
+			$_POST["{$email_type}_recipient"] = array_unique( array_filter( $_POST["{$email_type}_recipient"] ) ); // @codingStandardsIgnoreLine
 		}
 	}
 }

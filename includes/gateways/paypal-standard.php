@@ -110,7 +110,7 @@ function give_process_paypal_ipn() {
 		$post_data = file_get_contents( 'php://input' );
 	} else {
 		// If allow_url_fopen is not enabled, then make sure that post_max_size is large enough.
-		ini_set( 'post_max_size', '12M' );
+		ini_set( 'post_max_size', '12M' ); // @codingStandardsIgnoreLine
 	}
 	// Start the encoded data collection with notification command.
 	$encoded_data = 'cmd=_notify-validate';
@@ -157,7 +157,7 @@ function give_process_paypal_ipn() {
 
 		$remote_post_vars = array(
 			'method'      => 'POST',
-			'timeout'     => 45,
+			'timeout'     => 45, // @codingStandardsIgnoreLine
 			'redirection' => 5,
 			'httpversion' => '1.1',
 			'blocking'    => true,

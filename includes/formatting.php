@@ -686,9 +686,9 @@ function give_validate_nonce( $nonce, $action = - 1, $wp_die_args = array() ) {
 		);
 
 		wp_die(
-			$wp_die_args['message'],
-			$wp_die_args['title'],
-			$wp_die_args['args']
+			$wp_die_args['message'], // @codingStandardsIgnoreLine
+			$wp_die_args['title'], // @codingStandardsIgnoreLine
+			$wp_die_args['args'] // @codingStandardsIgnoreLine
 		);
 	}
 
@@ -706,7 +706,7 @@ function give_validate_nonce( $nonce, $action = - 1, $wp_die_args = array() ) {
  */
 function give_verify_donation_form_nonce( $nonce = '' ) {
 	// Get nonce key from donation.
-	$nonce   = empty( $nonce ) ? give_clean( $_POST['_wpnonce'] ) : $nonce;
+	$nonce   = empty( $nonce ) ? give_clean( $_POST['_wpnonce'] ) : $nonce; // @codingStandardsIgnoreLine
 	$form_id = isset( $_POST['give-form-id'] ) ? absint( $_POST['give-form-id'] ) : 0;
 
 	// Form nonce action.

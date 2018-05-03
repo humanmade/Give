@@ -95,14 +95,14 @@ function give_akismet( $spam ) {
 	// Build args array.
 	$args = array();
 
-	$args['comment_author']       = isset( $_POST['give_first'] ) ? strip_tags( trim( $_POST['give_first'] ) ) : '';
-	$args['comment_author_email'] = isset( $_POST['give_email'] ) ? $_POST['give_email'] : false;
+	$args['comment_author']       = isset( $_POST['give_first'] ) ? trim( wp_strip_all_tags( wp_unslash( $_POST['give_first'] ) ) ) : '';
+	$args['comment_author_email'] = isset( $_POST['give_email'] ) ? sanitize_email( wp_unslash( $_POST['give_email'] ) ) : false;
 	$args['blog']                 = get_option( 'home' );
 	$args['blog_lang']            = get_locale();
 	$args['blog_charset']         = get_option( 'blog_charset' );
-	$args['user_ip']              = $_SERVER['REMOTE_ADDR'];
-	$args['user_agent']           = $_SERVER['HTTP_USER_AGENT'];
-	$args['referrer']             = $_SERVER['HTTP_REFERER'];
+	$args['user_ip']              = filter_var( wp_unslash( $_SERVER['REMOTE_ADDR'] ), FILTER_VALIDATE_IP ); // @codingStandardsIgnoreLine
+	$args['user_agent']           = sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ); // @codingStandardsIgnoreLine
+	$args['referrer']             = esc_url_raw( wp_unslash( $_SERVER['HTTP_REFERER'] ) ); // @codingStandardsIgnoreLine
 	$args['comment_type']         = 'contact-form';
 
 	$ignore = array( 'HTTP_COOKIE', 'HTTP_COOKIE2', 'PHP_AUTH_PW' );

@@ -75,7 +75,7 @@ Give()->notices->render_frontend_notices();
 					})(jQuery);
 				</script>
 
-				<script src='https://www.google.com/recaptcha/api.js'></script>
+				<script src='https://www.google.com/recaptcha/api.js'></script><?php // @codingStandardsIgnoreLine ?>
 				<div class="g-recaptcha" data-sitekey="<?php echo esc_attr( $recaptcha_key ); ?>"></div>
 				<input type="hidden" name="give_ip" class="give_ip" value=""/>
 			<?php endif; ?>

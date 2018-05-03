@@ -188,7 +188,7 @@ class Give_Sales_Log_Table extends WP_List_Table {
 	 * @return string|bool string If search is present, false otherwise
 	 */
 	public function get_search() {
-		return ! empty( $_GET['s'] ) ? urldecode( trim( $_GET['s'] ) ) : false;
+		return ! empty( $_GET['s'] ) ? urldecode( trim( sanitize_text_field( $_GET['s'] ) ) ) : false;
 	}
 
 
@@ -326,7 +326,7 @@ class Give_Sales_Log_Table extends WP_List_Table {
 	 * @return void
 	 */
 	public function give_forms_filter() {
-		echo Give()->html->forms_dropdown( array(
+		echo Give()->html->forms_dropdown( array( // @codingStandardsIgnoreLine
 			'selected' => $this->get_filtered_give_form(),
 			'name'   => 'form',
 			'id'     => 'give-log-form-filter',

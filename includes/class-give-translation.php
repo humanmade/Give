@@ -162,7 +162,7 @@ class Give_Translations {
 				self::$text_configs[ $args['id'] ] = $args;
 			}
 		} catch ( Exception $e ) {
-			error_log( $e->getMessage() );
+			trigger_error( $e->getMessage() ); // @codingStandardsIgnoreLine
 		}// End try().
 
 		/**

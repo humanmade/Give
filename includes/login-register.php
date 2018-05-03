@@ -327,15 +327,15 @@ function give_email_access_login() {
 	$recaptcha_secret = give_get_option( 'recaptcha_secret' );
 
 	$enable_recaptcha = ( give_is_setting_enabled( give_get_option( 'enable_recaptcha' ) ) ) && ! empty( $recaptcha_key ) && ! empty( $recaptcha_secret ) ? true : false;
-	$access_token     = ! empty( $_GET['payment_key'] ) ? $_GET['payment_key'] : '';
+	$access_token     = ! empty( $_GET['payment_key'] ) ? sanitize_text_field( wp_unslash( $_GET['payment_key'] ) ) : '';
 
 	// Use reCAPTCHA.
 	if ( $enable_recaptcha ) {
 
 		$args = array(
 			'secret'   => $recaptcha_secret,
-			'response' => $_POST['g-recaptcha-response'],
-			'remoteip' => $_POST['give_ip'],
+			'response' => sanitize_text_field( wp_unslash( $_POST['g-recaptcha-response'] ) ),
+			'remoteip' => filter_var( wp_unslash( $_POST['give_ip'] ), FILTER_VALIDATE_IP ),
 		);
 
 		if ( ! empty( $args['response'] ) ) {

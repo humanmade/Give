@@ -700,26 +700,26 @@ class Give_MetaBox_Form_Data {
 						// Determine if current tab is active.
 						$is_active = $active_tab === $form_data_tab['id'] ? true : false;
 						?>
-						<li class="<?php echo "{$form_data_tab['id']}_tab" . ( $is_active ? ' active' : '' ) . ( $this->has_sub_tab( $form_data_tab ) ? ' has-sub-fields' : '' ); ?>">
-							<a href="#<?php echo $form_data_tab['id']; ?>" data-tab-id="<?php echo $form_data_tab['id']; ?>">
+						<li class="<?php echo esc_attr( "{$form_data_tab['id']}_tab" . ( $is_active ? ' active' : '' ) . ( $this->has_sub_tab( $form_data_tab ) ? ' has-sub-fields' : '' ) ); ?>">
+							<a href="#<?php echo esc_attr( $form_data_tab['id'] ); ?>" data-tab-id="<?php echo esc_attr( $form_data_tab['id'] ); ?>">
 								<?php if ( ! empty( $form_data_tab['icon-html'] ) ) : ?>
-									<?php echo $form_data_tab['icon-html']; ?>
+									<?php echo $form_data_tab['icon-html']; // @codingStandardsIgnoreLine ?>
 								<?php else : ?>
 									<span class="give-icon give-icon-default"></span>
 								<?php endif; ?>
-								<span class="give-label"><?php echo $form_data_tab['label']; ?></span>
+								<span class="give-label"><?php echo $form_data_tab['label']; // @codingStandardsIgnoreLine ?></span>
 							</a>
 							<?php if ( $this->has_sub_tab( $form_data_tab ) ) : ?>
 								<ul class="give-metabox-sub-tabs give-hidden">
 									<?php foreach ( $form_data_tab['sub-fields'] as $sub_tab ) : ?>
-										<li class="<?php echo "{$sub_tab['id']}_tab"; ?>">
-											<a href="#<?php echo $sub_tab['id']; ?>" data-tab-id="<?php echo $sub_tab['id']; ?>">
+										<li class="<?php echo esc_attr( "{$sub_tab['id']}_tab" ); ?>">
+											<a href="#<?php echo esc_attr( $sub_tab['id'] ); ?>" data-tab-id="<?php echo esc_attr( $sub_tab['id'] ); ?>">
 												<?php if ( ! empty( $sub_tab['icon-html'] ) ) : ?>
-													<?php echo $sub_tab['icon-html']; ?>
+													<?php echo $sub_tab['icon-html']; // @codingStandardsIgnoreLine ?>
 												<?php else : ?>
 													<span class="give-icon give-icon-default"></span>
 												<?php endif; ?>
-												<span class="give-label"><?php echo $sub_tab['label']; ?></span>
+												<span class="give-label"><?php echo $sub_tab['label']; // @codingStandardsIgnoreLine ?></span>
 											</a>
 										</li>
 									<?php endforeach; ?>
@@ -735,7 +735,7 @@ class Give_MetaBox_Form_Data {
 					// Determine if current panel is active.
 					$is_active = $active_tab === $setting['id'] ? true : false;
 					?>
-					<div id="<?php echo $setting['id']; ?>" class="panel give_options_panel<?php echo( $is_active ? ' active' : '' ); ?>">
+					<div id="<?php echo esc_attr( $setting['id'] ); ?>" class="panel give_options_panel<?php echo( $is_active ? ' active' : '' ); ?>">
 						<?php if ( ! empty( $setting['fields'] ) ) : ?>
 							<?php foreach ( $setting['fields'] as $field ) : ?>
 								<?php give_render_field( $field ); ?>
@@ -748,7 +748,7 @@ class Give_MetaBox_Form_Data {
 					<?php if ( $this->has_sub_tab( $setting ) ) : ?>
 						<?php if ( ! empty( $setting['sub-fields'] ) ) : ?>
 							<?php foreach ( $setting['sub-fields'] as $index => $sub_fields ) : ?>
-								<div id="<?php echo $sub_fields['id']; ?>" class="panel give_options_panel give-hidden">
+								<div id="<?php echo esc_attr( $sub_fields['id'] ); ?>" class="panel give_options_panel give-hidden">
 									<?php if ( ! empty( $sub_fields['fields'] ) ) : ?>
 										<?php foreach ( $sub_fields['fields'] as $sub_field ) : ?>
 											<?php give_render_field( $sub_field ); ?>
@@ -776,7 +776,7 @@ class Give_MetaBox_Form_Data {
 	 */
 	public function output_goal( $post ) {
 
-		echo give_admin_form_goal_stats( $post->ID );
+		echo give_admin_form_goal_stats( $post->ID ); // @codingStandardsIgnoreLine
 
 	}
 
@@ -888,13 +888,13 @@ class Give_MetaBox_Form_Data {
 								break;
 
 							case 'range_slider' :
-								$form_meta_value = $_POST[ $form_meta_key ];
+								$form_meta_value = $_POST[ $form_meta_key ]; // @codingStandardsIgnoreLine
 								break;
 
 							case 'group':
 								$form_meta_value = array();
 
-								foreach ( $_POST[ $form_meta_key ] as $index => $group ) {
+								foreach ( $_POST[ $form_meta_key ] as $index => $group ) { // @codingStandardsIgnoreLine
 
 									// Do not save template input field values.
 									if ( '{{row-count-placeholder}}' === $index ) {

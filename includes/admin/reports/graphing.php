@@ -209,7 +209,7 @@ function give_reports_graph() {
 				</tr>
 				<tr class="alternate">
 					<th scope="row"><strong><?php _e( 'Total donations for period:', 'give' ); ?><strong></th>
-					<td><?php echo $sales_totals; ?></td>
+					<td><?php echo esc_html( $sales_totals ); ?></td>
 				</tr>
 				<?php if ( 'this_month' === $dates['range'] ) : ?>
 					<tr>
@@ -218,7 +218,7 @@ function give_reports_graph() {
 					</tr>
 					<tr class="alternate">
 						<th scope="row"><strong><?php _e( 'Estimated monthly donations:', 'give' ); ?></strong></th>
-						<td><?php echo floor( $estimated['sales'] ); ?></td>
+						<td><?php echo esc_html( floor( $estimated['sales'] ) ); ?></td>
 					</tr>
 				<?php endif; ?>
 			</table>
@@ -241,7 +241,7 @@ function give_reports_graph() {
 	$output = ob_get_contents();
 	ob_end_clean();
 
-	echo $output;
+	echo $output; // @codingStandardsIgnoreLine
 }
 
 /**
@@ -457,7 +457,7 @@ function give_reports_graph_of_form( $form_id = 0 ) {
 				</tr>
 				<tr class="alternate">
 					<th scope="row"><strong><?php _e( 'Total donations for period:', 'give' ); ?></strong></th>
-					<td><?php echo $sales_totals; ?></td>
+					<td><?php echo esc_html( $sales_totals ); ?></td>
 				</tr>
 				<tr>
 					<th scope="row"><strong><?php _e( 'Average monthly income:', 'give' ); ?></strong></th>
@@ -472,7 +472,7 @@ function give_reports_graph_of_form( $form_id = 0 ) {
 		</div>
 	</div>
 	<?php
-	echo ob_get_clean();
+	echo ob_get_clean(); // @codingStandardsIgnoreLine
 }
 
 /**
@@ -599,13 +599,13 @@ function give_get_report_dates() {
 
 	$current_time = current_time( 'timestamp' );
 
-	$dates['range']    = isset( $_GET['range'] ) ? $_GET['range'] : 'this_month';
-	$dates['year']     = isset( $_GET['year'] ) ? $_GET['year'] : date( 'Y' );
-	$dates['year_end'] = isset( $_GET['year_end'] ) ? $_GET['year_end'] : date( 'Y' );
-	$dates['m_start']  = isset( $_GET['m_start'] ) ? $_GET['m_start'] : 1;
-	$dates['m_end']    = isset( $_GET['m_end'] ) ? $_GET['m_end'] : 12;
-	$dates['day']      = isset( $_GET['day'] ) ? $_GET['day'] : 1;
-	$dates['day_end']  = isset( $_GET['day_end'] ) ? $_GET['day_end'] : cal_days_in_month( CAL_GREGORIAN, $dates['m_end'], $dates['year'] );
+	$dates['range']    = isset( $_GET['range'] ) ? sanitize_key( $_GET['range'] ) : 'this_month';
+	$dates['year']     = isset( $_GET['year'] ) ? absint( $_GET['year'] ) : date( 'Y' );
+	$dates['year_end'] = isset( $_GET['year_end'] ) ? absint( $_GET['year_end'] ) : date( 'Y' );
+	$dates['m_start']  = isset( $_GET['m_start'] ) ? absint( $_GET['m_start'] ) : 1;
+	$dates['m_end']    = isset( $_GET['m_end'] ) ? absint( $_GET['m_end'] ) : 12;
+	$dates['day']      = isset( $_GET['day'] ) ? absint( $_GET['day'] ) : 1;
+	$dates['day_end']  = isset( $_GET['day_end'] ) ? absint( $_GET['day_end'] ) : cal_days_in_month( CAL_GREGORIAN, $dates['m_end'], $dates['year'] );
 
 	// Modify dates based on predefined ranges.
 	switch ( $dates['range'] ) :
@@ -789,7 +789,7 @@ function give_parse_report_dates( $data ) {
 
 	$view = give_get_reporting_view();
 	$tab  = isset( $_GET['tab'] ) ? sanitize_text_field( $_GET['tab'] ) : 'earnings';
-	$id   = isset( $_GET['form-id'] ) ? $_GET['form-id'] : null;
+	$id   = isset( $_GET['form-id'] ) ? absint( $_GET['form-id'] ) : null;
 
 	wp_redirect( add_query_arg( $dates, admin_url( 'edit.php?post_type=give_forms&page=give-reports&tab=' . esc_attr( $tab ) . '&view=' . esc_attr( $view ) . '&form-id=' . absint( $id ) ) ) );
 	give_die();
@@ -815,7 +815,7 @@ function give_reports_refresh_button() {
 	echo Give()->tooltips->render_link( array(
 		'label'       => esc_attr__( 'Clicking this will clear the reports cache.', 'give' ),
 		'tag_content' => '<span class="give-admin-button-icon give-admin-button-icon-update"></span>' . esc_html__( 'Refresh Report Data', 'give' ),
-		'link'        => $url,
+		'link'        => esc_url( $url ),
 		'position'    => 'left',
 		'attributes'  => array(
 			'class' => 'button alignright give-admin-button'

@@ -254,8 +254,8 @@ add_action( 'admin_head', 'give_admin_quick_css' );
  * @return void
  */
 function give_set_donation_levels_max_min_amount( $form_id ) {
-	$price_option            = isset( $_POST['_give_price_option'] ) ? give_clean( $_POST['_give_price_option'] ) : '';
-	$donation_levels_data    = isset( $_POST['_give_donation_levels'] ) ? give_clean( $_POST['_give_donation_levels'] ) : [];
+	$price_option            = isset( $_POST['_give_price_option'] ) ? give_clean( $_POST['_give_price_option'] ) : ''; // @codingStandardsIgnoreLine
+	$donation_levels_data    = isset( $_POST['_give_donation_levels'] ) ? give_clean( $_POST['_give_donation_levels'] ) : []; // @codingStandardsIgnoreLine
 	$donation_levels_amounts = ! empty( $donation_levels_data ) && is_array( $donation_levels_data ) ? wp_list_pluck( $donation_levels_data, '_give_amount' ) : false;
 
 	if ( 'set' === $price_option || ! $donation_levels_amounts ) {

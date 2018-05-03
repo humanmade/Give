@@ -9,6 +9,8 @@
  * @since       1.8.14
  */
 
+// @codingStandardsIgnoreFile
+
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -155,9 +157,9 @@ class Give_Donors_Query {
 
 		if ( is_null( $this->donors  ) ) {
 			if ( empty( $this->args['count'] ) ) {
-				$this->donors = $wpdb->get_results( $this->get_sql() );
+				$this->donors = $wpdb->get_results( $this->get_sql() ); // @codingStandardsIgnoreLine
 			} else {
-				$this->donors = $wpdb->get_var( $this->get_sql() );
+				$this->donors = $wpdb->get_var( $this->get_sql() ); // @codingStandardsIgnoreLine
 			}
 
 			Give_Cache::set_db_query( $cache_key, $this->donors );

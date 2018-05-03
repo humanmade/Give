@@ -288,7 +288,7 @@ class Give_Payments_Query extends Give_Stats {
 
 				$this->set_filters();
 
-				$new_results = $wpdb->get_results( $this->get_sql(), ARRAY_N );
+				$new_results = $wpdb->get_results( $this->get_sql(), ARRAY_N ); // @codingStandardsIgnoreLine
 
 				$this->unset_filters();
 
@@ -751,19 +751,19 @@ class Give_Payments_Query extends Give_Stats {
 		global $wpdb;
 
 		$where = "WHERE {$wpdb->posts}.post_type = 'give_payment'";
-		$where .= " AND {$wpdb->posts}.post_status IN ('" . implode( "','", $this->args['post_status'] ) . "')";
+		$where .= " AND {$wpdb->posts}.post_status IN ('" . implode( "','", array_map( 'sanitize_key', $this->args['post_status'] ) ) . "')";
 
 		if( is_numeric( $this->args['post_parent'] ) ) {
-			$where .= " AND {$wpdb->posts}.post_parent={$this->args['post_parent']}";
+			$where .= " AND {$wpdb->posts}.post_parent=" . intval( $this->args['post_parent'] );
 		}
 
 		// Set orderby.
-		$orderby  = "ORDER BY {$wpdb->posts}.{$this->args['orderby']}";
+		$orderby  = "ORDER BY {$wpdb->posts}." . sanitize_key( $this->args['orderby'] );
 		$group_by = '';
 
 		// Set group by.
 		if ( ! empty( $this->args['group_by'] ) ) {
-			$group_by = "GROUP BY {$wpdb->posts}.{$this->args['group_by']}";
+			$group_by = "GROUP BY {$wpdb->posts}." . sanitize_key( $this->args['group_by'] );
 		}
 
 		// Set offset.
@@ -779,9 +779,9 @@ class Give_Payments_Query extends Give_Stats {
 		$fields = "{$wpdb->posts}.*";
 		if ( ! empty( $this->args['fields'] ) && 'all' !== $this->args['fields'] ) {
 			if ( is_string( $this->args['fields'] ) ) {
-				$fields = "{$wpdb->posts}.{$this->args['fields']}";
+				$fields = "{$wpdb->posts}." . sanitize_key( $this->args['fields'] );
 			} elseif ( is_array( $this->args['fields'] ) ) {
-				$fields = "{$wpdb->posts}." . implode( " , {$wpdb->posts}.", $this->args['fields'] );
+				$fields = "{$wpdb->posts}." . implode( " , {$wpdb->posts}.", array_map( 'sanitize_key', $this->args['fields'] ) );
 			}
 		}
 
@@ -790,7 +790,7 @@ class Give_Payments_Query extends Give_Stats {
 			$fields = "COUNT({$wpdb->posts}.ID)";
 
 			if ( ! empty( $this->args['group_by'] ) ) {
-				$fields = "{$wpdb->posts}.{$this->args['group_by']}, {$fields}";
+				$fields = "{$wpdb->posts}." . sanitize_key( $this->args['group_by'] ) . ", {$fields}";
 			}
 		}
 
@@ -821,7 +821,7 @@ class Give_Payments_Query extends Give_Stats {
 
 		// Set sql query.
 		$sql = $wpdb->prepare(
-			"SELECT {$fields} FROM {$wpdb->posts} LIMIT %d,%d;",
+			"SELECT {$fields} FROM {$wpdb->posts} LIMIT %d,%d;", // @codingStandardsIgnoreLine
 			absint( $this->args['offset'] ),
 			( empty( $this->args['nopaging'] ) ? absint( $this->args['posts_per_page'] ) : 99999999999 )
 		);

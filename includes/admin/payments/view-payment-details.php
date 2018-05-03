@@ -66,10 +66,10 @@ $base_url       = admin_url( 'edit.php?post_type=give_forms&page=give-payment-hi
 		printf(
 			/* translators: %s: donation number */
 			esc_html__( 'Donation %s', 'give' ),
-			$number
+			esc_html( $number )
 		);
 		if ( $payment_mode == 'test' ) {
-			echo Give()->tooltips->render_span(array(
+			echo Give()->tooltips->render_span(array( // @codingStandardsIgnoreLine
 				'label' => __( 'This donation was made in test mode.', 'give' ),
 				'tag_content' => __( 'Test Donation', 'give' ),
 				'position'=> 'right',
@@ -132,16 +132,16 @@ $base_url       = admin_url( 'edit.php?post_type=give_forms&page=give-payment-hi
 									if ( current_user_can( 'view_give_payments' ) ) {
 										echo sprintf(
 											'<span class="delete-donation" id="delete-donation-%d"><a class="delete-single-donation delete-donation-button dashicons dashicons-trash" href="%s" aria-label="%s"></a></span>',
-											$payment_id,
-											wp_nonce_url(
+											esc_attr( $payment_id ),
+											esc_url( wp_nonce_url(
 												add_query_arg(
 													array(
 														'give-action' => 'delete_payment',
 														'purchase_id' => $payment_id,
 													), $base_url
 												), 'give_donation_nonce'
-											),
-											sprintf( __( 'Delete Donation %s', 'give' ), $payment_id )
+											) ),
+											sprintf( __( 'Delete Donation %s', 'give' ), intval( $payment_id ) )
 										);
 									}
 									?>
@@ -169,7 +169,7 @@ $base_url       = admin_url( 'edit.php?post_type=give_forms&page=give-payment-hi
 														<option value="<?php echo esc_attr( $key ); ?>"<?php selected( $payment->status, $key, true ); ?>><?php echo esc_html( $status ); ?></option>
 													<?php endforeach; ?>
 												</select>
-												<span class="give-donation-status status-<?php echo sanitize_title( $payment->status ); ?>"><span class="give-donation-status-icon"></span></span>
+												<span class="give-donation-status status-<?php echo esc_attr( $payment->status ); ?>"><span class="give-donation-status-icon"></span></span>
 											</p>
 										</div>
 
@@ -204,7 +204,7 @@ $base_url       = admin_url( 'edit.php?post_type=give_forms&page=give-payment-hi
 										<div class="give-order-payment give-admin-box-inside">
 											<p>
 												<label for="give-payment-total" class="strong"><?php _e( 'Total Donation:', 'give' ); ?></label>&nbsp;
-												<?php echo give_currency_symbol( $payment->currency ); ?>
+												<?php echo give_currency_symbol( $payment->currency ); // @codingStandardsIgnoreLine ?>
 												&nbsp;<input id="give-payment-total" name="give-payment-total" type="text" class="small-text give-price-field" value="<?php echo esc_attr( give_format_decimal( give_donation_amount( $payment_id ), false, false ) ); ?>"/>
 											</p>
 										</div>
@@ -303,7 +303,7 @@ $base_url       = admin_url( 'edit.php?post_type=give_forms&page=give-payment-hi
 											<div class="give-order-gateway give-admin-box-inside">
 												<p>
 													<strong><?php _e( 'Gateway:', 'give' ); ?></strong>&nbsp;
-													<?php echo give_get_gateway_admin_label( $gateway ); ?>
+													<?php echo give_get_gateway_admin_label( $gateway ); // @codingStandardsIgnoreLine ?>
 												</p>
 											</div>
 										<?php endif; ?>
@@ -311,7 +311,7 @@ $base_url       = admin_url( 'edit.php?post_type=give_forms&page=give-payment-hi
 										<div class="give-order-payment-key give-admin-box-inside">
 											<p>
 												<strong><?php _e( 'Key:', 'give' ); ?></strong>&nbsp;
-												<?php echo give_get_payment_key( $payment_id ); ?>
+												<?php echo give_get_payment_key( $payment_id ); // @codingStandardsIgnoreLine ?>
 											</p>
 										</div>
 
@@ -329,15 +329,15 @@ $base_url       = admin_url( 'edit.php?post_type=give_forms&page=give-payment-hi
                                         if ( $transaction_id != $payment_id ) : ?>
 											<div class="give-order-tx-id give-admin-box-inside">
 												<p>
-													<strong><?php _e( 'Transaction ID:', 'give' ); ?> <span class="give-tooltip give-icon give-icon-question"  data-tooltip="<?php echo sprintf( esc_attr__( 'The transaction ID within %s.', 'give' ), $gateway); ?>"></span></strong>&nbsp;
-													<?php echo apply_filters( "give_payment_details_transaction_id-{$gateway}", $transaction_id, $payment_id ); ?>
+													<strong><?php _e( 'Transaction ID:', 'give' ); ?> <span class="give-tooltip give-icon give-icon-question"  data-tooltip="<?php echo sprintf( esc_attr__( 'The transaction ID within %s.', 'give' ), esc_attr( $gateway ) ); ?>"></span></strong>&nbsp;
+													<?php echo apply_filters( "give_payment_details_transaction_id-{$gateway}", $transaction_id, $payment_id ); // @codingStandardsIgnoreLine ?>
 												</p>
 											</div>
 										<?php endif; ?>
 
 										<div class="give-admin-box-inside">
 											<p><?php $purchase_url = admin_url( 'edit.php?post_type=give_forms&page=give-payment-history&donor=' . absint( give_get_payment_donor_id( $payment_id ) ) ); ?>
-												<a href="<?php echo $purchase_url; ?>"><?php _e( 'View all donations for this donor &raquo;', 'give' ); ?></a>
+												<a href="<?php echo esc_url( $purchase_url ); ?>"><?php _e( 'View all donations for this donor &raquo;', 'give' ); ?></a>
 											</p>
 										</div>
 
@@ -393,7 +393,7 @@ $base_url       = admin_url( 'edit.php?post_type=give_forms&page=give-payment-hi
 							?>
 
 							<?php $column_count = 'columns-3'; ?>
-							<div id="give-donation-overview" class="postbox <?php echo $column_count; ?>">
+							<div id="give-donation-overview" class="postbox <?php echo esc_attr( $column_count ); ?>">
 								<h3 class="hndle"><?php _e( 'Donation Information', 'give' ); ?></h3>
 
 								<div class="inside">
@@ -406,8 +406,8 @@ $base_url       = admin_url( 'edit.php?post_type=give_forms&page=give-payment-hi
 												if ( $payment_meta['form_id'] ) :
 													printf(
 														'<a href="%1$s">%2$s</a>',
-														admin_url( 'post.php?action=edit&post=' . $payment_meta['form_id'] ),
-														$payment_meta['form_id']
+														esc_url( admin_url( 'post.php?action=edit&post=' . $payment_meta['form_id'] ) ),
+														intval( $payment_meta['form_id'] )
 													);
 												endif;
 												?>
@@ -415,7 +415,7 @@ $base_url       = admin_url( 'edit.php?post_type=give_forms&page=give-payment-hi
 											<p>
 												<strong><?php esc_html_e( 'Donation Form Title:', 'give' ); ?></strong><br>
 												<?php
-												echo Give()->html->forms_dropdown(
+												echo Give()->html->forms_dropdown( // @codingStandardsIgnoreLine
 													array(
 														'selected' => $payment_meta['form_id'],
 														'name' => 'give-payment-form-select',
@@ -430,7 +430,7 @@ $base_url       = admin_url( 'edit.php?post_type=give_forms&page=give-payment-hi
 										<div class="column">
 											<p>
 												<strong><?php _e( 'Donation Date:', 'give' ); ?></strong><br>
-												<?php echo date_i18n( give_date_format(), $payment_date ); ?>
+												<?php echo esc_html( date_i18n( give_date_format(), $payment_date ) ); ?>
 											</p>
 											<p>
 												<strong><?php _e( 'Donation Level:', 'give' ); ?></strong><br>
@@ -466,7 +466,7 @@ $base_url       = admin_url( 'edit.php?post_type=give_forms&page=give-payment-hi
 										<div class="column">
 											<p>
 												<strong><?php esc_html_e( 'Total Donation:', 'give' ); ?></strong><br>
-												<?php echo give_donation_amount( $payment, true ); ?>
+												<?php echo give_donation_amount( $payment, true ); // @codingStandardsIgnoreLine ?>
 											</p>
 
 											<p>
@@ -552,8 +552,8 @@ $base_url       = admin_url( 'edit.php?post_type=give_forms&page=give-payment-hi
 												if ( ! empty( $donor->id ) ) {
 													printf(
 														'<a href="%1$s">%2$s</a>',
-														admin_url( 'edit.php?post_type=give_forms&page=give-donors&view=overview&id=' . $donor->id ),
-														$donor->id
+														esc_url( admin_url( 'edit.php?post_type=give_forms&page=give-donors&view=overview&id=' . $donor->id ) ),
+														intval( $donor->id )
 													);
 												}
 												?>
@@ -561,7 +561,7 @@ $base_url       = admin_url( 'edit.php?post_type=give_forms&page=give-payment-hi
 											</p>
 											<p>
 												<strong><?php _e( 'Donor Since:', 'give' ); ?></strong><br>
-												<?php echo date_i18n( give_date_format(), strtotime( $donor->date_created ) ) ?>
+												<?php echo esc_html( date_i18n( give_date_format(), strtotime( $donor->date_created ) ) ) ?>
 											</p>
 										</div>
 										<div class="column">
@@ -573,22 +573,22 @@ $base_url       = admin_url( 'edit.php?post_type=give_forms&page=give-payment-hi
 
 												// Check whether the donor name and WP_User name is same or not.
 												if ( sanitize_title( $donor_billing_name ) != sanitize_title( $donor_name ) ) {
-													echo $donor_billing_name . ' (<a href="' . esc_url( admin_url( "edit.php?post_type=give_forms&page=give-donors&view=overview&id=$donor_id" ) ) . '">' . $donor_name . '</a>)';
+													echo esc_html( $donor_billing_name ) . ' (<a href="' . esc_url( admin_url( "edit.php?post_type=give_forms&page=give-donors&view=overview&id=$donor_id" ) ) . '">' . esc_html( $donor_name ) . '</a>)';
 												} else {
-													echo $donor_name;
+													echo esc_html( $donor_name );
 												}
 												?>
 											</p>
 											<p>
 												<strong><?php _e( 'Donor Email:', 'give' ); ?></strong><br>
-												<?php echo $donor->email; ?>
+												<?php echo esc_html( $donor->email ); ?>
 											</p>
 										</div>
 										<div class="column">
 											<p>
 												<strong><?php _e( 'Change Donor:', 'give' ); ?></strong><br>
 												<?php
-												echo Give()->html->donor_dropdown(
+												echo Give()->html->donor_dropdown( // @codingStandardsIgnoreLine
 													array(
 														'selected' => $donor->id,
 														'name' => 'donor-id',
@@ -601,7 +601,7 @@ $base_url       = admin_url( 'edit.php?post_type=give_forms&page=give-payment-hi
 													?>
 													<strong><?php esc_html_e( 'Company Name:', 'give' ); ?></strong><br>
 													<?php
-													echo $company_name;
+													echo esc_html( $company_name );
 												} ?>
 											</p>
 										</div>
@@ -628,7 +628,7 @@ $base_url       = admin_url( 'edit.php?post_type=give_forms&page=give-payment-hi
 										</div>
 										<div class="column">
 											<p>
-												<input type="hidden" name="give-current-donor" value="<?php echo $donor->id; ?>"/>
+												<input type="hidden" name="give-current-donor" value="<?php echo esc_attr( $donor->id ); ?>"/>
 												<input type="hidden" id="give-new-donor" name="give-new-donor" value="0"/>
 												<a href="#cancel" class="give-payment-new-donor-cancel give-delete"><?php _e( 'Cancel', 'give' ); ?></a>
 												<br>
@@ -698,11 +698,11 @@ $base_url       = admin_url( 'edit.php?post_type=give_forms&page=give-payment-hi
 													<div id="give-order-address-country-wrap">
 														<label class="order-data-address-line"><?php _e( 'Country:', 'give' ); ?></label>
 														<?php
-														echo Give()->html->select(
+														echo Give()->html->select( // @codingStandardsIgnoreLine
 															array(
 																'options'          => give_get_country_list(),
 																'name'             => 'give-payment-address[0][country]',
-																'selected'         => $address['country'],
+																'selected'         => $address['country'], // @codingStandardsIgnoreLine
 																'show_option_all'  => false,
 																'show_option_none' => false,
 																'chosen'           => true,
@@ -745,11 +745,11 @@ $base_url       = admin_url( 'edit.php?post_type=give_forms&page=give-payment-hi
 															<?php
 															$states = give_get_states( $address['country'] );
 															if ( ! empty( $states ) ) {
-																echo Give()->html->select(
+																echo Give()->html->select( // @codingStandardsIgnoreLine
 																	array(
 																		'options'          => $states,
 																		'name'             => 'give-payment-address[0][state]',
-																		'selected'         => $address['state'],
+																		'selected'         => $address['state'], // @codingStandardsIgnoreLine
 																		'show_option_all'  => false,
 																		'show_option_none' => false,
 																		'chosen'           => true,
@@ -818,14 +818,14 @@ $base_url       = admin_url( 'edit.php?post_type=give_forms&page=give-payment-hi
 											$no_notes_display = ' style="display:none;"';
 											foreach ( $notes as $note ) :
 
-												echo give_get_payment_note_html( $note, $payment_id );
+												echo give_get_payment_note_html( $note, $payment_id ); // @codingStandardsIgnoreLine
 
 											endforeach;
 										} else {
 											$no_notes_display = '';
 										}
 
-										echo '<p class="give-no-payment-notes"' . $no_notes_display . '>' . esc_html__( 'No donation notes.', 'give' ) . '</p>';
+										echo '<p class="give-no-payment-notes"' . $no_notes_display . '>' . esc_html__( 'No donation notes.', 'give' ) . '</p>'; // @codingStandardsIgnoreLine
 										?>
 									</div>
 									<textarea name="give-payment-note" id="give-payment-note" class="large-text"></textarea>

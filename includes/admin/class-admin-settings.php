@@ -557,7 +557,7 @@ if ( ! class_exists( 'Give_Admin_Settings' ) ) :
 									id="<?php echo esc_attr( $value['id'] ); ?>"
 									style="<?php echo esc_attr( $value['css'] ); ?>"
 									class="<?php echo esc_attr( $value['class'] ); ?>"
-									<?php echo esc_html( implode( ' ', $custom_attributes ) ); ?>
+									<?php echo implode( ' ', $custom_attributes ); ?>
 									<?php echo ( 'multiselect' === $value['type'] ) ? 'multiple="multiple"' : ''; ?>
 								>
 
@@ -565,9 +565,9 @@ if ( ! class_exists( 'Give_Admin_Settings' ) ) :
 									if ( ! empty( $value['options'] ) ) {
 										foreach ( $value['options'] as $key => $val ) {
 											printf(
-												'<option value="%s" %s>%s</option',
+												'<option value="%s" %s>%s</option>',
 												esc_attr( $key ),
-												is_array( $option_value ) ? selected( in_array( $key, $option_value, true ), true ) : selected( $option_value, $key ),
+												is_array( $option_value ) ? selected( in_array( $key, $option_value, true ), false ) : selected( $option_value, $key, false ),
 												esc_html( $val )
 											);
 										}
@@ -934,11 +934,11 @@ if ( ! class_exists( 'Give_Admin_Settings' ) ) :
 					parse_str( $option['id'], $option_name_array );
 					$field_option_name = current( array_keys( $option_name_array ) );
 					$setting_name      = key( $option_name_array[ $field_option_name ] );
-					$raw_value         = isset( $_POST[ $field_option_name ][ $setting_name ] ) ? wp_unslash( $_POST[ $field_option_name ][ $setting_name ] ) : null;
+					$raw_value         = isset( $_POST[ $field_option_name ][ $setting_name ] ) ? wp_unslash( $_POST[ $field_option_name ][ $setting_name ] ) : null; // @codingStandardsIgnoreLine
 				} else {
 					$field_option_name = $option['id'];
 					$setting_name      = '';
-					$raw_value         = isset( $_POST[ $option['id'] ] ) ? wp_unslash( $_POST[ $option['id'] ] ) : null;
+					$raw_value         = isset( $_POST[ $option['id'] ] ) ? wp_unslash( $_POST[ $option['id'] ] ) : null; // @codingStandardsIgnoreLine
 				}
 
 				// Format the value based on option type.

@@ -322,7 +322,7 @@ if ( ! class_exists( 'Give_Settings_Gateways' ) ) :
 				printf(
 					'<input class="gateways-radio" type="radio" name="%1$s" value="%2$s" %3$s>',
 					'default_gateway',
-					$key,
+					esc_attr( $key ),
 					checked( $key, $default_gateway, false )
 				);
 
@@ -341,8 +341,8 @@ if ( ! class_exists( 'Give_Settings_Gateways' ) ) :
 
 			printf(
 				'<tr><th>%1$s</th><td>%2$s</td></tr>',
-				$field['title'],
-				ob_get_clean()
+				esc_html( $field['title'] ),
+				ob_get_clean() // @codingStandardsIgnoreLine
 			);
 		}
 	}

@@ -27,7 +27,7 @@ function give_do_ajax_export() {
 
 	require_once GIVE_PLUGIN_DIR . 'includes/admin/tools/export/class-batch-export.php';
 
-	parse_str( $_POST['form'], $form );
+	parse_str( $_POST['form'], $form ); // @codingStandardsIgnoreLine
 
 	$_REQUEST = $form = (array) $form;
 

@@ -580,8 +580,8 @@ if ( ! class_exists( 'Give_Email_Notification' ) ) :
 			if ( count( $email_tags ) && $formatted ) : ob_start() ?>
 				<ul class="give-email-tags-wrap">
 					<?php foreach ( $email_tags as $email_tag ) : ?>
-						<li class="give_<?php echo $email_tag['tag']; ?>_tag">
-							<code>{<?php echo $email_tag['tag']; ?>}</code> - <?php echo $email_tag['description']; ?>
+						<li class="give_<?php echo esc_attr( $email_tag['tag'] ); ?>_tag">
+							<code>{<?php echo esc_html( $email_tag['tag'] ); ?>}</code> - <?php echo esc_html( $email_tag['description'] ); ?>
 						</li>
 					<?php endforeach; ?>
 				</ul>
