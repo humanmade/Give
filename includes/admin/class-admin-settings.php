@@ -557,7 +557,7 @@ if ( ! class_exists( 'Give_Admin_Settings' ) ) :
 									id="<?php echo esc_attr( $value['id'] ); ?>"
 									style="<?php echo esc_attr( $value['css'] ); ?>"
 									class="<?php echo esc_attr( $value['class'] ); ?>"
-									<?php echo implode( ' ', $custom_attributes ); ?>
+									<?php echo implode( ' ', $custom_attributes ); // @codingStandardsIgnoreLine ?>
 									<?php echo ( 'multiselect' === $value['type'] ) ? 'multiple="multiple"' : ''; ?>
 								>
 

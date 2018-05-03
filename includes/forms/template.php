@@ -214,7 +214,7 @@ function give_get_donation_form( $args = array() ) {
 
 	$final_output = ob_get_clean();
 
-	echo wp_kses_post( apply_filters( 'give_donate_form', $final_output, $args ) );
+	echo apply_filters( 'give_donate_form', $final_output, $args ); // @codingStandardsIgnoreLine
 }
 
 /**
