@@ -485,7 +485,7 @@ if ( ! class_exists( 'Give_Admin_Settings' ) ) :
 									esc_attr( $value['id'] ),
 									esc_attr( $type ),
 									esc_attr( $value['css'] ),
-									esc_attr( $field_value ),
+									esc_attr( $option_value ),
 									! empty( $value['class'] ) ? esc_attr( $value['class'] ) : '',
 									esc_attr( $value['id'] ),
 									esc_html( implode( ' ', $custom_attributes ) )
