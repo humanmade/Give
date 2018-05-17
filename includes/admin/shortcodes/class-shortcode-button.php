@@ -32,7 +32,7 @@ final class Give_Shortcode_Button {
 	 * Class constructor
 	 */
 	public function __construct() {
-		add_action( 'admin_init', array( $this, 'init'), 999 );
+		add_action( 'admin_init', array( $this, 'init' ), 999 );
 	}
 
 	/**
@@ -41,7 +41,7 @@ final class Give_Shortcode_Button {
 	 * @since 2.1.0
 	 * @access public
 	 */
-	public function init(){
+	public function init() {
 		if ( $this->is_add_button() ) {
 			add_filter( 'mce_external_plugins', array( $this, 'mce_external_plugins' ), 15 );
 
@@ -50,8 +50,8 @@ final class Give_Shortcode_Button {
 			add_action( 'media_buttons', array( $this, 'shortcode_button' ) );
 		}
 
-		add_action( "wp_ajax_give_shortcode", array( $this, 'shortcode_ajax' ) );
-		add_action( "wp_ajax_nopriv_give_shortcode", array( $this, 'shortcode_ajax' ) );
+		add_action( 'wp_ajax_give_shortcode', array( $this, 'shortcode_ajax' ) );
+		add_action( 'wp_ajax_nopriv_give_shortcode', array( $this, 'shortcode_ajax' ) );
 	}
 
 	/**
@@ -82,7 +82,7 @@ final class Give_Shortcode_Button {
 	 * @since 1.0
 	 */
 	public function admin_enqueue_assets() {
-		$direction = ( is_rtl() || isset( $_GET['d'] ) && 'rtl' === $_GET['d'] ) ? '.rtl' : '';
+		$direction = ( is_rtl() || isset( $_GET['d'] ) && 'rtl' === sanitize_text_field( wp_unslash( $_GET['d'] ) ) ) ? '.rtl' : ''; // WPCS: input var ok, CSRF ok.
 
 		wp_enqueue_script(
 			'give_shortcode',
@@ -144,10 +144,9 @@ final class Give_Shortcode_Button {
 			if ( apply_filters( sanitize_title( $shortcode ) . '_condition', true ) ) {
 
 				$shortcodes[ $shortcode ] = sprintf(
-					'<div class="sc-shortcode mce-menu-item give-shortcode-item-%1$s" data-shortcode="%2$s">%3$s</div>',
-					$shortcode,
-					$shortcode,
-					$values['label']
+					'<div class="sc-shortcode mce-menu-item give-shortcode-item-%1$s" data-shortcode="%1$s">%2$s</div>',
+					esc_attr( $shortcode ),
+					esc_html( $values['label'] )
 				);
 			}
 		}
@@ -165,23 +164,23 @@ final class Give_Shortcode_Button {
 
 				$shortcode = key( $shortcodes );
 
-				printf(
+				printf( // WPCS: XSS ok.
 					'<button type="button" class="button sc-shortcode" data-shortcode="%s">%s</button>',
-					$shortcode,
+					esc_attr( $shortcode ),
 					sprintf( '%s %s %s',
 						$img,
-						__( 'Insert', 'give' ),
+						esc_html__( 'Insert', 'give' ),
 						self::$shortcodes[ $shortcode ]['label']
 					)
 				);
 			} else {
-				printf(
+				printf( // WPCS: XSS ok.
 					'<div class="sc-wrap">' .
 					'<button class="button sc-button" type="button">%s %s</button>' .
 					'<div class="sc-menu mce-menu">%s</div>' .
 					'</div>',
 					$img,
-					__( 'Give Shortcodes', 'give' ),
+					esc_html__( 'Give Shortcodes', 'give' ),
 					implode( '', array_values( $shortcodes ) )
 				);
 			}
@@ -196,8 +195,7 @@ final class Give_Shortcode_Button {
 	 * @since 1.0
 	 */
 	public function shortcode_ajax() {
-
-		$shortcode = isset( $_POST['shortcode'] ) ? $_POST['shortcode'] : false;
+		$shortcode = isset( $_POST['shortcode'] ) ? sanitize_text_field( wp_unslash( $_POST['shortcode'] ) ) : false; // WPCS: input var ok.
 		$response  = false;
 
 		if ( $shortcode && array_key_exists( $shortcode, self::$shortcodes ) ) {
@@ -217,7 +215,7 @@ final class Give_Shortcode_Button {
 			);
 		} else {
 			// todo: handle error
-			error_log( print_r( 'AJAX error!', 1 ) );
+			error_log( print_r( 'AJAX error!', 1 ) ); // @codingStandardsIgnoreLine
 		}
 
 		wp_send_json( $response );
@@ -245,10 +243,10 @@ final class Give_Shortcode_Button {
 
 		// Only run in admin post/page creation and edit screens
 		if (
-			! is_admin()
-			|| ! in_array( $pagenow, $shortcode_button_pages )
-			|| ! apply_filters( 'give_shortcode_button_condition', true )
-			|| empty( self::$shortcodes )
+			! is_admin() ||
+			! in_array( $pagenow, $shortcode_button_pages, true ) ||
+			! apply_filters( 'give_shortcode_button_condition', true ) ||
+			empty( self::$shortcodes )
 		) {
 			return false;
 		}

@@ -65,6 +65,6 @@ switch ( $template ) {
 		echo '<div class="wrapper hentry" style="box-sizing: border-box;">';
 		break;
 	default :
-		echo apply_filters( 'give_default_wrapper_start', '<div id="container" class="give-wrap container"><div id="content" role="main">' );
+		echo wp_kses_post( apply_filters( 'give_default_wrapper_start', '<div id="container" class="give-wrap container"><div id="content" role="main">' ) );
 		break;
 }

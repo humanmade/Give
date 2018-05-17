@@ -118,28 +118,28 @@ function give_email_preview_buttons_callback( $field ) {
 
 	echo sprintf(
 		'<a href="%1$s" class="button-secondary" target="_blank">%2$s</a>',
-		wp_nonce_url(
+		esc_url( wp_nonce_url(
 			add_query_arg(
 				array( 'give_action' => 'preview_email', 'email_type' => $field_id ),
 				home_url()
 			), 'give-preview-email'
-		),
-		$field['name']
+		) ),
+		esc_html( $field['name'] )
 	);
 
 	echo sprintf(
 		' <a href="%1$s" aria-label="%2$s" class="button-secondary">%3$s</a>',
-		wp_nonce_url(
+		esc_url( wp_nonce_url(
 				add_query_arg( array(
 			'give_action'  => 'send_preview_email',
 			'email_type' => $field_id,
 			'give-message' => 'sent-test-email',
-		) ), 'give-send-preview-email' ),
+		) ), 'give-send-preview-email' ) ),
 		esc_attr__( 'Send Test Email.', 'give' ),
 		esc_html__( 'Send Test Email', 'give' )
 	);
 
-	echo ob_get_clean();
+	echo ob_get_clean(); // @codingStandardsIgnoreLine
 }
 
 
@@ -185,7 +185,7 @@ function give_get_preview_email_header() {
 	$transaction_header = '<div style="margin:0;padding:10px 0;width:100%;background-color:#FFF;border-bottom:1px solid #eee; text-align:center;">';
 
 	// Remove payment id query param if set from request url.
-	$request_url_data = wp_parse_url( $_SERVER['REQUEST_URI'] );
+	$request_url_data = wp_parse_url( esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) );
 	$query            = $request_url_data['query'];
 	$query            = remove_query_arg( array( 'preview_id' ), $query );
 

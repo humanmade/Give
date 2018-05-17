@@ -47,14 +47,14 @@ function give_donation_history( $atts, $content = false ) {
 	if ( isset( $_GET['payment_key'] ) ) {
 		ob_start();
 
-		echo give_receipt_shortcode( array() );
+		echo give_receipt_shortcode( array() ); // @codingStandardsIgnoreLine
 
 		// Display donation history link only if Receipt Access Session is available.
 		if ( give_get_receipt_session() ) {
 			echo sprintf(
 				'<a href="%s">%s</a>',
 				esc_url( give_get_history_page_uri() ),
-				__( '&laquo; Return to All Donations', 'give' )
+				__( '&laquo; Return to All Donations', 'give' ) // @codingStandardsIgnoreLine
 			);
 		}
 
@@ -89,7 +89,7 @@ function give_donation_history( $atts, $content = false ) {
 
 	} else {
 
-		echo apply_filters( 'give_donation_history_nonuser_message', Give()->notices->print_frontend_notice( __( 'You must be logged in to view your donation history. Please login using your account or create an account using the same email you used to donate with.', 'give' ), false ) );
+		echo apply_filters( 'give_donation_history_nonuser_message', Give()->notices->print_frontend_notice( __( 'You must be logged in to view your donation history. Please login using your account or create an account using the same email you used to donate with.', 'give' ), false ) ); // @codingStandardsIgnoreLine
 		echo do_shortcode( '[give_login]' );
 	}
 
@@ -275,7 +275,7 @@ function give_receipt_shortcode( $atts ) {
 
 	// set payment key var
 	if ( isset( $_GET['payment_key'] ) ) {
-		$payment_key = urldecode( $_GET['payment_key'] );
+		$payment_key = sanitize_text_field( urldecode( wp_unslash( $_GET['payment_key'] ) ) ); // @codingStandardsIgnoreLine
 	} elseif ( $session ) {
 		$payment_key = $session['purchase_key'];
 	} elseif ( $give_receipt_args['payment_key'] ) {
@@ -693,7 +693,7 @@ function give_totals_shortcode( $atts ) {
 			give_show_goal_totals_progress( $total, $total_goal );
 		}
 
-		echo sprintf( $message ) . $donate_link;
+		echo sprintf( $message ) . $donate_link; // @codingStandardsIgnoreLine
 		?>
 	</div>
 	<?php
@@ -875,7 +875,7 @@ function give_form_grid_shortcode( $atts ) {
 
 			printf(
 				'<div class="give-page-numbers">%s</div>',
-				paginate_links( $paginate_args )
+				paginate_links( $paginate_args ) // @codingStandardsIgnoreLine
 			);
 		}
 		echo '</div><!-- .give-wrap -->';

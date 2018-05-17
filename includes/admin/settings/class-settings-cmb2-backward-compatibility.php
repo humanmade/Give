@@ -537,7 +537,7 @@ if ( ! class_exists( 'Give_CMB2_Settings_Loader' ) ) :
 			switch ( $this->current_tab ) :
 				case 'licenses':
 					?>
-					<div class="give-settings-wrap give-settings-wrap-<?php echo $this->current_tab; ?>">
+					<div class="give-settings-wrap give-settings-wrap-<?php echo esc_attr( $this->current_tab ); ?>">
 						<?php $field['func']['function']( $field_obj, $saved_value, '', '', $field_type_obj ); ?>
 					</div>
 					<?php break;
@@ -548,11 +548,11 @@ if ( ! class_exists( 'Give_CMB2_Settings_Loader' ) ) :
 					<tr valign="top">
 						<?php if ( ! empty( $field['name'] ) && ! in_array( $field['name'], array( '&nbsp;' ) ) ) : ?>
 							<th scope="row" class="titledesc">
-								<label for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo $field['title']; ?></label>
+								<label for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_attr( $field['title'] ); ?></label>
 							</th>
 							<?php $colspan = ''; ?>
 						<?php endif; ?>
-						<td class="give-forminp" <?php echo $colspan; ?>>
+						<td class="give-forminp" <?php echo $colspan; // @codingStandardsIgnoreLine ?>>
 							<?php
 							if ( is_array( $field['func']['function'] ) ) {
 								$classname = $field['func']['function'][0];
@@ -644,7 +644,7 @@ if ( ! class_exists( 'Give_CMB2_Settings_Loader' ) ) :
 			$array_keys = array_keys( $sections );
 
 			foreach ( $sections as $id => $label ) {
-				echo '<li><a href="' . admin_url( 'edit.php?post_type=give_forms&page=give-settings&tab=' . $this->current_tab . '&section=' . sanitize_title( $id ) ) . '" class="' . ( $this->current_section == $id ? 'current' : '' ) . '">' . strip_tags( $label ) . '</a> ' . ( end( $array_keys ) == $id ? '' : '|' ) . ' </li>';
+				echo '<li><a href="' . esc_url( admin_url( 'edit.php?post_type=give_forms&page=give-settings&tab=' . $this->current_tab . '&section=' . sanitize_title( $id ) ) ) . '" class="' . ( $this->current_section == $id ? 'current' : '' ) . '">' . esc_html( wp_strip_all_tags( $label ) ) . '</a> ' . ( end( $array_keys ) == $id ? '' : '|' ) . ' </li>';
 			}
 
 			echo '</ul><br class="clear" /><hr>';

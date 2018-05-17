@@ -165,7 +165,7 @@ class Give_DB_Logs extends Give_DB {
 			case 'id':
 				$log = $wpdb->get_row(
 					$wpdb->prepare(
-						"SELECT * FROM $this->table_name WHERE ID = %s LIMIT 1",
+						"SELECT * FROM $this->table_name WHERE ID = %d LIMIT 1", // @codingStandardsIgnoreLine
 						$log_id
 					),
 					ARRAY_A
@@ -192,10 +192,10 @@ class Give_DB_Logs extends Give_DB {
 	public function get_logs( $args = array() ) {
 		global $wpdb;
 		$sql_query = $this->get_sql( $args );
-		
+
 		// Get log.
 		if ( ! ( $logs = Give_Cache::get( 'give_logs', true, $sql_query ) ) ) {
-			$logs = $wpdb->get_results( $sql_query );
+			$logs = $wpdb->get_results( $sql_query ); // @codingStandardsIgnoreLine
 			Give_Cache::set( 'give_logs', $logs, 3600, true, $sql_query );
 		}
 
@@ -223,7 +223,7 @@ class Give_DB_Logs extends Give_DB {
 		$sql_query = $this->get_sql( $args );
 
 		if ( ! ( $count = Give_Cache::get( 'give_logs_count', true, $sql_query ) ) ) {
-			$count = $wpdb->get_var( $sql_query );
+			$count = $wpdb->get_var( $sql_query ); // @codingStandardsIgnoreLine
 			Give_Cache::set( 'give_logs_count', $count, 3600, true, $args );
 		}
 		
@@ -366,7 +366,7 @@ class Give_DB_Logs extends Give_DB {
 		$args['order']   = esc_sql( $args['order'] );
 
 		return $wpdb->prepare(
-			"SELECT {$fields} FROM {$this->table_name} {$where} ORDER BY {$this->table_name}.{$args['orderby']} {$args['order']} LIMIT %d,%d;",
+			"SELECT {$fields} FROM {$this->table_name} {$where} ORDER BY {$this->table_name}.{$args['orderby']} {$args['order']} LIMIT %d,%d;", // @codingStandardsIgnoreLine
 			absint( $args['offset'] ),
 			absint( $args['number'] )
 		);

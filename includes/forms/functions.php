@@ -143,9 +143,9 @@ function give_send_to_success_page( $query_string = null ) {
 		$redirect .= $query_string;
 	}
 
-	$gateway = isset( $_REQUEST['give-gateway'] ) ? $_REQUEST['give-gateway'] : '';
+	$gateway = isset( $_REQUEST['give-gateway'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['give-gateway'] ) ) : '';
 
-	wp_redirect( apply_filters( 'give_success_page_redirect', $redirect, $gateway, $query_string ) );
+	wp_safe_redirect( apply_filters( 'give_success_page_redirect', $redirect, $gateway, $query_string ) );
 	give_die();
 }
 
@@ -163,12 +163,12 @@ function give_send_to_success_page( $query_string = null ) {
  */
 function give_send_back_to_checkout( $args = array() ) {
 
-	$url     = isset( $_POST['give-current-url'] ) ? sanitize_text_field( $_POST['give-current-url'] ) : '';
+	$url     = isset( $_POST['give-current-url'] ) ? sanitize_text_field( wp_unslash( $_POST['give-current-url'] ) ) : '';
 	$form_id = 0;
 
 	// Set the form_id.
 	if ( isset( $_POST['give-form-id'] ) ) {
-		$form_id = sanitize_text_field( $_POST['give-form-id'] );
+		$form_id = sanitize_text_field( wp_unslash( $_POST['give-form-id'] ) );
 	}
 
 	// Need a URL to continue. If none, redirect back to single form.
@@ -183,7 +183,7 @@ function give_send_back_to_checkout( $args = array() ) {
 
 	// Set the $level_id.
 	if ( isset( $_POST['give-price-id'] ) ) {
-		$defaults['level-id'] = sanitize_text_field( $_POST['give-price-id'] );
+		$defaults['level-id'] = sanitize_text_field( wp_unslash( $_POST['give-price-id'] ) );
 	}
 
 	// Check for backward compatibility.
@@ -306,8 +306,8 @@ function give_is_failed_transaction_page() {
 function give_listen_for_failed_payments() {
 
 	$failed_page = give_get_option( 'failure_page', 0 );
-	$payment_id  = ! empty( $_GET['payment-id'] ) ? absint( $_GET['payment-id'] ) : 0;
-	$nonce       = ! empty( $_GET['_wpnonce'] ) ? give_clean( $_GET['_wpnonce'] ) : false;
+	$payment_id  = ! empty( $_GET['payment-id'] ) ? absint( $_GET['payment-id'] ) : 0; // WPCS: Input var ok.
+	$nonce       = ! empty( $_GET['_wpnonce'] ) ? give_clean( $_GET['_wpnonce'] ) : false; // @codingStandardsIgnoreLine
 
 	// Bailout.
 	if ( ! $failed_page || ! is_page( $failed_page ) || ! $payment_id || ! $nonce ) {
@@ -316,7 +316,10 @@ function give_listen_for_failed_payments() {
 
 	// Security check.
 	if ( ! wp_verify_nonce( $nonce, "give-failed-donation-{$payment_id}" ) ) {
-		wp_die( __( 'Nonce verification failed.', 'give' ), __( 'Error', 'give' ) );
+		wp_die(
+			esc_html__( 'Nonce verification failed.', 'give' ),
+			esc_html__( 'Error', 'give' )
+		);
 	}
 
 	// Set payment status to failure
@@ -604,7 +607,7 @@ function give_get_price_option_name( $form_id = 0, $price_id = 0, $payment_id = 
 function give_price_range( $form_id = 0, $formatted = true ) {
 	$low        = give_get_lowest_price_option( $form_id );
 	$high       = give_get_highest_price_option( $form_id );
-	$order_type = ! empty( $_REQUEST['order'] ) ? $_REQUEST['order'] : 'asc';
+	$order_type = ! empty( $_REQUEST['order'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['order'] ) ) : 'asc';
 
 	$range = sprintf(
 		'<span class="give_price_range_%1$s">%2$s</span><span class="give_price_range_sep">&nbsp;&ndash;&nbsp;</span><span class="give_price_range_%3$s">%4$s</span>',
@@ -828,11 +831,11 @@ function give_price( $form_id = 0, $echo = true, $price_id = false ) {
 	}
 
 	$price           = apply_filters( 'give_form_price', give_maybe_sanitize_amount( $price ), $form_id );
-	$formatted_price = '<span class="give_price" id="give_price_' . $form_id . '">' . $price . '</span>';
+	$formatted_price = '<span class="give_price" id="give_price_' . esc_attr( $form_id ) . '">' . esc_html( $price ) . '</span>';
 	$formatted_price = apply_filters( 'give_form_price_after_html', $formatted_price, $form_id, $price );
 
 	if ( $echo ) {
-		echo $formatted_price;
+		echo wp_kses_post( $formatted_price );
 	} else {
 		return $formatted_price;
 	}
@@ -1039,7 +1042,7 @@ function give_goal( $form_id = 0, $echo = true ) {
 	$formatted_goal = apply_filters( 'give_form_price_after_html', $formatted_goal, $form_id, $goal );
 
 	if ( $echo ) {
-		echo $formatted_goal;
+		echo wp_kses_post( $formatted_goal );
 	} else {
 		return $formatted_goal;
 	}
@@ -1191,6 +1194,7 @@ function give_get_form_donor_count( $form_id, $args = array() ) {
 
 		$distinct = $args['unique'] ? 'DISTINCT meta_value' : 'meta_value';
 
+		// WPCS: unprepared SQL ok.
 		$query = $wpdb->prepare(
 			"
 			SELECT COUNT({$distinct})
@@ -1206,9 +1210,9 @@ function give_get_form_donor_count( $form_id, $args = array() ) {
 			'_give_payment_donor_id',
 			'_give_payment_form_id',
 			$form_id
-		);
+		); // WPCS: unprepared SQL ok.
 
-		$donor_count = absint( $wpdb->get_var( $query ) );
+		$donor_count = absint( $wpdb->get_var( $query ) ); // WPCS: unprepared SQL ok.
 	}
 
 

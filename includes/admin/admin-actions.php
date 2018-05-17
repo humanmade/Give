@@ -24,10 +24,12 @@ function give_load_wp_editor() {
 		die();
 	}
 
-	$wp_editor                     = json_decode( base64_decode( $_POST['wp_editor'] ), true );
-	$wp_editor[2]['textarea_name'] = $_POST['textarea_name'];
+	$wp_editor                     = isset( $_POST['wp_editor'] ) ? json_decode( base64_decode( sanitize_text_field( wp_unslash( $_POST['wp_editor'] ) ) ), true ) : '';
+	$wp_editor[2]['textarea_name'] = isset( $_POST['textarea_name'] ) ? sanitize_text_field( wp_unslash( $_POST['textarea_name'] ) ) : '';
 
-	wp_editor( $wp_editor[0], $_POST['wp_editor_id'], $wp_editor[2] );
+	$wp_editor_id = isset( $_POST['wp_editor_id'] ) ? sanitize_text_field( wp_unslash( $_POST['wp_editor_id'] ) ) : '';
+
+	wp_editor( $wp_editor[0], $wp_editor_id, $wp_editor[2] );
 
 	die();
 }
@@ -52,7 +54,7 @@ function give_redirect_to_clean_url_admin_pages() {
 	);
 
 	// Get current page.
-	$current_page = isset( $_GET['page'] ) ? esc_attr( $_GET['page'] ) : '';
+	$current_page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : '';
 
 	// Bailout.
 	if (
@@ -70,12 +72,14 @@ function give_redirect_to_clean_url_admin_pages() {
 	 */
 	$redirect = apply_filters( "give_validate_{$current_page}", true );
 
+	$server_request_uri = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
+
 	if ( $redirect ) {
 		// Redirect.
 		wp_redirect(
 			remove_query_arg(
 				array( '_wp_http_referer', '_wpnonce' ),
-				wp_unslash( $_SERVER['REQUEST_URI'] )
+				sanitize_text_field( wp_unslash( $server_request_uri ) )
 			)
 		);
 		exit;
@@ -139,9 +143,10 @@ function _give_register_admin_notices() {
 			isset( $_GET['payment'] ) &&
 			! empty( $_GET['payment'] )
 		) {
-			$payment_count = isset( $_GET['payment'] ) ? count( $_GET['payment'] ) : 0;
+			$payment_count = isset( $_GET['payment'] ) ? count( $_GET['payment'] ) : 0; // WPCS: Sanitization ok.
+			$action        = isset( $_GET['action'] ) ? sanitize_text_field( wp_unslash( $_GET['action'] ) ) : '';
 
-			switch ( $_GET['action'] ) {
+			switch ( $action ) {
 				case 'delete':
 					Give()->notices->register_notice( array(
 						'id'          => 'bulk_action_delete',
@@ -203,9 +208,10 @@ function _give_register_admin_notices() {
 
 	// Add give message notices.
 	if ( ! empty( $_GET['give-message'] ) ) {
+		$message = sanitize_text_field( wp_unslash( $_GET['give-message'] ) );
 		// Donation reports errors.
 		if ( current_user_can( 'view_give_reports' ) ) {
-			switch ( $_GET['give-message'] ) {
+			switch ( $message ) {
 				case 'donation_deleted' :
 					Give()->notices->register_notice( array(
 						'id'          => 'give-donation-deleted',
@@ -243,7 +249,7 @@ function _give_register_admin_notices() {
 
 		// Give settings notices and errors.
 		if ( current_user_can( 'manage_give_settings' ) ) {
-			switch ( $_GET['give-message'] ) {
+			switch ( $message ) {
 				case 'settings-imported' :
 					Give()->notices->register_notice( array(
 						'id'          => 'give-settings-imported',
@@ -304,7 +310,7 @@ function _give_register_admin_notices() {
 		}// End if().
 		// Payments errors.
 		if ( current_user_can( 'edit_give_payments' ) ) {
-			switch ( $_GET['give-message'] ) {
+			switch ( $message ) {
 				case 'note-added' :
 					Give()->notices->register_notice( array(
 						'id'          => 'give-note-added',
@@ -326,7 +332,7 @@ function _give_register_admin_notices() {
 
 		// Donor Notices.
 		if ( current_user_can( 'edit_give_payments' ) ) {
-			switch ( $_GET['give-message'] ) {
+			switch ( $message ) {
 				case 'donor-deleted' :
 					Give()->notices->register_notice( array(
 						'id'          => 'give-donor-deleted',
@@ -451,7 +457,7 @@ add_action( 'admin_notices', '_give_register_admin_notices', - 1 );
  */
 function _give_show_test_mode_notice_in_admin_bar( $wp_admin_bar ) {
 	$is_test_mode = ! empty( $_POST['test_mode'] ) ?
-		give_is_setting_enabled( $_POST['test_mode'] ) :
+		give_is_setting_enabled( sanitize_text_field( wp_unslash( $_POST['test_mode'] ) ) ) :
 		give_is_test_mode();
 
 	if (
@@ -510,11 +516,16 @@ add_action( 'admin_head', '_give_test_mode_notice_admin_bar_css' );
 function give_import_page_link_callback() {
 	?>
 	<a href="<?php echo esc_url( give_import_page_url() ); ?>"
-	   class="page-import-action page-title-action"><?php _e( 'Import Donations', 'give' ); ?></a>
+	   class="page-import-action page-title-action"><?php esc_html_e( 'Import Donations', 'give' ); ?></a>
 
 	<?php
 	// Check if view donation single page only.
-	if ( ! empty( $_REQUEST['view'] ) && 'view-payment-details' === (string) give_clean( $_REQUEST['view'] ) && 'give-payment-history' === give_clean( $_REQUEST['page'] ) ) {
+	if (
+		! empty( $_REQUEST['view'] ) &&
+		! empty( $_REQUEST['page'] ) &&
+		'view-payment-details' === (string) give_clean( $_REQUEST['view'] ) && // WPCS: Sanitization ok.
+		'give-payment-history' === give_clean( $_REQUEST['page'] ) // WPCS: Sanitization ok.
+	) {
 		?>
 		<style type="text/css">
 			.wrap #transaction-details-heading {
@@ -541,38 +552,37 @@ function give_donation_import_callback() {
 	Give_Cache::get_instance()->disable();
 
 	$import_setting = array();
-	$fields         = isset( $_POST['fields'] ) ? $_POST['fields'] : null;
+	$fields         = isset( $_POST['fields'] ) ? give_clean( $_POST['fields'] ) : null; // WPCS: Sanitization ok.
 
 	parse_str( $fields );
 
-	$import_setting['create_user'] = $create_user;
-	$import_setting['mode']        = $mode;
-	$import_setting['delimiter']   = $delimiter;
-	$import_setting['csv']         = $csv;
-	$import_setting['delete_csv']  = $delete_csv;
-	$import_setting['dry_run']     = $dry_run;
+	$import_setting['create_user'] = isset( $fields['create_user'] ) ? $fields['create_user'] : '';
+	$import_setting['mode']        = isset( $fields['mode'] ) ? $fields['mode'] : '';
+	$import_setting['delimiter']   = isset( $fields['delimiter'] ) ? $fields['delimiter'] : '';
+	$import_setting['csv']         = isset( $fields['csv'] ) ? $fields['csv'] : '';
+	$import_setting['delete_csv']  = isset( $fields['delete_csv'] ) ? $fields['delete_csv'] : '';
+	$import_setting['dry_run']     = isset( $fields['dry_run'] ) ? $fields['dry_run'] : '';
 
 	// Parent key id.
-	$main_key = maybe_unserialize( $main_key );
+	$main_key = isset( $fields['main_key'] ) ? maybe_unserialize( $fields['main_key'] ) : false;
 
-	$current    = absint( $_REQUEST['current'] );
-	$total_ajax = absint( $_REQUEST['total_ajax'] );
-	$start      = absint( $_REQUEST['start'] );
-	$end        = absint( $_REQUEST['end'] );
-	$next       = absint( $_REQUEST['next'] );
-	$total      = absint( $_REQUEST['total'] );
-	$per_page   = absint( $_REQUEST['per_page'] );
-	if ( empty( $delimiter ) ) {
-		$delimiter = ',';
-	}
+	$current    = isset( $_REQUEST['current'] ) ? absint( sanitize_key( $_REQUEST['current'] ) ) : 0;
+	$total_ajax = isset( $_REQUEST['total_ajax'] ) ? absint( sanitize_key( $_REQUEST['total_ajax'] ) ) : 0;
+	$start      = isset( $_REQUEST['start'] ) ? absint( sanitize_key( $_REQUEST['start'] ) ) : 0;
+	$end        = isset( $_REQUEST['end'] ) ? absint( sanitize_key( $_REQUEST['end'] ) ) : 0;
+	$next       = isset( $_REQUEST['next'] ) ? absint( sanitize_key( $_REQUEST['next'] ) ) : 0;
+	$total      = isset( $_REQUEST['total'] ) ? absint( sanitize_key( $_REQUEST['total'] ) ) : 0;
+	$per_page   = isset( $_REQUEST['per_page'] ) ? absint( sanitize_key( $_REQUEST['per_page'] ) ) : 0;
+
+	$delimiter = ! empty( $fields['delimiter'] ) ? $fields['delimiter'] : ',';
 
 	// Processing done here.
-	$raw_data                  = give_get_donation_data_from_csv( $csv, $start, $end, $delimiter );
-	$raw_key                   = maybe_unserialize( $mapto );
+	$raw_data                  = give_get_donation_data_from_csv( $import_setting['csv'], $import_setting['start'], $import_setting['end'], $delimiter );
+	$raw_key                   = maybe_unserialize( $fields['mapto'] );
 	$import_setting['raw_key'] = $raw_key;
 
-	if ( ! empty( $dry_run ) ) {
-		$import_setting['csv_raw_data'] = give_get_donation_data_from_csv( $csv, 1, $end, $delimiter );
+	if ( ! empty( $import_settings['dry_run'] ) ) {
+		$import_setting['csv_raw_data'] = give_get_donation_data_from_csv( $import_settings['csv'], 1, $import_settings['end'], $delimiter );
 
 		$import_setting['donors_list'] = Give()->donors->get_donors( array(
 			'number' => - 1,
@@ -663,7 +673,7 @@ add_action( 'wp_ajax_give_donation_import', 'give_donation_import_callback' );
  */
 
 function give_core_settings_import_callback() {
-	$fields = isset( $_POST['fields'] ) ? $_POST['fields'] : null;
+	$fields = isset( $_POST['fields'] ) ? give_clean( $_POST['fields'] ) : null; // WPCS: Sanitization ok.
 	parse_str( $fields, $fields );
 
 	$json_data['success'] = false;
@@ -806,10 +816,10 @@ function give_donor_information_profile_fields( $user ) {
 		<table class="form-table">
 			<tbody>
 			<tr>
-				<th scope="row"><?php _e( 'Donor', 'give' ); ?></th>
+				<th scope="row"><?php esc_html_e( 'Donor', 'give' ); ?></th>
 				<td>
-					<a href="<?php echo admin_url( 'edit.php?post_type=give_forms&page=give-donors&view=overview&id=' . $donor->id ); ?>">
-						<?php _e( 'View Donor Information', 'give' ); ?>
+					<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=give_forms&page=give-donors&view=overview&id=' . $donor->id ) ); ?>">
+						<?php esc_html_e( 'View Donor Information', 'give' ); ?>
 					</a>
 				</td>
 			</tr>
@@ -1056,9 +1066,9 @@ function give_update_donor_name_on_user_update( $user_id = 0 ) {
 		}
 
 		// Get User First name and Last name.
-		$first_name = ( $_POST['first_name'] ) ? give_clean( $_POST['first_name'] ) : get_user_meta( $user_id, 'first_name', true );
-		$last_name  = ( $_POST['last_name'] ) ? give_clean( $_POST['last_name'] ) : get_user_meta( $user_id, 'last_name', true );
-		$full_name  = strip_tags( wp_unslash( trim( "{$first_name} {$last_name}" ) ) );
+		$first_name = isset( $_POST['first_name'] ) ? give_clean( $_POST['first_name'] ) : get_user_meta( $user_id, 'first_name', true ); // WPCS: Sanitization ok.
+		$last_name  = isset( $_POST['last_name'] ) ? give_clean( $_POST['last_name'] ) : get_user_meta( $user_id, 'last_name', true ); // WPCS: Sanitization ok.
+		$full_name  = wp_strip_all_tags( wp_unslash( trim( "{$first_name} {$last_name}" ) ) );
 
 		// Assign User First name and Last name to Donor.
 		Give()->donors->update( $donor->id, array(

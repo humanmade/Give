@@ -184,7 +184,7 @@ class Give_Graph {
 
 			jQuery( document ).ready( function ( $ ) {
 				$.plot(
-					$( "#give-graph-<?php echo $this->id; ?>" ),
+					$( "#give-graph-<?php echo esc_attr( $this->id ); ?>" ),
 					[
 						<?php
 							$order = 0;
@@ -192,17 +192,17 @@ class Give_Graph {
 						?>
 						{
 							label : "<?php echo esc_attr( $label ); ?>",
-							id    : "<?php echo sanitize_key( $label ); ?>",
-							dataType  : '<?php echo ( ! empty( $this->options['dataType'][$order] ) ? $this->options['dataType'][$order] : 'count' ); ?>',
+							id    : "<?php echo esc_attr( $label ); ?>",
+							dataType  : '<?php echo esc_js( ! empty( $this->options['dataType'][$order] ) ? $this->options['dataType'][$order] : 'count' ); ?>',
 							// data format is: [ point on x, value on y ]
-							data  : [<?php foreach( $data as $point ) { echo '[' . implode( ',', $point ) . '],'; } ?>],
+							data  : [<?php foreach( $data as $point ) { echo '[' . implode( ',', $point ) . '],'; } // @codingStandardsIgnoreLine  ?>],
 							points: {
 								show: <?php echo $this->options['points'] ? 'true' : 'false'; ?>,
 							},
 							bars  : {
 								show    : <?php echo $this->options['bars'] ? 'true' : 'false'; ?>,
 								barWidth: 100,
-				                order: <?php echo $order++; ?>,
+				                order: <?php echo $order++; // @codingStandardsIgnoreLine ?>,
 								align   : 'center'
 							},
 							lines : {
@@ -211,7 +211,7 @@ class Give_Graph {
 								fillColor: {colors: [{opacity: 0.4}, {opacity: 0.1}]}
 							},
 							<?php if( $this->options[ 'multiple_y_axes' ] ) : ?>
-							yaxis : <?php echo $yaxis_count; ?>
+							yaxis : <?php echo $yaxis_count; // @codingStandardsIgnoreLine ?>
 							<?php endif; ?>
 
 						},
@@ -224,9 +224,9 @@ class Give_Graph {
 						grid: {
 							show           : true,
 							aboveData      : false,
-							color          : "<?php echo $this->options[ 'color' ]; ?>",
-							backgroundColor: "<?php echo $this->options[ 'bgcolor' ]; ?>",
-							borderColor    : "<?php echo $this->options[ 'bordercolor' ]; ?>",
+							color          : "<?php echo esc_js( $this->options[ 'color' ] ); ?>",
+							backgroundColor: "<?php echo esc_js( $this->options[ 'bgcolor' ] ); ?>",
+							borderColor    : "<?php echo esc_js( $this->options[ 'bordercolor' ] ); ?>",
 							borderWidth    : <?php echo absint( $this->options[ 'borderwidth' ] ); ?>,
 							clickable      : false,
 							hoverable      : true
@@ -235,20 +235,20 @@ class Give_Graph {
 						colors: ["#66bb6a", "#546e7a"], //Give Colors
 
 						xaxis: {
-							mode        : "<?php echo $this->options['x_mode']; ?>",
-							timeFormat  : "<?php echo $this->options['x_mode'] == 'time' ? $this->options['time_format'] : ''; ?>",
-							tickSize    : "<?php echo $this->options['x_mode'] == 'time' ? '' : 1; ?>",
+							mode        : "<?php echo esc_js( $this->options['x_mode'] ); ?>",
+							timeFormat  : "<?php echo $this->options['x_mode'] == 'time' ? esc_js( $this->options['time_format'] ) : ''; ?>",
+							tickSize    : "<?php echo esc_js( $this->options['x_mode'] ) == 'time' ? '' : 1; ?>",
 							<?php if( $this->options['x_mode'] != 'time' ) : ?>
-							tickDecimals: <?php echo $this->options['x_decimals']; ?>
+							tickDecimals: <?php echo esc_js( $this->options['x_decimals'] ); ?>
 							<?php endif; ?>
 						},
 						yaxis: {
 							position    : 'right',
 							min         : 0,
-							mode        : "<?php echo $this->options['y_mode']; ?>",
-							timeFormat  : "<?php echo $this->options['y_mode'] == 'time' ? $this->options['time_format'] : ''; ?>",
+							mode        : "<?php echo esc_js( $this->options['y_mode'] ); ?>",
+							timeFormat  : "<?php echo $this->options['y_mode'] == 'time' ? esc_js( $this->options['time_format'] ) : ''; ?>",
 							<?php if( $this->options['y_mode'] != 'time' ) : ?>
-							tickDecimals: <?php echo $this->options['y_decimals']; ?>,
+							tickDecimals: <?php echo esc_js( $this->options['y_decimals'] ); ?>,
 							<?php endif; ?>
 							tickFormatter: function(val) {
 								return val.toString().replace(/\B(?=(?:\d{3})+(?!\d))/g, give_vars.thousands_separator);
@@ -271,7 +271,7 @@ class Give_Graph {
 				}
 
 				var previousPoint = null;
-				$( "#give-graph-<?php echo $this->id; ?>" ).bind( "plothover", function ( event, pos, item ) {
+				$( "#give-graph-<?php echo esc_attr( $this->id ); ?>" ).bind( "plothover", function ( event, pos, item ) {
 
 					$( "#x" ).text( pos.x.toFixed( 2 ) );
 					$( "#y" ).text( pos.y.toFixed( 2 ) );
@@ -303,7 +303,7 @@ class Give_Graph {
 			} );
 
 		</script>
-		<div id="give-graph-<?php echo $this->id; ?>" class="give-graph" style="height: 300px;"></div>
+		<div id="give-graph-<?php echo esc_attr( $this->id ); ?>" class="give-graph" style="height: 300px;"></div>
 		<?php
 		return ob_get_clean();
 	}
@@ -324,7 +324,7 @@ class Give_Graph {
 		do_action( 'give_before_graph', $this );
 
 		// Build the graph.
-		echo $this->build_graph();
+		echo $this->build_graph(); // @codingStandardsIgnoreLine
 
 		/**
 		 * Fires after displaying the final graph.

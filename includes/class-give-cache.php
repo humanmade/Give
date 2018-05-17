@@ -374,6 +374,7 @@ class Give_Cache {
 		$field_names = $fields ? 'option_name, option_value' : 'option_name';
 
 		if ( $fields ) {
+			// @codingStandardsIgnoreStart
 			$options = $wpdb->get_results(
 				$wpdb->prepare(
 					"SELECT {$field_names }
@@ -384,6 +385,7 @@ class Give_Cache {
 				),
 				ARRAY_A
 			);
+			// @codingStandardsIgnoreEnd
 		} else {
 			$options = $wpdb->get_col(
 				$wpdb->prepare(
@@ -449,7 +451,7 @@ class Give_Cache {
 			$group = self::$instance->filter_group_name( $group );
 
 			$cached_data = wp_cache_get( $id, $group );
-			$cached_data = false !== $cached_data ? $cached_data : null;
+			$cached_data = false !== $cached_data ? $cached_data : null; // @codingStandardsIgnoreLine
 		}
 
 		return $cached_data;
@@ -723,9 +725,9 @@ class Give_Cache {
 		if (
 			( Give_Admin_Settings::is_saving_settings()
 		       && isset( $_POST['cache'] )
-		       && give_is_setting_enabled( give_clean( $_POST['cache'] ) )
+		       && give_is_setting_enabled( give_clean( $_POST['cache'] ) ) // @codingStandardsIgnoreLine
 		     )
-			|| ( wp_doing_ajax() && 'give_cache_flush' === give_clean( $_GET['action'] ) )
+			|| ( wp_doing_ajax() && 'give_cache_flush' === give_clean( $_GET['action'] ) ) // @codingStandardsIgnoreLine
 		) {
 			self::$instance->get_incrementer( true );
 			self::$instance->get_incrementer( true, 'give-cache-incrementer' );

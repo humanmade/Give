@@ -87,7 +87,7 @@ function give_render_form_columns( $column_name, $post_id ) {
 			case 'goal':
 				if ( give_is_setting_enabled( give_get_meta( $post_id, '_give_goal_option', true ) ) ) {
 
-					echo give_admin_form_goal_stats( $post_id );
+					echo give_admin_form_goal_stats( $post_id ); // @codingStandardsIgnoreLine
 
 				} else {
 					_e( 'No Goal Set', 'give' );
@@ -96,7 +96,7 @@ function give_render_form_columns( $column_name, $post_id ) {
 				printf(
 					'<input type="hidden" class="formgoal-%1$s" value="%2$s" />',
 					esc_attr( $post_id ),
-					give_get_form_goal( $post_id )
+					give_get_form_goal( $post_id ) // @codingStandardsIgnoreLine
 				);
 
 				break;
@@ -105,7 +105,7 @@ function give_render_form_columns( $column_name, $post_id ) {
 					printf(
 						'<a href="%1$s">%2$s</a>',
 						esc_url( admin_url( 'edit.php?post_type=give_forms&page=give-payment-history&form_id=' . $post_id ) ),
-						give_get_form_sales_stats( $post_id )
+						give_get_form_sales_stats( $post_id ) // @codingStandardsIgnoreLine
 					);
 				} else {
 					echo '-';
@@ -250,7 +250,7 @@ function give_filter_forms( $vars ) {
 		// If an author ID was passed, use it
 		if ( isset( $_REQUEST['author'] ) && ! current_user_can( 'view_give_reports' ) ) {
 
-			$author_id = $_REQUEST['author'];
+			$author_id = absint( $_REQUEST['author'] );
 			if ( (int) $author_id !== get_current_user_id() ) {
 				wp_die( esc_html__( 'You do not have permission to view this data.', 'give' ), esc_html__( 'Error', 'give' ), array(
 					'response' => 403,
@@ -329,7 +329,7 @@ function give_price_save_quick_edit( $post_id ) {
 	}
 
 	if ( isset( $_REQUEST['_give_regprice'] ) ) {
-		give_update_meta( $post_id, '_give_set_price', give_sanitize_amount_for_db( strip_tags( stripslashes( $_REQUEST['_give_regprice'] ) ) ) );
+		give_update_meta( $post_id, '_give_set_price', give_sanitize_amount_for_db( wp_strip_all_tags( stripslashes( $_REQUEST['_give_regprice'] ) ) ) ); // @codingStandardsIgnoreLine
 	}
 }
 
@@ -343,10 +343,10 @@ add_action( 'save_post', 'give_price_save_quick_edit' );
  */
 function give_save_bulk_edit() {
 
-	$post_ids = ( isset( $_POST['post_ids'] ) && ! empty( $_POST['post_ids'] ) ) ? $_POST['post_ids'] : array();
+	$post_ids = ( isset( $_POST['post_ids'] ) && ! empty( $_POST['post_ids'] ) ) ? array_map( 'absint', $_POST['post_ids'] ) : array();
 
 	if ( ! empty( $post_ids ) && is_array( $post_ids ) ) {
-		$price = isset( $_POST['price'] ) ? strip_tags( stripslashes( $_POST['price'] ) ) : 0;
+		$price = isset( $_POST['price'] ) ? wp_strip_all_tags( stripslashes( $_POST['price'] ) ) : 0; // @codingStandardsIgnoreLine
 		foreach ( $post_ids as $post_id ) {
 
 			if ( ! current_user_can( 'edit_post', $post_id ) ) {

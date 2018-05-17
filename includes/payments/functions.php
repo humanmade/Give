@@ -154,8 +154,8 @@ function give_insert_payment( $payment_data = array() ) {
 
 	$payment    = new Give_Payment();
 	$gateway    = ! empty( $payment_data['gateway'] ) ? $payment_data['gateway'] : '';
-	$gateway    = empty( $gateway ) && isset( $_POST['give-gateway'] ) ? $_POST['give-gateway'] : $gateway;
-	$form_id    = isset( $payment_data['give_form_id'] ) ? $payment_data['give_form_id'] : 0;
+	$gateway    = empty( $gateway ) && isset( $_POST['give-gateway'] ) ? sanitize_text_field( wp_unslash( $_POST['give-gateway'] ) ) : $gateway; // @codingStandardsIgnoreLines
+	$form_id    = isset( $payment_data['give_form_id'] ) ? intval( wp_unslash( $payment_data['give_form_id'] ) ) : 0;
 	$price_id   = give_get_payment_meta_price_id( $payment_data );
 	$form_title = isset( $payment_data['give_form_title'] ) ? $payment_data['give_form_title'] : get_the_title( $form_id );
 
@@ -458,7 +458,7 @@ function give_count_payments( $args = array() ) {
 function give_check_for_existing_payment( $payment_id ) {
 	global $wpdb;
 
-	return (bool) $wpdb->get_var(
+	return (bool) $wpdb->get_var( // @codingStandardsIgnoreLine
 		$wpdb->prepare(
 			"
 			SELECT ID
@@ -580,7 +580,7 @@ function give_get_earnings_by_date( $day = null, $month_num, $year = null, $hour
 
 	$args = array(
 		'post_type'              => 'give_payment',
-		'nopaging'               => true,
+		'nopaging'               => true, // @codingStandardsIgnoreLine
 		'year'                   => $year,
 		'monthnum'               => $month_num,
 		'post_status'            => array( 'publish' ),
@@ -598,7 +598,7 @@ function give_get_earnings_by_date( $day = null, $month_num, $year = null, $hour
 	$args = apply_filters( 'give_get_earnings_by_date_args', $args );
 	$key  = Give_Cache::get_key( 'give_stats', $args );
 
-	if ( ! empty( $_GET['_wpnonce'] ) && wp_verify_nonce( $_GET['_wpnonce'], 'give-refresh-reports' ) ) {
+	if ( ! empty( $_GET['_wpnonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'give-refresh-reports' ) ) {
 		$earnings = false;
 	} else {
 		$earnings = Give_Cache::get( $key );
@@ -609,7 +609,7 @@ function give_get_earnings_by_date( $day = null, $month_num, $year = null, $hour
 		$earnings  = 0;
 		if ( $donations ) {
 			$donations      = implode( ',', $donations );
-			$earning_totals = $wpdb->get_var( "SELECT SUM(meta_value) FROM $wpdb->postmeta WHERE meta_key = '_give_payment_total' AND post_id IN ({$donations})" );
+			$earning_totals = $wpdb->get_var( "SELECT SUM(meta_value) FROM $wpdb->postmeta WHERE meta_key = '_give_payment_total' AND post_id IN ({$donations})" ); // @codingStandardsIgnoreLine
 
 			/**
 			 * Filter The earnings by dates.
@@ -646,7 +646,7 @@ function give_get_sales_by_date( $day = null, $month_num = null, $year = null, $
 	// This is getting deprecated soon. Use Give_Payment_Stats with the get_sales() method instead.
 	$args = array(
 		'post_type'              => 'give_payment',
-		'nopaging'               => true,
+		'nopaging'               => true, // @codingStandardsIgnoreLine
 		'year'                   => $year,
 		'fields'                 => 'ids',
 		'post_status'            => array( 'publish' ),
@@ -683,7 +683,7 @@ function give_get_sales_by_date( $day = null, $month_num = null, $year = null, $
 
 	$key = Give_Cache::get_key( 'give_stats', $args );
 
-	if ( ! empty( $_GET['_wpnonce'] ) && wp_verify_nonce( $_GET['_wpnonce'], 'give-refresh-reports' ) ) {
+	if ( ! empty( $_GET['_wpnonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'give-refresh-reports' ) ) {
 		$count = false;
 	} else {
 		$count = Give_Cache::get( $key );
@@ -785,7 +785,7 @@ function give_get_total_earnings( $recalculate = false ) {
 
 			if ( ! empty( $payments ) ) {
 				$payments = implode( ',', $payments );
-				$total   += $wpdb->get_var( "SELECT SUM(meta_value) FROM {$meta_table['name']} WHERE meta_key = '_give_payment_total' AND {$meta_table['column']['id']} IN({$payments})" );
+				$total   += $wpdb->get_var( "SELECT SUM(meta_value) FROM {$meta_table['name']} WHERE meta_key = '_give_payment_total' AND {$meta_table['column']['id']} IN({$payments})" ); // @codingStandardsIgnoreLine
 			}
 		}
 
@@ -967,6 +967,7 @@ function give_get_payment_user_id( $payment_id ) {
 	global $wpdb;
 	$paymentmeta_table = Give()->payment_meta->table_name;
 
+	// @codingStandardsIgnoreStart
 	return (int) $wpdb->get_var(
 		$wpdb->prepare(
 			"
@@ -983,6 +984,7 @@ function give_get_payment_user_id( $payment_id ) {
 			'_give_payment_donor_id'
 		)
 	);
+	// @codingStandardsIgnoreEnd
 }
 
 /**
@@ -1302,7 +1304,7 @@ function give_get_donation_id_by_key( $key ) {
 	global $wpdb;
 
 	$meta_table = __give_v20_bc_table_details( 'payment' );
-
+	// @codingStandardsIgnoreStart
 	$purchase = $wpdb->get_var(
 		$wpdb->prepare(
 			"
@@ -1316,6 +1318,7 @@ function give_get_donation_id_by_key( $key ) {
 			$key
 		)
 	);
+	// @codingStandardsIgnoreEnd
 
 	if ( $purchase != null ) {
 		return $purchase;
@@ -1339,7 +1342,7 @@ function give_get_purchase_id_by_transaction_id( $key ) {
 	global $wpdb;
 	$meta_table = __give_v20_bc_table_details( 'payment' );
 
-	$purchase = $wpdb->get_var( $wpdb->prepare( "SELECT {$meta_table['column']['id']} FROM {$meta_table['name']} WHERE meta_key = '_give_payment_transaction_id' AND meta_value = %s LIMIT 1", $key ) );
+	$purchase = $wpdb->get_var( $wpdb->prepare( "SELECT {$meta_table['column']['id']} FROM {$meta_table['name']} WHERE meta_key = '_give_payment_transaction_id' AND meta_value = %s LIMIT 1", $key ) ); // @codingStandardsIgnoreLine
 
 	if ( $purchase != null ) {
 		return $purchase;
@@ -1629,7 +1632,7 @@ function give_remove_payment_notes_in_comment_counts( $stats, $post_id ) {
 		$where .= $wpdb->prepare( ' AND comment_post_ID = %d', $post_id );
 	}
 
-	$count = $wpdb->get_results( "SELECT comment_approved, COUNT( * ) AS num_comments FROM {$wpdb->comments} {$where} GROUP BY comment_approved", ARRAY_A );
+	$count = $wpdb->get_results( "SELECT comment_approved, COUNT( * ) AS num_comments FROM {$wpdb->comments} {$where} GROUP BY comment_approved", ARRAY_A ); // @codingStandardsIgnoreLine
 
 	$total    = 0;
 	$approved = array(
@@ -1844,7 +1847,7 @@ function give_get_form_dropdown( $args = array(), $echo = false ) {
 		return $form_dropdown_html;
 	}
 
-	echo $form_dropdown_html;
+	echo $form_dropdown_html; // @codingStandardsIgnoreLine
 }
 
 /**
@@ -1898,7 +1901,7 @@ function give_get_form_variable_price_dropdown( $args = array(), $echo = false )
 		return $form_dropdown_html;
 	}
 
-	echo $form_dropdown_html;
+	echo $form_dropdown_html; // @codingStandardsIgnoreLine
 }
 
 /**
@@ -1994,7 +1997,7 @@ function give_is_donation_completed( $donation_id ) {
 	 * @param int $donation_id
 	 */
 	return apply_filters(
-		'give_is_donation_completed', (bool) $wpdb->get_var(
+		'give_is_donation_completed', (bool) $wpdb->get_var( // @codingStandardsIgnoreLine
 			$wpdb->prepare(
 				"
 				SELECT meta_value

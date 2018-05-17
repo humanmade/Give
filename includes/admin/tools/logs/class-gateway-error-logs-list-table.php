@@ -91,16 +91,16 @@ class Give_Gateway_Error_Log_Table extends WP_List_Table {
 	public function column_message( $item ) {
 		?>
 		<?php
-		echo Give()->tooltips->render_link( array(
+		echo Give()->tooltips->render_link( array( // @codingStandardsIgnoreLine
 			'label'       => __( 'View Log Message', 'give' ),
 			'tag_content' => '<span class="dashicons dashicons-visibility"></span>',
-			'link'        => "#TB_inline?width=640&amp;inlineId=log-message-{$item['ID']}",
+			'link'        => "#TB_inline?width=640&amp;inlineId=log-message-{$item['ID']}", // @codingStandardsIgnoreLine
 			'attributes'  => array(
 				'class' => 'thickbox give-error-log-details-link button button-small',
 			),
 		) );
 		?>
-		<div id="log-message-<?php echo $item['ID']; ?>" style="display:none;">
+		<div id="log-message-<?php echo esc_attr( $item['ID'] ); ?>" style="display:none;">
 			<?php
 
 			$serialized = strpos( $item['log_content'], '{"' );
@@ -111,12 +111,12 @@ class Give_Gateway_Error_Log_Table extends WP_List_Table {
 				$intro  = substr( $item['log_content'], 0, - $length );
 				$data   = substr( $item['log_content'], $serialized, strlen( $item['log_content'] ) - 1 );
 
-				echo wpautop( $intro );
-				echo wpautop( '<strong>' . esc_html__( 'Log data:', 'give' ) . '</strong>' );
-				echo '<div style="word-wrap: break-word;">' . wpautop( $data ) . '</div>';
+				echo wp_kses_post( wpautop( $intro ) );
+				echo '<strong>' . esc_html__( 'Log data:', 'give' ) . '</strong>';
+				echo wp_kses_post( '<div style="word-wrap: break-word;">' . wpautop( $data ) . '</div>' );
 			} else {
 				// No serialized data found
-				echo wpautop( $item['log_content'] );
+				echo wp_kses_post( wpautop( $item['log_content'] ) );
 			}
 			?>
 		</div>

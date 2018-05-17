@@ -66,7 +66,7 @@ $excerpt          = ''; // Trimmed form excerpt ready for display.
 					$excerpt = $stripped_content;
 				}
 
-				printf( '<p class="give-card__text">%s</p>', $excerpt );
+				echo wp_kses_post( sprintf( '<p class="give-card__text">%s</p>', $excerpt ) );
 			}
 
 			// Maybe display the goal progess bar.
@@ -113,7 +113,7 @@ $excerpt          = ''; // Trimmed form excerpt ready for display.
 	if ( 'modal_reveal' === $atts['display_style'] ) {
 		printf(
 			'<div id="give-modal-form-%1$s" class="give-donation-grid-item-form give-modal--slide mfp-hide">',
-			$form_id
+			esc_attr( $form_id )
 		);
 		give_get_donation_form( $form_id );
 		echo '</div>';

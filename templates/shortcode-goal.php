@@ -107,35 +107,57 @@ $progress = apply_filters( 'give_goal_amount_funded_percentage_output', $progres
 				$income = give_human_format_large_amount( give_format_amount( $income, $income_format_args ), array( 'currency' => $form_currency ) );
 				$goal   = give_human_format_large_amount( give_format_amount( $goal, $goal_format_args ), array( 'currency' => $form_currency ) );
 
-				echo sprintf( /* translators: 1: amount of income raised 2: goal target amount. */
-					__( '<span class="income">%1$s</span> of <span class="goal-text">%2$s</span> raised', 'give' ), give_currency_filter( $income, array( 'form_id' => $form_id ) ), give_currency_filter( $goal, array( 'form_id' => $form_id ) ) );
+				echo wp_kses_post(
+					sprintf(
+						/* translators: 1: amount of income raised 2: goal target amount. */
+						__( '<span class="income">%1$s</span> of <span class="goal-text">%2$s</span> raised', 'give' ),
+						give_currency_filter( $income, array( 'form_id' => $form_id ) ),
+						give_currency_filter( $goal, array( 'form_id' => $form_id ) )
+					)
+				);
 
 			elseif ( 'percentage' === $goal_format ) :
 
-				echo sprintf( /* translators: %s: percentage of the amount raised compared to the goal target */
-					__( '<span class="give-percentage">%s%%</span> funded', 'give' ), round( $progress ) );
+				echo wp_kses_post(
+					sprintf(
+						/* translators: %s: percentage of the amount raised compared to the goal target */
+						__( '<span class="give-percentage">%s%%</span> funded', 'give' ),
+						round( $progress )
+					)
+				);
 
 			elseif ( 'donation' === $goal_format ) :
 
-				echo sprintf( /* translators: 1: total number of donations completed 2: total number of donations set as goal */
-					_n( '<span class="income">%1$s</span> of <span class="goal-text">%2$s</span> donation', '<span class="income">%1$s</span> of <span class="goal-text">%2$s</span> donations', $donations_goal, 'give' ), $donations_completed, $donations_goal );
+				echo wp_kses_post(
+					sprintf(
+						/* translators: 1: total number of donations completed 2: total number of donations set as goal */
+						_n( '<span class="income">%1$s</span> of <span class="goal-text">%2$s</span> donation', '<span class="income">%1$s</span> of <span class="goal-text">%2$s</span> donations', $donations_goal, 'give' ),
+						$donations_completed,
+						$donations_goal
+					)
+				);
 
 			elseif ( 'donors' === $goal_format ) :
 
-				echo sprintf( /* translators: 1: total number of donors completed 2: total number of donors set as goal */
-					_n( '<span class="income">%1$s</span> of <span class="goal-text">%2$s</span> donation', '<span class="income">%1$s</span> of <span class="goal-text">%2$s</span> donors', $donor_goal, 'give' ), $donors, $donor_goal );
+				echo wp_kses_post(
+					sprintf(
+						/* translators: 1: total number of donors completed 2: total number of donors set as goal */
+						_n( '<span class="income">%1$s</span> of <span class="goal-text">%2$s</span> donation', '<span class="income">%1$s</span> of <span class="goal-text">%2$s</span> donors', $donor_goal, 'give' ),
+						$donors,
+						$donor_goal
+					)
+				);
 
 			endif;
 			?>
 		</div>
 	<?php endif; ?>
 
-
 	<?php if ( ! empty( $show_bar ) ) : ?>
 		<div class="give-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"
 			 aria-valuenow="<?php echo esc_attr( $progress_bar_value ); ?>">
 			<span style="width: <?php echo esc_attr( $progress_bar_value ); ?>%;<?php if ( ! empty( $color ) ) {
-				echo 'background-color:' . $color;
+				echo 'background-color:' . esc_attr( $color );
 			} ?>"></span>
 		</div><!-- /.give-progress-bar -->
 	<?php endif; ?>

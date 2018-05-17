@@ -22,13 +22,22 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function give_process_batch_export_form() {
 
-	if ( ! wp_verify_nonce( $_REQUEST['nonce'], 'give-batch-export' ) ) {
-		wp_die( esc_html__( 'Nonce verification failed.', 'give' ), esc_html__( 'Error', 'give' ), array(
-			'response' => 403,
-		) );
+	if (
+		! isset( $_REQUEST['nonce'] ) ||
+		! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) ), 'give-batch-export' )
+	) {
+		wp_die(
+			esc_html__( 'Nonce verification failed.', 'give' ),
+			esc_html__( 'Error', 'give' ),
+			array(
+				'response' => 403,
+			)
+		);
 	}
 
 	require_once GIVE_PLUGIN_DIR . 'includes/admin/tools/export/class-batch-export.php';
+
+	$class = isset( $_REQUEST['class'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['class'] ) ) : '';
 
 	/**
 	 * Fires before batch export.
@@ -37,10 +46,12 @@ function give_process_batch_export_form() {
 	 *
 	 * @param string $class Export class.
 	 */
-	do_action( 'give_batch_export_class_include', $_REQUEST['class'] );
+	do_action( 'give_batch_export_class_include', $class );
 
-	$export = new $_REQUEST['class'];
-	$export->export();
+	if ( class_exists( $class ) ) {
+		$export = new $class;
+		$export->export();
+	}
 
 }
 

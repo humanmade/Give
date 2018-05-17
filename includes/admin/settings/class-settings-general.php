@@ -475,14 +475,14 @@ if ( ! class_exists( 'Give_Settings_General' ) ) :
 		 */
 		public function __render_give_sequential_donation_code_preview( $field ) {
 			?>
-			<tr valign="top" <?php echo ! empty( $field['wrapper_class'] ) ? 'class="' . $field['wrapper_class'] . '"' : '' ?>>
+			<tr valign="top" <?php echo ! empty( $field['wrapper_class'] ) ? 'class="' . esc_attr( $field['wrapper_class'] ) . '"' : '' ?>>
 				<th scope="row" class="titledesc">
 					<label
 						for="<?php echo esc_attr( $field['id'] ); ?>"><?php echo esc_html( $field['name'] ) ?></label>
 				</th>
 				<td class="give-forminp">
 					<input id="<?php echo esc_attr( $field['id'] ); ?>" class="give-input-field" type="text" disabled>
-					<?php echo Give_Admin_Settings::get_field_description( $field ); ?>
+					<?php echo Give_Admin_Settings::get_field_description( $field ); // @codingStandardsIgnoreLine ?>
 				</td>
 			</tr>
 			<?php
@@ -499,14 +499,14 @@ if ( ! class_exists( 'Give_Settings_General' ) ) :
 		 */
 		public function __render_give_unlock_all_settings( $field ) {
 			?>
-			<tr valign="top" <?php echo ! empty( $field['wrapper_class'] ) ? 'class="' . $field['wrapper_class'] . '"' : '' ?>>
+			<tr valign="top" <?php echo ! empty( $field['wrapper_class'] ) ? 'class="' . esc_attr( $field['wrapper_class'] ) . '"' : '' ?>>
 				<th scope="row" class="titledesc">
 					<label
 						for="<?php echo esc_attr( $field['id'] ); ?>"><?php echo esc_html( $field['name'] ) ?></label>
 				</th>
 				<td class="give-forminp">
-					<?php echo Give_Admin_Settings::get_field_description( $field ); ?>
-					<a href="" id="<?php echo $field['id']; ?>" data-message="<?php echo $field['confirmation_msg'] ?>"><?php echo __( 'Unlock all settings', 'give' ); ?></a>
+					<?php echo Give_Admin_Settings::get_field_description( $field ); // @codingStandardsIgnoreLine ?>
+					<a href="" id="<?php echo esc_attr( $field['id'] ); ?>" data-message="<?php echo esc_attr( $field['confirmation_msg'] ) ?>"><?php echo __( 'Unlock all settings', 'give' ); ?></a>
 				</td>
 			</tr>
 			<?php

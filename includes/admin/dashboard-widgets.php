@@ -46,26 +46,26 @@ function give_dashboard_sales_widget() {
 	<div class="give-dashboard-widget">
 
 		<div class="give-dashboard-today give-clearfix">
-			<h3 class="give-dashboard-date-today"><?php echo date_i18n( _x( 'F j, Y', 'dashboard widget', 'give' ) ); ?></h3>
+			<h3 class="give-dashboard-date-today"><?php echo esc_html( date_i18n( _x( 'F j, Y', 'dashboard widget', 'give' ) ) ); ?></h3>
 
 			<p class="give-dashboard-happy-day"><?php
 				printf(
 				/* translators: %s: day of the week */
-					__( 'Happy %s!', 'give' ),
-					date_i18n( 'l', current_time( 'timestamp' ) )
+					__( 'Happy %s!', 'give' ), // @codingStandardsIgnoreLine
+					esc_html( date_i18n( 'l', current_time( 'timestamp' ) ) )
 				);
 			?></p>
 
 			<p class="give-dashboard-today-earnings"><?php
 				$earnings_today = $stats->get_earnings( 0, 'today', false );
-				echo give_currency_filter( give_format_amount( $earnings_today, array( 'sanitize' => false ) ) );
+				echo give_currency_filter( give_format_amount( $earnings_today, array( 'sanitize' => false ) ) ); // @codingStandardsIgnoreLine
 			?></p>
 
 			<p class="give-donations-today"><?php
 				$donations_today = $stats->get_sales( 0, 'today', false );
 				printf(
 					/* translators: %s: daily donation count */
-					__( '%s donations today', 'give' ),
+					__( '%s donations today', 'give' ), // @codingStandardsIgnoreLine
 					give_format_amount( $donations_today, array( 'decimal' => false, 'sanitize' => false ) )
 				);
 			?></p>

@@ -120,7 +120,7 @@ abstract class Give_DB {
 			return null;
 		}
 
-		return $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $this->table_name WHERE $this->primary_key = %s LIMIT 1;", $row_id ) );
+		return $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $this->table_name WHERE $this->primary_key = %s LIMIT 1;", $row_id ) ); // @codingStandardsIgnoreLine
 	}
 
 	/**
@@ -145,7 +145,7 @@ abstract class Give_DB {
 
 		$column = esc_sql( $column );
 
-		return $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $this->table_name WHERE $column = %s LIMIT 1;", $row_id ) );
+		return $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $this->table_name WHERE $column = %s LIMIT 1;", $row_id ) );  // @codingStandardsIgnoreLine
 	}
 
 	/**
@@ -170,7 +170,7 @@ abstract class Give_DB {
 
 		$column = esc_sql( $column );
 
-		return $wpdb->get_var( $wpdb->prepare( "SELECT $column FROM $this->table_name WHERE $this->primary_key = %s LIMIT 1;", $row_id ) );
+		return $wpdb->get_var( $wpdb->prepare( "SELECT $column FROM $this->table_name WHERE $this->primary_key = %s LIMIT 1;", $row_id ) );  // @codingStandardsIgnoreLine
 	}
 
 	/**
@@ -197,7 +197,7 @@ abstract class Give_DB {
 		$column_where = esc_sql( $column_where );
 		$column       = esc_sql( $column );
 
-		return $wpdb->get_var( $wpdb->prepare( "SELECT $column FROM $this->table_name WHERE $column_where = %s LIMIT 1;", $column_value ) );
+		return $wpdb->get_var( $wpdb->prepare( "SELECT $column FROM $this->table_name WHERE $column_where = %s LIMIT 1;", $column_value ) );  // @codingStandardsIgnoreLine
 	}
 
 	/**
@@ -295,7 +295,7 @@ abstract class Give_DB {
 		$data_keys      = array_keys( $data );
 		$column_formats = array_merge( array_flip( $data_keys ), $column_formats );
 
-		if ( false === $wpdb->update( $this->table_name, $data, array( $where => $row_id ), $column_formats ) ) {
+		if ( false === $wpdb->update( $this->table_name, $data, array( $where => $row_id ), $column_formats ) ) {  // @codingStandardsIgnoreLine
 			return false;
 		}
 
@@ -323,7 +323,7 @@ abstract class Give_DB {
 			return false;
 		}
 
-		if ( false === $wpdb->query( $wpdb->prepare( "DELETE FROM $this->table_name WHERE $this->primary_key = %d", $row_id ) ) ) {
+		if ( false === $wpdb->query( $wpdb->prepare( "DELETE FROM $this->table_name WHERE $this->primary_key = %d", $row_id ) ) ) {  // @codingStandardsIgnoreLine
 			return false;
 		}
 
@@ -346,7 +346,7 @@ abstract class Give_DB {
 
 		$table = sanitize_text_field( $table );
 
-		return $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE '%s'", $table ) ) === $table;
+		return $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE '%s'", $table ) ) === $table; // @codingStandardsIgnoreLine
 	}
 
 	/**
@@ -364,7 +364,7 @@ abstract class Give_DB {
 
 		global $wpdb;
 
-		$column = $wpdb->get_results( $wpdb->prepare(
+		$column = $wpdb->get_results( $wpdb->prepare(  // @codingStandardsIgnoreLine
 			"SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND COLUMN_NAME = %s ",
 			DB_NAME, $this->table_name, $column_name
 		) );

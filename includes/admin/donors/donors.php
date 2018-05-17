@@ -48,24 +48,24 @@ function __give_get_format_address( $address, $address_args = array() ) {
 	$address_html = '';
 	$address_html .= sprintf(
 		'<span data-address-type="line1">%1$s</span>%2$s',
-		$address['line1'],
+		esc_html( $address['line1'] ),
 		( ! empty( $address['line2'] ) ? '<br>' : '' )
 	);
 	$address_html .= sprintf(
 		'<span data-address-type="line2">%1$s</span>%2$s',
-		$address['line2'],
+		esc_html( $address['line2'] ),
 		( ! empty( $address['city'] ) ? '<br>' : '' )
 	);
 	$address_html .= sprintf(
 		'<span data-address-type="city">%1$s</span><span data-address-type="state">%2$s</span><span data-address-type="zip">%3$s</span>%4$s',
 		$address['city'],
-		( ! empty( $address['state'] ) ? ", {$address['state']}" : '' ),
-		( ! empty( $address['zip'] ) ? " {$address['zip']}" : '' ),
+		( ! empty( $address['state'] ) ? esc_html( ", {$address['state']}" ) : '' ),
+		( ! empty( $address['zip'] ) ? esc_html( " {$address['zip']}" ) : '' ),
 		( ! empty( $address['country'] ) ? '<br>' : '' )
 	);
 	$address_html .= sprintf(
 		'<span data-address-type="country">%s</span><br>',
-		$address['country']
+		esc_html( $address['country'] )
 	);
 
 	// Address action.
@@ -94,8 +94,8 @@ function __give_get_format_address( $address, $address_args = array() ) {
 	// Add address wrapper.
 	$address_html = sprintf(
 		'<div class="give-grid-col-4"><div data-address-id="%s" class="address"><span class="alignright address-number-label">%s</span>%s</div></div>',
-		$address_id,
-		$address_label,
+		esc_attr( $address_id ),
+		esc_html( $address_label ),
 		$address_html
 	);
 
@@ -162,7 +162,7 @@ function give_donors_list() {
 	$donors_table->prepare_items();
 	?>
 	<div class="wrap">
-		<h1 class="wp-heading-inline"><?php echo get_admin_page_title(); ?></h1>
+		<h1 class="wp-heading-inline"><?php echo esc_html( get_admin_page_title() ); ?></h1>
 		<?php
 		/**
 		 * Fires in donors screen, above the table.
@@ -173,7 +173,7 @@ function give_donors_list() {
 		?>
 
 		<hr class="wp-header-end">
-		<form id="give-donors-search-filter" method="get" action="<?php echo admin_url( 'edit.php?post_type=give_forms&page=give-donors' ); ?>">
+		<form id="give-donors-search-filter" method="get" action="<?php echo esc_url( admin_url( 'edit.php?post_type=give_forms&page=give-donors' ) ); ?>">
 			<?php $donors_table->search_box( __( 'Search Donors', 'give' ), 'give-donors' ); ?>
 			<input type="hidden" name="post_type" value="give_forms" />
 			<input type="hidden" name="page" value="give-donors" />
@@ -253,8 +253,8 @@ function give_render_donor_view( $view, $callbacks ) {
 			printf(
 			/* translators: %s: donor first name */
 				__( 'Edit Donor: %s %s', 'give' ),
-				$donor->get_first_name(),
-				$donor->get_last_name()
+				esc_html( $donor->get_first_name() ),
+				esc_html( $donor->get_last_name() )
 			);
 			?>
 		</h1>
@@ -323,7 +323,7 @@ function give_donor_view( $donor ) {
 	<div id="donor-summary" class="info-wrapper donor-section postbox">
 
 		<form id="edit-donor-info" method="post"
-		      action="<?php echo admin_url( 'edit.php?post_type=give_forms&page=give-donors&view=overview&id=' . $donor->id ); ?>">
+		      action="<?php echo esc_url( admin_url( 'edit.php?post_type=give_forms&page=give-donors&view=overview&id=' . $donor->id ) ); ?>">
 
 			<div class="donor-info">
 
@@ -335,7 +335,7 @@ function give_donor_view( $donor ) {
 
 					<div id="donor-name-wrap" class="left">
 						<span class="donor-name info-item edit-item">
-							<input <?php echo $read_only; ?> size="15" data-key="first_name"
+							<input <?php echo $read_only; // @codingStandardsIgnoreLine ?> size="15" data-key="first_name"
 							                                 name="customerinfo[first_name]" type="text"
 							                                 value="<?php esc_attr_e( $donor->get_first_name() ); ?>"
 							                                 placeholder="<?php _e( 'First Name', 'give' ); ?>"/>
@@ -344,7 +344,7 @@ function give_donor_view( $donor ) {
 									<i class="give-icon give-icon-locked"></i>
 								</a>
 							<?php endif; ?>
-							<input <?php echo $read_only; ?> size="15" data-key="last_name"
+							<input <?php echo $read_only; // @codingStandardsIgnoreLine ?> size="15" data-key="last_name"
 							                                 name="customerinfo[last_name]" type="text"
 							                                 value="<?php esc_attr_e( $donor->get_last_name() ); ?>"
 							                                 placeholder="<?php _e( 'Last Name', 'give' ); ?>"/>
@@ -355,11 +355,11 @@ function give_donor_view( $donor ) {
 							<?php endif; ?>
 						</span>
 						<span class="donor-name info-item editable"><span
-									data-key="name"><?php echo $donor->name; ?></span></span>
+									data-key="name"><?php echo esc_html( $donor->name ); ?></span></span>
 					</div>
 					<p class="donor-since info-item">
 						<?php _e( 'Donor since', 'give' ); ?>
-						<?php echo date_i18n( give_date_format(), strtotime( $donor->date_created ) ) ?>
+						<?php echo esc_html( date_i18n( give_date_format(), strtotime( $donor->date_created ) ) ) ?>
 					</p>
 					<?php if ( current_user_can( $donor_edit_role ) ) : ?>
 						<a href="#" id="edit-donor"
@@ -374,7 +374,7 @@ function give_donor_view( $donor ) {
 						<tbody>
 						<tr>
 							<th scope="col"><label for="tablecell"><?php _e( 'Donor ID:', 'give' ); ?></label></th>
-							<td><?php echo $donor->id; ?></td>
+							<td><?php echo esc_html( $donor->id ); ?></td>
 						</tr>
 						<tr>
 							<th scope="col"><label for="tablecell"><?php _e( 'User ID:', 'give' ); ?></label></th>
@@ -405,7 +405,7 @@ function give_donor_view( $donor ) {
 
 								<span class="donor-user-id info-item editable">
 										<?php if ( ! empty( $userdata ) ) : ?>
-											<span data-key="user_id">#<?php echo $donor->user_id . ' - ' . $userdata->display_name; ?></span>
+											<span data-key="user_id">#<?php echo esc_html( $donor->user_id . ' - ' . $userdata->display_name ); ?></span>
 										<?php else: ?>
 											<span data-key="user_id"><?php _e( 'Unregistered', 'give' ); ?></span>
 										<?php endif; ?>
@@ -420,7 +420,7 @@ function give_donor_view( $donor ) {
  										               </span>',
 											__( 'Disconnects the current user ID from this donor record.', 'give' ),
 											__( 'Disconnect User', 'give' ),
-											'user-edit.php?user_id=' . $donor->user_id,
+											esc_url_raw( 'user-edit.php?user_id=' . $donor->user_id ),
 											__( 'View User Profile of current user ID.', 'give' ),
 											__( 'View User Profile', 'give' )
 										);
@@ -439,7 +439,7 @@ function give_donor_view( $donor ) {
 								<th scope="col">
 									<label for="tablecell"><?php _e( 'Company Name:', 'give' ); ?></label>
 								</th>
-								<td><?php echo $donor_company; ?></td>
+								<td><?php echo esc_html( $donor_company ); ?></td>
 							</tr>
 							<?php
 						}
@@ -452,7 +452,7 @@ function give_donor_view( $donor ) {
 			</div>
 
 			<span id="donor-edit-actions" class="edit-item">
-				<input type="hidden" data-key="id" name="customerinfo[id]" value="<?php echo $donor->id; ?>"/>
+				<input type="hidden" data-key="id" name="customerinfo[id]" value="<?php echo esc_attr( $donor->id ); ?>"/>
 				<?php wp_nonce_field( 'edit-donor', '_wpnonce', false, true ); ?>
 				<input type="hidden" name="give_action" value="edit-donor"/>
 				<input type="submit" id="give-edit-donor-save" class="button-secondary"
@@ -478,12 +478,12 @@ function give_donor_view( $donor ) {
 	<div id="donor-stats-wrapper" class="donor-section postbox clear">
 		<ul>
 			<li>
-				<a href="<?php echo admin_url( 'edit.php?post_type=give_forms&page=give-payment-history&donor=' . absint( $donor->id ) ); ?>">
+				<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=give_forms&page=give-payment-history&donor=' . absint( $donor->id ) ) ); ?>">
 					<span class="dashicons dashicons-heart"></span>
 					<?php
 					// Completed Donations.
 					$completed_donations_text = sprintf( _n( '%d Completed Donation', '%d Completed Donations', $donor->purchase_count, 'give' ), $donor->purchase_count );
-					echo apply_filters( 'give_donor_completed_donations', $completed_donations_text, $donor );
+					echo esc_html( apply_filters( 'give_donor_completed_donations', $completed_donations_text, $donor ) );
 					?>
 				</a>
 			</li>
@@ -587,7 +587,7 @@ function give_donor_view( $donor ) {
 									echo Give()->html->select( array(
 										'options'          => give_get_country_list(),
 										'name'             => 'country',
-										'selected'         => give_get_option( 'base_country' ),
+										'selected'         => give_get_option( 'base_country' ), // @codingStandardsIgnoreLine
 										'show_option_all'  => false,
 										'show_option_none' => false,
 										'chosen'           => true,
@@ -730,9 +730,9 @@ function give_donor_view( $donor ) {
 			<?php if ( ! empty( $donor->emails ) ) { ?>
 
 				<?php foreach ( $donor->emails as $key => $email ) : ?>
-					<tr data-key="<?php echo $key; ?>">
+					<tr data-key="<?php echo esc_attr( $key ); ?>">
 						<td>
-							<?php echo $email; ?>
+							<?php echo esc_html( $email ); ?>
 							<?php if ( 'primary' === $key ) : ?>
 								<span class="dashicons dashicons-star-filled primary-email-icon"></span>
 							<?php endif; ?>
@@ -750,9 +750,9 @@ function give_donor_view( $donor ) {
 									'give_action' => 'remove_donor_email',
 								), $base_url ), 'give-remove-donor-email' );
 								?>
-								<a href="<?php echo $promote_url; ?>"><?php _e( 'Make Primary', 'give' ); ?></a>
+								<a href="<?php echo esc_url( $promote_url ); ?>"><?php _e( 'Make Primary', 'give' ); ?></a>
 								&nbsp;|&nbsp;
-								<a href="<?php echo $remove_url; ?>" class="delete"><?php _e( 'Remove', 'give' ); ?></a>
+								<a href="<?php echo esc_url( $remove_url ); ?>" class="delete"><?php _e( 'Remove', 'give' ); ?></a>
 							<?php endif; ?>
 						</td>
 					</tr>
@@ -761,7 +761,7 @@ function give_donor_view( $donor ) {
 				<tr class="add-donor-email-row">
 					<td colspan="2" class="add-donor-email-td">
 						<div class="add-donor-email-wrapper">
-							<input type="hidden" name="donor-id" value="<?php echo $donor->id; ?>"/>
+							<input type="hidden" name="donor-id" value="<?php echo esc_attr( $donor->id ); ?>"/>
 							<?php wp_nonce_field( 'give_add_donor_email', 'add_email_nonce', false, true ); ?>
 							<input type="email" name="additional-email" value=""
 							       placeholder="<?php _e( 'Email Address', 'give' ); ?>"/>&nbsp;
@@ -807,18 +807,18 @@ function give_donor_view( $donor ) {
 				<?php foreach ( $payments as $payment ) : ?>
 					<tr>
 						<td><?php echo Give()->seq_donation_number->get_serial_code( $payment->ID ); ?></td>
-						<td><?php echo give_donation_amount( $payment->ID, array( 'currency' => true, 'amount' => true, 'type' => 'donor' ) ); ?></td>
-						<td><?php echo date_i18n( give_date_format(), strtotime( $payment->post_date ) ); ?></td>
-						<td><?php echo give_get_payment_status( $payment, true ); ?></td>
+						<td><?php echo esc_html( give_donation_amount( $payment->ID, array( 'currency' => true, 'amount' => true, 'type' => 'donor' ) ) ); ?></td>
+						<td><?php echo esc_html( date_i18n( give_date_format(), strtotime( $payment->post_date ) ) ); ?></td>
+						<td><?php echo esc_html( give_get_payment_status( $payment, true ) ); ?></td>
 						<td>
 							<?php
 							printf(
 								'<a href="%1$s" aria-label="%2$s">%3$s</a>',
-								admin_url( 'edit.php?post_type=give_forms&page=give-payment-history&view=view-payment-details&id=' . $payment->ID ),
+								esc_url( admin_url( 'edit.php?post_type=give_forms&page=give-payment-history&view=view-payment-details&id=' . $payment->ID ) ),
 								sprintf(
 								/* translators: %s: Donation ID */
 									esc_attr__( 'View Donation %s.', 'give' ),
-									$payment->ID
+									esc_attr( $payment->ID )
 								),
 								__( 'View Donation', 'give' )
 							);
@@ -864,7 +864,7 @@ function give_donor_view( $donor ) {
 			<?php if ( ! empty( $donations ) ) { ?>
 				<?php foreach ( $donations as $donation ) : ?>
 					<tr>
-						<td><?php echo $donation->post_title; ?></td>
+						<td><?php echo esc_html( $donation->post_title ); ?></td>
 						<td>
 							<?php
 							printf(
@@ -873,7 +873,7 @@ function give_donor_view( $donor ) {
 								sprintf(
 								/* translators: %s: form name */
 									esc_attr__( 'View Form %s.', 'give' ),
-									$donation->post_title
+									esc_html( $donation->post_title )
 								),
 								__( 'View Form', 'give' )
 							);
@@ -925,7 +925,7 @@ function give_donor_view( $donor ) {
  */
 function give_donor_notes_view( $donor ) {
 
-	$paged       = isset( $_GET['paged'] ) && is_numeric( $_GET['paged'] ) ? $_GET['paged'] : 1;
+	$paged       = isset( $_GET['paged'] ) && is_numeric( $_GET['paged'] ) ? absint( $_GET['paged'] ) : 1;
 	$paged       = absint( $paged );
 	$note_count  = $donor->get_notes_count();
 	$per_page    = apply_filters( 'give_donor_notes_per_page', 20 );
@@ -935,17 +935,17 @@ function give_donor_notes_view( $donor ) {
 
 	<div id="donor-notes-wrapper">
 		<div class="donor-notes-header">
-			<?php echo get_avatar( $donor->email, 30 ); ?> <span><?php echo $donor->name; ?></span>
+			<?php echo get_avatar( $donor->email, 30 ); ?> <span><?php echo esc_html( $donor->name ); ?></span>
 		</div>
 		<h3><?php _e( 'Notes', 'give' ); ?></h3>
 
 		<?php if ( 1 == $paged ) : ?>
 			<div style="display: block; margin-bottom: 55px;">
 				<form id="give-add-donor-note" method="post"
-				      action="<?php echo admin_url( 'edit.php?post_type=give_forms&page=give-donors&view=notes&id=' . $donor->id ); ?>">
+				      action="<?php echo esc_url( admin_url( 'edit.php?post_type=give_forms&page=give-donors&view=notes&id=' . $donor->id ) ); ?>">
 					<textarea id="donor-note" name="donor_note" class="donor-note-input" rows="10"></textarea>
 					<br/>
-					<input type="hidden" id="donor-id" name="customer_id" value="<?php echo $donor->id; ?>"/>
+					<input type="hidden" id="donor-id" name="customer_id" value="<?php echo esc_attr( $donor->id ); ?>"/>
 					<input type="hidden" name="give_action" value="add-donor-note"/>
 					<?php wp_nonce_field( 'add-donor-note', 'add_donor_note_nonce', true, true ); ?>
 					<input id="add-donor-note" class="right button-primary" type="submit" value="Add Note"/>
@@ -962,7 +962,7 @@ function give_donor_notes_view( $donor ) {
 			'show_all' => true,
 		);
 
-		echo paginate_links( $pagination_args );
+		echo paginate_links( $pagination_args ); // @codingStandardsIgnoreLine
 		?>
 
 		<div id="give-donor-notes" class="postbox">
@@ -970,7 +970,7 @@ function give_donor_notes_view( $donor ) {
 				<?php foreach ( $donor_notes as $key => $note ) : ?>
 					<div class="donor-note-wrapper dashboard-comment-wrap comment-item">
 					<span class="note-content-wrap">
-						<?php echo stripslashes( $note ); ?>
+						<?php echo wp_kses_post( stripslashes( $note ) ); ?>
 					</span>
 					</div>
 				<?php endforeach; ?>
@@ -981,7 +981,7 @@ function give_donor_notes_view( $donor ) {
 			<?php } ?>
 		</div>
 
-		<?php echo paginate_links( $pagination_args ); ?>
+		<?php echo paginate_links( $pagination_args ); // @codingStandardsIgnoreLine ?>
 
 	</div>
 
@@ -1014,10 +1014,10 @@ function give_donor_delete_view( $donor ) {
 	<div class="info-wrapper donor-section">
 
 		<form id="delete-donor" method="post"
-		      action="<?php echo admin_url( 'edit.php?post_type=give_forms&page=give-donors&view=delete&id=' . $donor->id ); ?>">
+		      action="<?php echo esc_url( admin_url( 'edit.php?post_type=give_forms&page=give-donors&view=delete&id=' . $donor->id ) ); ?>">
 
 			<div class="donor-notes-header">
-				<?php echo get_avatar( $donor->email, 30 ); ?> <span><?php echo $donor->name; ?></span>
+				<?php echo get_avatar( $donor->email, 30 ); ?> <span><?php echo esc_html( $donor->name ); ?></span>
 			</div>
 
 
@@ -1056,13 +1056,13 @@ function give_donor_delete_view( $donor ) {
 				</span>
 
 				<span id="donor-edit-actions">
-					<input type="hidden" name="customer_id" value="<?php echo $donor->id; ?>"/>
+					<input type="hidden" name="customer_id" value="<?php echo esc_attr( $donor->id ); ?>"/>
 					<?php wp_nonce_field( 'delete-donor', '_wpnonce', false, true ); ?>
 					<input type="hidden" name="give_action" value="delete-donor"/>
 					<input type="submit" disabled="disabled" id="give-delete-donor" class="button-primary"
 					       value="<?php _e( 'Delete Donor', 'give' ); ?>"/>
 					<a id="give-delete-donor-cancel"
-					   href="<?php echo admin_url( 'edit.php?post_type=give_forms&page=give-donors&view=overview&id=' . $donor->id ); ?>"
+					   href="<?php echo esc_url( admin_url( 'edit.php?post_type=give_forms&page=give-donors&view=overview&id=' . $donor->id ) ); ?>"
 					   class="delete"><?php _e( 'Cancel', 'give' ); ?></a>
 				</span>
 

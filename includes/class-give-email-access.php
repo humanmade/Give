@@ -207,12 +207,12 @@ class Give_Email_Access {
 	 * @return bool
 	 */
 	public function check_for_token() {
-
-		$token = isset( $_GET['give_nl'] ) ? $_GET['give_nl'] : '';
+		$cookie_name = defined( 'GIVE_NL_COOKIE_NAME' ) ? GIVE_NL_COOKIE_NAME : 'give_nl';
+		$token = isset( $_GET['give_nl'] ) ? sanitize_text_field( wp_unslash( $_GET['give_nl'] ) ) : '';
 
 		// Check for cookie.
 		if ( empty( $token ) ) {
-			$token = isset( $_COOKIE['give_nl'] ) ? $_COOKIE['give_nl'] : '';
+			$token = isset( $_COOKIE[ $cookie_name ] ) ? sanitize_text_field( $_COOKIE[ $cookie_name ] ) : '';
 		}
 
 		// Must have a token.
@@ -229,7 +229,7 @@ class Give_Email_Access {
 			$this->token_exists = true;
 			// Set cookie.
 			$lifetime = current_time( 'timestamp' ) + Give()->session->set_expiration_time();
-			@setcookie( 'give_nl', $token, $lifetime, COOKIEPATH, COOKIE_DOMAIN, false );
+			@setcookie( $cookie_name, $token, $lifetime, COOKIEPATH, COOKIE_DOMAIN, false );
 
 			return true;
 		}
@@ -375,7 +375,7 @@ class Give_Email_Access {
 		global $wpdb;
 
 		// Create columns in donors table.
-		$wpdb->query( "ALTER TABLE {$wpdb->donors} ADD `token` VARCHAR(255) CHARACTER SET utf8 NOT NULL, ADD `verify_key` VARCHAR(255) CHARACTER SET utf8 NOT NULL AFTER `token`, ADD `verify_throttle` DATETIME NOT NULL AFTER `verify_key`" );
+		$wpdb->query( "ALTER TABLE {$wpdb->donors} ADD `token` VARCHAR(255) CHARACTER SET utf8 NOT NULL, ADD `verify_key` VARCHAR(255) CHARACTER SET utf8 NOT NULL AFTER `token`, ADD `verify_throttle` DATETIME NOT NULL AFTER `verify_key`" ); // @codingStandardsIgnoreLine
 	}
 
 }

@@ -67,15 +67,15 @@ class Give_API_Request_Log_Table extends WP_List_Table {
 		$input_id = $input_id . '-search-input';
 
 		if ( ! empty( $_REQUEST['orderby'] ) ) {
-			echo '<input type="hidden" name="orderby" value="' . esc_attr( $_REQUEST['orderby'] ) . '" />';
+			echo '<input type="hidden" name="orderby" value="' . esc_attr( sanitize_key( $_REQUEST['orderby'] ) ) . '" />';
 		}
 		if ( ! empty( $_REQUEST['order'] ) ) {
-			echo '<input type="hidden" name="order" value="' . esc_attr( $_REQUEST['order'] ) . '" />';
+			echo '<input type="hidden" name="order" value="' . esc_attr( sanitize_key( $_REQUEST['order'] ) ) . '" />';
 		}
 		?>
 		<p class="search-box" role="search">
-			<label class="screen-reader-text" for="<?php echo $input_id ?>"><?php echo $text; ?>:</label>
-			<input type="search" id="<?php echo $input_id ?>" name="s" value="<?php _admin_search_query(); ?>"/>
+			<label class="screen-reader-text" for="<?php echo esc_attr( $input_id ) ?>"><?php echo esc_html( $text ); ?>:</label>
+			<input type="search" id="<?php echo esc_attr( $input_id ) ?>" name="s" value="<?php _admin_search_query(); ?>"/>
 			<?php submit_button( $text, 'button', false, false, array( 'ID' => 'search-submit' ) ); ?>
 		</p>
 		<?php
@@ -129,22 +129,22 @@ class Give_API_Request_Log_Table extends WP_List_Table {
 	 * @return void
 	 */
 	public function column_details( $item ) {
-		echo Give()->tooltips->render_link( array(
+		echo Give()->tooltips->render_link( array( // @codingStandardsIgnoreLine
 			'label'       => __( 'View Request', 'give' ),
 			'tag_content' => '<span class="dashicons dashicons-visibility"></span>',
-			'link'        => "#TB_inline?width=640&amp;inlineId=log-details-{$item['ID']}",
+			'link'        => "#TB_inline?width=640&amp;inlineId=log-details-{$item['ID']}", // @codingStandardsIgnoreLine
 			'attributes'  => array(
 				'class' => 'thickbox give-error-log-details-link button button-small',
 			),
 		) );
 		?>
-		<div id="log-details-<?php echo $item['ID']; ?>" style="display:none;">
+		<div id="log-details-<?php echo esc_attr( $item['ID'] ); ?>" style="display:none;">
 			<?php
 			// Print API Request.
 			echo sprintf(
 				'<p><strong>%1$s</strong></p><div>%2$s</div>',
 				__( 'API Request:', 'give' ),
-				Give()->logs->logmeta_db->get_meta( $item['ID'], '_give_log_api_query', true )
+				esc_html( Give()->logs->logmeta_db->get_meta( $item['ID'], '_give_log_api_query', true ) )
 			);
 
 			// Print Log Content, if not empty.
@@ -160,21 +160,21 @@ class Give_API_Request_Log_Table extends WP_List_Table {
 			echo sprintf(
 				'<p><strong>%1$s</strong></p><div>%2$s</div>',
 				__( 'API User:', 'give' ),
-				Give()->logs->logmeta_db->get_meta( $item['ID'], '_give_log_user', true )
+				esc_html( Give()->logs->logmeta_db->get_meta( $item['ID'], '_give_log_user', true ) )
 			);
 
 			// Print the logged key used by API.
 			echo sprintf(
 				'<p><strong>%1$s</strong></p><div>%2$s</div>',
 				__( 'API Key:', 'give' ),
-				Give()->logs->logmeta_db->get_meta( $item['ID'], '_give_log_key', true )
+				esc_html( Give()->logs->logmeta_db->get_meta( $item['ID'], '_give_log_key', true ) )
 			);
 
 			// Print the API Request Date.
 			echo sprintf(
 				'<p><strong>%1$s</strong></p><div>%2$s</div>',
 				__( 'Request Date:', 'give' ),
-				$item['log_date']
+				esc_html( $item['log_date'] )
 			);
 			?>
 		</div>
@@ -190,7 +190,7 @@ class Give_API_Request_Log_Table extends WP_List_Table {
 	 * @return string|bool String if search is present, false otherwise
 	 */
 	public function get_search() {
-		return ! empty( $_GET['s'] ) ? urldecode( trim( $_GET['s'] ) ) : false;
+		return ! empty( $_GET['s'] ) ? urldecode( trim( sanitize_text_field( $_GET['s'] ) ) ) : false;
 	}
 
 

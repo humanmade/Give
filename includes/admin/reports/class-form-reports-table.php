@@ -230,7 +230,7 @@ class Give_Form_Reports_Table extends WP_List_Table {
 
 		$categories = get_terms( 'form_category' );
 		if ( $categories && ! is_wp_error( $categories ) ) {
-			echo Give()->html->category_dropdown( 'category', $this->get_category() );
+			echo Give()->html->category_dropdown( 'category', $this->get_category() ); // @codingStandardsIgnoreLine
 		}
 	}
 
@@ -244,8 +244,8 @@ class Give_Form_Reports_Table extends WP_List_Table {
 	 */
 	public function query() {
 
-		$orderby  = isset( $_GET['orderby'] ) ? $_GET['orderby'] : 'title';
-		$order    = isset( $_GET['order'] ) ? $_GET['order'] : 'DESC';
+		$orderby  = isset( $_GET['orderby'] ) ? sanitize_key( $_GET['orderby'] ) : 'title';
+		$order    = isset( $_GET['order'] ) ? sanitize_key( $_GET['order'] ) : 'DESC';
 		$category = $this->get_category();
 
 		$args = array(
@@ -255,7 +255,7 @@ class Give_Form_Reports_Table extends WP_List_Table {
 			'fields'           => 'ids',
 			'posts_per_page'   => $this->per_page,
 			'paged'            => $this->get_paged(),
-			'suppress_filters' => true
+			'suppress_filters' => true // @codingStandardsIgnoreLine
 		);
 
 		if ( ! empty( $category ) ) {

@@ -130,15 +130,15 @@ function give_get_admin_page_menu_title() {
 function give_recently_activated_addons() {
 	// Check if action is set.
 	if ( isset( $_REQUEST['action'] ) ) {
-		$plugin_action = ( '-1' !== $_REQUEST['action'] ) ? $_REQUEST['action'] : ( isset( $_REQUEST['action2'] ) ? $_REQUEST['action2'] : '' );
+		$plugin_action = ( '-1' !== $_REQUEST['action'] ) ? sanitize_key( $_REQUEST['action'] ) : ( isset( $_REQUEST['action2'] ) ? sanitize_key( $_REQUEST['action2'] ) : '' );
 		$plugins       = array();
 
 		switch ( $plugin_action ) {
 			case 'activate': // Single add-on activation.
-				$plugins[] = $_REQUEST['plugin'];
+				$plugins[] = sanitize_text_field( $_REQUEST['plugin'] );
 				break;
 			case 'activate-selected': // If multiple add-ons activated.
-				$plugins = $_REQUEST['checked'];
+				$plugins = array_map( 'sanitize_text_field', $_REQUEST['checked'] );
 				break;
 		}
 
@@ -273,7 +273,7 @@ function give_in_plugin_update_message( $data, $response ) {
 	$upgrade_notice = give_get_plugin_upgrade_notice( $new_version );
 
 	// Display upgrade notice.
-	echo apply_filters( 'give_in_plugin_update_message', $upgrade_notice ? '</p>' . wp_kses_post( $upgrade_notice ) . '<p class="dummy">' : '' );
+	echo apply_filters( 'give_in_plugin_update_message', $upgrade_notice ? '</p>' . wp_kses_post( $upgrade_notice ) . '<p class="dummy">' : '' ); // @codingStandardsIgnoreLine
 }
 
 // Display upgrade notice.

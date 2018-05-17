@@ -154,12 +154,12 @@ function give_get_ip() {
 
 	if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
 		// check ip from share internet
-		$ip = $_SERVER['HTTP_CLIENT_IP'];
+		$ip = filter_var( $_SERVER['HTTP_CLIENT_IP'], FILTER_VALIDATE_IP ); // @codingStandardsIgnoreLine
 	} elseif ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
 		// to check ip is pass from proxy
-		$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+		$ip = filter_var( $_SERVER['HTTP_X_FORWARDED_FOR'], FILTER_VALIDATE_IP ); // @codingStandardsIgnoreLine
 	} elseif ( ! empty( $_SERVER['REMOTE_ADDR'] ) ) {
-		$ip = $_SERVER['REMOTE_ADDR'];
+		$ip = filter_var( $_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP ); // @codingStandardsIgnoreLine
 	}
 
 	/**
@@ -363,11 +363,11 @@ function give_get_host() {
 		$host = 'Rackspace Cloud';
 	} elseif ( strpos( DB_HOST, '.sysfix.eu' ) !== false ) {
 		$host = 'SysFix.eu Power Hosting';
-	} elseif ( strpos( $_SERVER['SERVER_NAME'], 'Flywheel' ) !== false ) {
+	} elseif ( strpos( $_SERVER['SERVER_NAME'], 'Flywheel' ) !== false ) { // @codingStandardsIgnoreLine
 		$host = 'Flywheel';
 	} else {
 		// Adding a general fallback for data gathering
-		$host = 'DBH: ' . DB_HOST . ', SRV: ' . $_SERVER['SERVER_NAME'];
+		$host = 'DBH: ' . DB_HOST . ', SRV: ' . $_SERVER['SERVER_NAME']; // @codingStandardsIgnoreLine
 	}
 
 	return $host;
@@ -443,7 +443,7 @@ function give_is_host( $host = false ) {
 				}
 				break;
 			case 'flywheel':
-				if ( strpos( $_SERVER['SERVER_NAME'], 'Flywheel' ) !== false ) {
+				if ( strpos( $_SERVER['SERVER_NAME'], 'Flywheel' ) !== false ) { // @codingStandardsIgnoreLine
 					$return = true;
 				}
 				break;
@@ -496,12 +496,12 @@ function _give_deprecated_function( $function, $version, $replacement = null, $b
 	// Allow plugin to filter the output error trigger.
 	if ( WP_DEBUG && apply_filters( 'give_deprecated_function_trigger_error', $show_errors ) ) {
 		if ( ! is_null( $replacement ) ) {
-			trigger_error( sprintf( __( '%1$s is <strong>deprecated</strong> since Give version %2$s! Use %3$s instead.', 'give' ), $function, $version, $replacement ) );
-			trigger_error( print_r( $backtrace, 1 ) ); // Limited to previous 1028 characters, but since we only need to move back 1 in stack that should be fine.
+			trigger_error( sprintf( __( '%1$s is <strong>deprecated</strong> since Give version %2$s! Use %3$s instead.', 'give' ), $function, $version, $replacement ) ); // @codingStandardsIgnoreLine
+			trigger_error( print_r( $backtrace, 1 ) ); // Limited to previous 1028 characters, but since we only need to move back 1 in stack that should be fine. @codingStandardsIgnoreLine
 			// Alternatively we could dump this to a file.
 		} else {
-			trigger_error( sprintf( __( '%1$s is <strong>deprecated</strong> since Give version %2$s with no alternative available.', 'give' ), $function, $version ) );
-			trigger_error( print_r( $backtrace, 1 ) );// Limited to previous 1028 characters, but since we only need to move back 1 in stack that should be fine.
+			trigger_error( sprintf( __( '%1$s is <strong>deprecated</strong> since Give version %2$s with no alternative available.', 'give' ), $function, $version ) ); // @codingStandardsIgnoreLine
+			trigger_error( print_r( $backtrace, 1 ) );// Limited to previous 1028 characters, but since we only need to move back 1 in stack that should be fine. @codingStandardsIgnoreLine
 			// Alternatively we could dump this to a file.
 		}
 	}
@@ -628,8 +628,7 @@ function give_get_newsletter() {
 		</div>
 
 	</div>
-
-	<script type='text/javascript' src='//s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js'></script>
+	<script type='text/javascript' src='https://s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js'></script><?php // @codingStandardsIgnoreLine ?>
 	<script type='text/javascript'>(function( $ ) {
 			window.fnames = new Array();
 			window.ftypes = new Array();
@@ -789,13 +788,13 @@ if ( ! function_exists( 'array_column' ) ) {
 		$params = func_get_args();
 
 		if ( $argc < 2 ) {
-			trigger_error( sprintf( esc_html__( 'array_column() expects at least 2 parameters, %s given.', 'give' ), $argc ), E_USER_WARNING );
+			trigger_error( sprintf( esc_html__( 'array_column() expects at least 2 parameters, %s given.', 'give' ), $argc ), E_USER_WARNING ); // @codingStandardsIgnoreLine
 
 			return null;
 		}
 
 		if ( ! is_array( $params[0] ) ) {
-			trigger_error( sprintf( esc_html__( 'array_column() expects parameter 1 to be array, %s given.', 'give' ), gettype( $params[0] ) ), E_USER_WARNING );
+			trigger_error( sprintf( esc_html__( 'array_column() expects parameter 1 to be array, %s given.', 'give' ), gettype( $params[0] ) ), E_USER_WARNING ); // @codingStandardsIgnoreLine
 
 			return null;
 		}
@@ -1072,7 +1071,7 @@ function give_delete_donation_stats( $date_range = '', $args = array() ) {
 function give_is_add_new_form_page() {
 	$status = false;
 
-	if ( false !== strpos( $_SERVER['REQUEST_URI'], '/wp-admin/post-new.php?post_type=give_forms' ) ) {
+	if ( false !== strpos( $_SERVER['REQUEST_URI'], '/wp-admin/post-new.php?post_type=give_forms' ) ) { // @codingStandardsIgnoreLine
 		$status = true;
 	}
 
@@ -1663,16 +1662,16 @@ function give_donation_history_table_end() {
 				<div class="give-security-column give-security-description-wrap">
 					<?php
 					echo sprintf(
-						__( 'For security reasons, please confirm your email address (%s) to view your complete donation history.', 'give' ),
-						$email
+						__( 'For security reasons, please confirm your email address (%s) to view your complete donation history.', 'give' ), // @codingStandardsIgnoreLine
+						esc_html( $email )
 					);
 					?>
 				</div>
 				<div class="give-security-column give-security-button-wrap">
-					<a href="#" data-email="<?php echo $email; ?>" id="give-confirm-email-btn" class="give-confirm-email-btn give-btn">
-						<?php _e( 'Confirm Email', 'give' ); ?>
+					<a href="#" data-email="<?php echo esc_attr( $email ); ?>" id="give-confirm-email-btn" class="give-confirm-email-btn give-btn">
+						<?php _e( 'Confirm Email', 'give' ); // @codingStandardsIgnoreLine ?>
 					</a>
-					<span><?php _e( 'Email Sent!', 'give' ); ?></span>
+					<span><?php _e( 'Email Sent!', 'give' ); // @codingStandardsIgnoreLine ?></span>
 				</div>
 			</div>
 		</td>
@@ -1695,7 +1694,7 @@ function give_donation_history_table_end() {
 function give_doing_it_wrong( $function, $message, $version ) {
 	$message .= "\nBacktrace:" . wp_debug_backtrace_summary();
 
-	_doing_it_wrong( $function, $message , $version );
+	_doing_it_wrong( $function, $message , $version ); // @codingStandardsIgnoreLine
 }
 
 
@@ -1726,22 +1725,22 @@ function give_get_total_post_type_count( $post_type = '', $args = array() ){
 	global $wpdb;
 	$where = '';
 
-	if( ! $post_type ) {
+	if ( ! $post_type ) {
 		return 0;
 	}
 
 	// Bulit where query
-	if( ! empty( $post_type ) ) {
+	if ( ! empty( $post_type ) ) {
 		$where.=' WHERE';
 
-		if( is_array( $post_type ) ) {
-			$where .= " post_type='" . implode( "' OR post_type='", $post_type ) . "'";
-		}else{
+		if ( is_array( $post_type ) ) {
+			$where .= " post_type='" . implode( "' OR post_type='", array_map( 'sanitize_key', $post_type ) ) . "'";
+		} else {
 			$where .= " post_type='{$post_type}'";
 		}
 	}
 
-	$result = $wpdb->get_var("SELECT count(ID) FROM {$wpdb->posts}{$where}");
+	$result = $wpdb->get_var("SELECT count(ID) FROM {$wpdb->posts}{$where}"); // @codingStandardsIgnoreLine
 
 	return absint( $result );
 }

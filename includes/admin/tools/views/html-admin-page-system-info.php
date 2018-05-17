@@ -108,7 +108,7 @@ $give_updates = Give_Updates::get_instance();
 		<tr>
 			<td data-export-label="Language"><?php _e( 'Language', 'give' ); ?>:</td>
 			<td class="help"><?php echo Give()->tooltips->render_help( __( 'The current language used by WordPress. Default = English', 'give' ) ); ?></td>
-			<td><?php echo get_locale(); ?></td>
+			<td><?php echo esc_html( get_locale() ); ?></td>
 		</tr>
 		<tr>
 			<td data-export-label="Permalink Structure"><?php _e( 'Permalink Structure', 'give' ); ?>:</td>
@@ -210,7 +210,7 @@ $give_updates = Give_Updates::get_instance();
 		<tr>
 			<td data-export-label="Server Info"><?php _e( 'Server Info', 'give' ); ?>:</td>
 			<td class="help"><?php echo Give()->tooltips->render_help( __( 'Information about the web server that is currently hosting your site.', 'give' ) ); ?></td>
-			<td><?php echo esc_html( $_SERVER['SERVER_SOFTWARE'] ); ?></td>
+			<td><?php echo esc_html( sanitize_text_field( $_SERVER['SERVER_SOFTWARE'] ) ); ?></td>
 		</tr>
 		<tr>
 			<td data-export-label="PHP Version"><?php _e( 'PHP Version', 'give' ); ?>:</td>
@@ -240,12 +240,12 @@ $give_updates = Give_Updates::get_instance();
 			<tr>
 				<td data-export-label="PHP Time Limit"><?php _e( 'PHP Time Limit', 'give' ); ?>:</td>
 				<td class="help"><?php echo Give() ->tooltips->render_help( __( 'The amount of time (in seconds) that your site will spend on a single operation before timing out (to avoid server lockups).', 'give' ) ); ?></td>
-				<td><?php echo ini_get( 'max_execution_time' ); ?></td>
+				<td><?php echo esc_html( ini_get( 'max_execution_time' ) ); ?></td>
 			</tr>
 			<tr>
 				<td data-export-label="PHP Max Input Vars"><?php _e( 'PHP Max Input Vars', 'give' ); ?>:</td>
 				<td class="help"><?php echo Give()->tooltips->render_help( __( 'The maximum number of variables your server can use for a single function to avoid overloads.', 'give' ) ); ?></td>
-				<td><?php echo ini_get( 'max_input_vars' ); ?></td>
+				<td><?php echo esc_html( ini_get( 'max_input_vars' ) ); ?></td>
 			</tr>
 			<tr>
 				<td data-export-label="PHP Max Upload Size"><?php _e( 'PHP Max Upload Size', 'give' ); ?>:</td>
@@ -307,7 +307,7 @@ $give_updates = Give_Updates::get_instance();
 			<td><?php
 				$default_timezone = date_default_timezone_get();
 				if ( 'UTC' !== $default_timezone ) {
-					echo '<mark class="error"><span class="dashicons dashicons-warning"></span> ' . sprintf( __( 'Default timezone is %s - it should be UTC', 'give' ), $default_timezone ) . '</mark>';
+					echo '<mark class="error"><span class="dashicons dashicons-warning"></span> ' . sprintf( esc_html__( 'Default timezone is %s - it should be UTC', 'give' ), esc_html( $default_timezone ) ) . '</mark>';
 				} else {
 					echo '<mark class="yes"><span class="dashicons dashicons-yes"></span></mark>';
 				} ?>
@@ -382,7 +382,7 @@ $give_updates = Give_Updates::get_instance();
 		$posting['wp_remote_post']['help'] = __( 'PayPal uses this method of communicating when sending back transaction information.', 'give' );
 
 		$response = wp_safe_remote_post( 'https://www.paypal.com/cgi-bin/webscr', array(
-			'timeout'     => 60,
+			'timeout'     => 60, // @codingStandardsIgnoreLine
 			'user-agent'  => 'Give/' . GIVE_VERSION,
 			'httpversion' => '1.1',
 			'body'        => array(
@@ -426,10 +426,10 @@ $give_updates = Give_Updates::get_instance();
 			$mark = ! empty( $post['success'] ) ? 'yes' : 'error';
 			?>
 			<tr>
-				<td data-export-label="<?php echo esc_html( $post['name'] ); ?>"><?php echo esc_html( $post['name'] ); ?>:</td>
+				<td data-export-label="<?php echo esc_attr( $post['name'] ); ?>"><?php echo esc_attr( $post['name'] ); ?>:</td>
 				<td class="help"><?php echo Give()->tooltips->render_help( esc_attr( isset( $post['help'] ) ? $post['help'] : '' ) ); ?></td>
 				<td>
-					<mark class="<?php echo $mark; ?>">
+					<mark class="<?php echo esc_attr( $mark ); ?>">
 						<?php echo ! empty( $post['success'] ) ? '<span class="dashicons dashicons-yes"></span>' : '<span class="dashicons dashicons-no-alt"></span>'; ?> <?php echo ! empty( $post['note'] ) ? wp_kses_data( $post['note'] ) : ''; ?>
 					</mark>
 				</td>
@@ -477,19 +477,19 @@ $give_updates = Give_Updates::get_instance();
 					// When all the db updates are pending.
 					$updates_text = sprintf(
 						__( '%1$s updates still need to run.', 'give' ),
-						$total_updates
+						esc_html( $total_updates )
 					);
 				} elseif( $pending_updates > 0 ) {
 
 					// When some of the db updates are completed and some are pending.
 					$updates_text = sprintf(
 						__( '%1$s of %2$s updates still need to run.', 'give' ),
-						$pending_updates,
-						$total_updates
+						esc_html( $pending_updates ),
+						esc_html( $total_updates )
 					);
 				}
 
-				echo $updates_text;
+				echo $updates_text; // @codingStandardsIgnoreLine
 				?>
 			</td>
 		</tr>
@@ -514,13 +514,13 @@ $give_updates = Give_Updates::get_instance();
 
 						echo sprintf(
 							'<li><mark class="%1$s"><span class="dashicons dashicons-%2$s"></mark></span>%3$s</li>',
-							Give_Email_Notification_Util::is_email_notification_active( $email_notification ) ? 'yes' : 'error',
-							Give_Email_Notification_Util::is_email_notification_active( $email_notification ) ? 'yes' : 'no-alt',
-							$email_notification->config['label']
+							esc_attr( Give_Email_Notification_Util::is_email_notification_active( $email_notification ) ? 'yes' : 'error' ),
+							esc_attr( Give_Email_Notification_Util::is_email_notification_active( $email_notification ) ? 'yes' : 'no-alt' ),
+							esc_html( $email_notification->config['label'] )
 						);
 					}
 
-					echo sprintf( '<ul>%s</ul>', ob_get_clean() );
+					echo sprintf( '<ul>%s</ul>', ob_get_clean() ); // @codingStandardsIgnoreLine
 				}
 				?>
 			</td>
@@ -626,13 +626,13 @@ $give_updates = Give_Updates::get_instance();
 					$donation_url    = site_url() . '/wp-admin/edit.php?post_type=give_forms&page=give-payment-history&view=view-payment-details&id=' . $donation_id;
 					echo sprintf(
 						__( 'IPN received for <a href="%s">#%s</a> ( <a href="%s" target="_blank">%s</a> ) on %s at %s. Status %s', 'give' ),
-						$donation_url,
-						$donation_id,
-						$transaction_url,
-						$last_paypal_ipn_received['transaction_id'],
-						date_i18n( 'm/d/Y', $ipn_timestamp ),
-						date_i18n( 'H:i', $ipn_timestamp ),
-						$last_paypal_ipn_received['auth_status']
+						esc_url( $donation_url ),
+						esc_html( $donation_id ),
+						esc_url( $transaction_url ),
+						esc_html( $last_paypal_ipn_received['transaction_id'] ),
+						esc_html( date_i18n( 'm/d/Y', $ipn_timestamp ) ),
+						esc_html( date_i18n( 'H:i', $ipn_timestamp ) ),
+						esc_html( $last_paypal_ipn_received['auth_status'] )
 					);
 				} else {
 					echo 'N/A';
@@ -663,9 +663,9 @@ $give_updates = Give_Updates::get_instance();
 		<tr>
 			<td data-export-label="Session"><?php _e( 'Session', 'give' ); ?>:</td>
 			<td class="help"><?php echo Give()->tooltips->render_help( __( 'Whether a PHP session is currently set.', 'give' ) ); ?></td>
-			<td><?php echo isset( $_SESSION ) ? __( 'Enabled', 'give' ) : __( 'Disabled', 'give' ); ?></td>
+			<td><?php echo isset( $_SESSION ) ? __( 'Enabled', 'give' ) : __( 'Disabled', 'give' ); // @codingStandardsIgnoreLine ?></td>
 		</tr>
-		<?php if ( isset( $_SESSION ) ) { ?>
+		<?php if ( isset( $_SESSION ) ) { // @codingStandardsIgnoreLine ?>
 			<tr>
 				<td data-export-label="Session Name"><?php _e( 'Session Name', 'give' ); ?>:</td>
 				<td class="help"><?php echo Give()->tooltips->render_help( __( 'The name of the current PHP session.', 'give' ) ); ?></td>
@@ -743,7 +743,7 @@ $give_updates = Give_Updates::get_instance();
 					}
 
 					echo ' &ndash; '
-					     . sprintf( _x( 'by %s', 'by author', 'give' ), wp_kses( $author_name, wp_kses_allowed_html( 'post' ) ) )
+					     . sprintf( _x( 'by %s', 'by author', 'give' ), wp_kses( $author_name, wp_kses_allowed_html( 'post' ) ) ) // @codingStandardsIgnoreLine
 					     . ' &ndash; '
 					     . esc_html( $plugin_data['Version'] );
 					?>
@@ -799,7 +799,7 @@ $give_updates = Give_Updates::get_instance();
 			<tr>
 				<td><?php echo wp_kses( $plugin_name, wp_kses_allowed_html( 'post' ) ); ?></td>
 				<td class="help">&nbsp;</td>
-				<td><?php echo sprintf( _x( 'by %s', 'by author', 'give' ), wp_kses( $author_name, wp_kses_allowed_html( 'post' ) ) ) . ' &ndash; ' . esc_html( $plugin_data['Version'] ); ?></td>
+				<td><?php echo sprintf( _x( 'by %s', 'by author', 'give' ), wp_kses( $author_name, wp_kses_allowed_html( 'post' ) ) ) . ' &ndash; ' . esc_html( $plugin_data['Version'] ); // @codingStandardsIgnoreLine ?></td>
 			</tr>
 			<?php
 		}
@@ -846,7 +846,7 @@ $give_updates = Give_Updates::get_instance();
 			<tr>
 				<td><?php echo wp_kses( $plugin_name, wp_kses_allowed_html( 'post' ) ); ?></td>
 				<td class="help">&nbsp;</td>
-				<td><?php echo sprintf( _x( 'by %s', 'by author', 'give' ), wp_kses( $author_name, wp_kses_allowed_html( 'post' ) ) ) . ' &ndash; ' . esc_html( $plugin_data['Version'] ); ?></td>
+				<td><?php echo sprintf( _x( 'by %s', 'by author', 'give' ), wp_kses( $author_name, wp_kses_allowed_html( 'post' ) ) ) . ' &ndash; ' . esc_html( $plugin_data['Version'] ); // @codingStandardsIgnoreLine ?></td>
 			</tr>
 			<?php
 		}
@@ -893,9 +893,9 @@ if ( ! empty( $active_mu_plugins ) ) {
 					}
 					?>
 					<tr>
-						<td><?php echo $plugin_name; ?></td>
+						<td><?php echo esc_html( $plugin_name ); ?></td>
 						<td class="help">&nbsp;</td>
-						<td><?php echo sprintf( _x( 'by %s', 'by author', 'give' ), $author_name ) . ' &ndash; ' . esc_html( $mu_plugin_data['Version'] ); ?></td>
+						<td><?php echo sprintf( _x( 'by %s', 'by author', 'give' ), $author_name ) . ' &ndash; ' . esc_html( $mu_plugin_data['Version'] ); // @codingStandardsIgnoreLine ?></td>
 					</tr>
 					<?php
 				}
@@ -929,7 +929,7 @@ if ( ! empty( $active_mu_plugins ) ) {
 		<tr>
 			<td data-export-label="Author URL"><?php _e( 'Author URL', 'give' ); ?>:</td>
 			<td class="help"><?php echo Give()->tooltips->render_help( __( 'The theme developer\'s URL.', 'give' ) ); ?></td>
-			<td><?php echo $active_theme->{'Author URI'}; ?></td>
+			<td><?php echo esc_url( $active_theme->{'Author URI'} ); ?></td>
 		</tr>
 		<tr>
 			<td data-export-label="Child Theme"><?php _e( 'Child Theme', 'give' ); ?>:</td>
@@ -955,7 +955,7 @@ if ( ! empty( $active_mu_plugins ) ) {
 			<tr>
 				<td data-export-label="Parent Theme Author URL"><?php _e( 'Parent Theme Author URL', 'give' ); ?>:</td>
 				<td class="help"><?php echo Give()->tooltips->render_help( __( 'The parent theme developers URL.', 'give' ) ); ?></td>
-				<td><?php echo $parent_theme->{'Author URI'}; ?></td>
+				<td><?php echo esc_url( $parent_theme->{'Author URI'} ); ?></td>
 			</tr>
 		<?php } ?>
 	</tbody>

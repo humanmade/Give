@@ -50,7 +50,7 @@ function give_get_enabled_payment_gateways( $form_id = 0 ) {
 
 	$gateways = give_get_payment_gateways();
 
-	$enabled = isset( $_POST['gateways'] ) ? $_POST['gateways'] : give_get_option( 'gateways' );
+	$enabled = isset( $_POST['gateways'] ) ? $_POST['gateways'] : give_get_option( 'gateways' ); // @codingStandardsIgnoreLine
 
 	$gateway_list = array();
 
@@ -208,14 +208,14 @@ function give_send_to_gateway( $gateway, $payment_data ) {
  */
 function give_get_chosen_gateway( $form_id ) {
 
-	$request_form_id = isset( $_REQUEST['give_form_id'] ) ? $_REQUEST['give_form_id'] : 0;
+	$request_form_id = isset( $_REQUEST['give_form_id'] ) ? absint( $_REQUEST['give_form_id'] ) : 0;
 
 	// Back to check if 'form-id' is present.
 	if ( empty( $request_form_id ) ) {
-		$request_form_id = isset( $_REQUEST['form-id'] ) ? $_REQUEST['form-id'] : 0;
+		$request_form_id = isset( $_REQUEST['form-id'] ) ? absint( $_REQUEST['form-id'] ) : 0;
 	}
 
-	$request_payment_mode = isset( $_REQUEST['payment-mode'] ) ? $_REQUEST['payment-mode'] : '';
+	$request_payment_mode = isset( $_REQUEST['payment-mode'] ) ? sanitize_text_field( $_REQUEST['payment-mode'] ) : '';
 	$chosen               = false;
 
 	// If both 'payment-mode' and 'form-id' then set for only this form.
@@ -292,7 +292,7 @@ function give_count_sales_by_gateway( $gateway_id = 'paypal', $status = 'publish
 	$args = array(
 		'meta_key'    => '_give_payment_gateway',
 		'meta_value'  => $gateway_id,
-		'nopaging'    => true,
+		'nopaging'    => true, // @codingStandardsIgnoreLine
 		'post_type'   => 'give_payment',
 		'post_status' => $status,
 		'fields'      => 'ids',
@@ -320,7 +320,7 @@ function give_count_sales_by_gateway( $gateway_id = 'paypal', $status = 'publish
 function give_get_ordered_payment_gateways( $gateways ) {
 
 	// Get gateways setting.
-	$gateways_setting = isset( $_POST['gateways'] ) ? $_POST['gateways'] : give_get_option( 'gateways' );
+	$gateways_setting = isset( $_POST['gateways'] ) ? $_POST['gateways'] : give_get_option( 'gateways' ); // @codingStandardsIgnoreLine
 
 	// Return from here if we do not have gateways setting.
 	if ( empty( $gateways_setting ) ) {

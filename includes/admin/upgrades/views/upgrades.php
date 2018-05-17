@@ -43,10 +43,11 @@ $give_updates = Give_Updates::get_instance();
 									<span class="give-doing-update-text-p" <?php echo Give_Updates::$background_updater->is_paused_process() ? 'style="display:none;"' : '';  ?>>
 										<?php echo sprintf(
 										__( '%1$s <a href="%2$s" class="give-update-now %3$s">%4$s</a>', 'give' ),
-										$is_doing_updates ?
+										esc_html( $is_doing_updates ?
 											__( 'Give is currently updating the database in the background.', 'give' ) :
-											__( 'Give needs to update the database.', 'give' ),
-										$db_update_url,
+											__( 'Give needs to update the database.', 'give' )
+										),
+										esc_url( $db_update_url ),
 										( $is_doing_updates ? 'give-hidden' : '' ),
 										__( 'Update now', 'give' )
 									);
@@ -63,10 +64,10 @@ $give_updates = Give_Updates::get_instance();
 
 									<?php if ( Give_Updates::$background_updater->is_paused_process() ) : ?>
 										<?php  $is_disabled = isset( $_GET['give-restart-db-upgrades'] ) ? ' disabled' : ''; ?>
-										<button id="give-restart-upgrades" class="button button-primary alignright" data-redirect-url="<?php echo esc_url( admin_url( '/edit.php?post_type=give_forms&page=give-updates&give-restart-db-upgrades=1' ) ); ?>"<?php echo $is_disabled; ?>><?php _e( 'Restart Upgrades', 'give' ); ?></button>
+										<button id="give-restart-upgrades" class="button button-primary alignright" data-redirect-url="<?php echo esc_url( admin_url( '/edit.php?post_type=give_forms&page=give-updates&give-restart-db-upgrades=1' ) ); ?>"<?php echo $is_disabled; ?>><?php _e( 'Restart Upgrades', 'give' ); // @codingStandardsIgnoreLine ?></button>
 									<?php elseif( $give_updates->is_doing_updates() ): ?>
 										<?php  $is_disabled = isset( $_GET['give-pause-db-upgrades'] ) ? ' disabled' : ''; ?>
-										<button id="give-pause-upgrades" class="button button-primary alignright" data-redirect-url="<?php echo esc_url( admin_url( '/edit.php?post_type=give_forms&page=give-updates&give-pause-db-upgrades=1' ) ); ?>"<?php echo $is_disabled; ?>>
+										<button id="give-pause-upgrades" class="button button-primary alignright" data-redirect-url="<?php echo esc_url( admin_url( '/edit.php?post_type=give_forms&page=give-updates&give-pause-db-upgrades=1' ) ); ?>"<?php echo $is_disabled; // @codingStandardsIgnoreLine ?>>
 											<?php _e( 'Pause Upgrades', 'give' ); ?>
 										</button>
 									<?php endif; ?>
@@ -97,8 +98,8 @@ $give_updates = Give_Updates::get_instance();
 										<?php
 										echo sprintf(
 											__( 'Update %s of %s', 'give' ),
-											$give_updates->get_running_db_update(),
-											$give_updates->get_total_new_db_update_count()
+											esc_html( $give_updates->get_running_db_update() ),
+											esc_html( $give_updates->get_total_new_db_update_count() )
 										);
 										?>
 									</strong>
@@ -112,7 +113,7 @@ $give_updates = Give_Updates::get_instance();
 											<?php endif; ?>
 
 											<div class="give-progress">
-												<div style="width: <?php echo $width ?>%;"></div>
+												<div style="width: <?php echo esc_attr( $width ) ?>%;"></div>
 											</div>
 										</div>
 									<?php endif; ?>
@@ -143,14 +144,14 @@ $give_updates = Give_Updates::get_instance();
 								<p>
 									<?php
 									printf(
-										_n(
+										_n( // @codingStandardsIgnoreLine
 											'There is %1$d Give addon that needs to be updated. <a href="%2$s">Update now</a>',
 											'There are %1$d Give addons that need to be updated. <a href="%2$s">Update now</a>',
 											$plugin_updates,
 											'give'
 										),
-										$plugin_updates,
-										$plugin_update_url
+										esc_html( $plugin_updates ),
+										esc_url( $plugin_update_url )
 									);
 									?>
 								</p>

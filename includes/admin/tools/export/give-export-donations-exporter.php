@@ -89,7 +89,7 @@ class Give_Export_Donations_CSV extends Give_Batch_Export {
 
 		// Set data from form submission
 		if ( isset( $_POST['form'] ) ) {
-			parse_str( $_POST['form'], $this->data );
+			parse_str( $_POST['form'], $this->data ); // @codingStandardsIgnoreLine
 		}
 
 		$this->form       = $this->data['forms'];

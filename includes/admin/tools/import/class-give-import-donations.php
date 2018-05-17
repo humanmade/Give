@@ -66,7 +66,7 @@ if ( ! class_exists( 'Give_Import_Donations' ) ) {
 		 * @access private
 		 */
 		private function __construct() {
-			self::$per_page = ! empty( $_GET['per_page'] ) ? absint( $_GET['per_page'] ) : self::$per_page;
+			self::$per_page = ! empty( $_GET['per_page'] ) ? absint( sanitize_text_field( wp_unslash( $_GET['per_page'] ) ) ) : self::$per_page;
 		}
 
 		/**
@@ -138,7 +138,7 @@ if ( ! class_exists( 'Give_Import_Donations' ) ) {
 		 * @return mixed
 		 */
 		public function update_notices( $messages ) {
-			if ( ! empty( $_GET['tab'] ) && 'import' === give_clean( $_GET['tab'] ) ) {
+			if ( ! empty( $_GET['tab'] ) && 'import' === give_clean( $_GET['tab'] ) ) { // WPCS: Sanitization ok.
 				unset( $messages['give-setting-updated'] );
 			}
 
@@ -153,9 +153,8 @@ if ( ! class_exists( 'Give_Import_Donations' ) ) {
 		public function submit() {
 			wp_nonce_field( 'give-save-settings', '_give-save-settings' );
 			?>
-			<input type="hidden" class="import-step" id="import-step" name="step"
-			       value="<?php echo $this->get_step(); ?>"/>
-			<input type="hidden" class="importer-type" value="<?php echo $this->importer_type; ?>"/>
+			<input type="hidden" class="import-step" id="import-step" name="step" value="<?php echo esc_attr( $this->get_step() ); ?>"/>
+			<input type="hidden" class="importer-type" value="<?php echo esc_attr( $this->importer_type ); ?>"/>
 			<?php
 		}
 
@@ -171,9 +170,7 @@ if ( ! class_exists( 'Give_Import_Donations' ) ) {
 			$this->render_progress();
 			?>
 			<section>
-				<table
-					class="widefat export-options-table give-table <?php echo "step-{$step}"; ?> <?php echo( 1 === $step && ! empty( $this->is_csv_valid ) ? 'give-hidden' : '' ); ?>  "
-					id="<?php echo "step-{$step}"; ?>">
+				<table class="widefat export-options-table give-table <?php echo esc_attr( "step-{$step}" ); ?> <?php echo 1 === $step && ! empty( $this->is_csv_valid ) ? 'give-hidden' : ''; ?>  " id="<?php echo esc_attr( "step-{$step}" ); ?>">
 					<tbody>
 					<?php
 					switch ( $step ) {
@@ -197,7 +194,7 @@ if ( ! class_exists( 'Give_Import_Donations' ) ) {
 						<tr valign="top">
 							<th>
 								<input type="submit"
-								       class="button button-primary button-large button-secondary <?php echo "step-{$step}"; ?>"
+								       class="button button-primary button-large button-secondary <?php echo esc_attr( "step-{$step}" ); ?>"
 								       id="recount-stats-submit"
 								       value="
 									       <?php
@@ -206,7 +203,7 @@ if ( ! class_exists( 'Give_Import_Donations' ) ) {
 								        *
 								        * @since 2.1
 								        */
-								       echo apply_filters( 'give_import_donation_submit_button_text', __( 'Submit', 'give' ) );
+								       echo esc_html( apply_filters( 'give_import_donation_submit_button_text', __( 'Submit', 'give' ) ) );
 								       ?>
 											"/>
 							</th>
@@ -237,8 +234,8 @@ if ( ! class_exists( 'Give_Import_Donations' ) ) {
 		 */
 		public function import_success() {
 
-			$delete_csv = ( ! empty( $_GET['delete_csv'] ) ? absint( $_GET['delete_csv'] ) : false );
-			$csv        = ( ! empty( $_GET['csv'] ) ? absint( $_GET['csv'] ) : false );
+			$delete_csv = ( ! empty( $_GET['delete_csv'] ) ? absint( sanitize_text_field( wp_unslash( $_GET['delete_csv'] ) ) ) : false );
+			$csv        = ( ! empty( $_GET['csv'] ) ? absint( sanitize_text_field( wp_unslash( $_GET['csv'] ) ) ) : false );
 			if ( ! empty( $delete_csv ) && ! empty( $csv ) ) {
 				wp_delete_attachment( $csv, true );
 			}
@@ -277,10 +274,10 @@ if ( ! class_exists( 'Give_Import_Donations' ) ) {
 					__( 'donations', 'give' ),
 				),
 			);
-			$total       = (int) $_GET['total'];
+			$total       = isset( $_GET['total'] ) ? absint( sanitize_text_field( wp_unslash( $_GET['total'] ) ) ) : 0;
 			-- $total;
-			$success = (bool) $_GET['success'];
-			$dry_run = empty( $_GET['dry_run'] ) ? 0 : absint( $_GET['dry_run'] );
+			$success = isset( $_GET['success'] ) ? (bool) sanitize_text_field( wp_unslash( $_GET['success'] ) ) : false;
+			$dry_run = empty( $_GET['dry_run'] ) ? 0 : absint( sanitize_text_field( wp_unslash( $_GET['dry_run'] ) ) );
 			?>
 			<tr valign="top" class="give-import-dropdown">
 				<th colspan="2">
@@ -288,21 +285,21 @@ if ( ! class_exists( 'Give_Import_Donations' ) ) {
 						<?php
 						if ( $success ) {
 							if ( $dry_run ) {
-								printf(
-									_n( 'Dry run import complete! %s donation processed', 'Dry run import complete! %s donations processed', $total, 'give' ),
+								echo wp_kses_post( sprintf(
+									esc_html( _n( 'Dry run import complete! %s donation processed', 'Dry run import complete! %s donations processed', $total, 'give' ) ),
 									"<strong>{$total}</strong>"
-								);
+								) );
 							} else {
-								printf(
-									_n( 'Import complete! %s donation processed', 'Import complete! %s donations processed', $total, 'give' ),
+								echo wp_kses_post( sprintf(
+									esc_html( _n( 'Import complete! %s donation processed', 'Import complete! %s donations processed', $total, 'give' ) ),
 									"<strong>{$total}</strong>"
-								);
+								) );
 							}
 						} else {
-							printf(
-								_n( 'Failed to import %s donation', 'Failed to import %s donations', $total, 'give' ),
+							echo wp_kses_post( sprintf(
+								esc_html( _n( 'Failed to import %s donation', 'Failed to import %s donations', $total, 'give' ) ),
 								"<strong>{$total}</strong>"
-							);
+							) );
 						}
 						?>
 					</h2>
@@ -339,7 +336,7 @@ if ( ! class_exists( 'Give_Import_Donations' ) ) {
 						if ( array_key_exists( $key, $report_html ) && ! empty( $value ) ) {
 							?>
 							<p>
-								<?php printf( $report_html[ $key ][$dry_run], $value, _n( $report_html[ $key ][2], $report_html[ $key ][3], $value, 'give' ) ); ?>
+								<?php echo wp_kses_post( sprintf( $report_html[ $key ][$dry_run], $value, _n( $report_html[ $key ][2], $report_html[ $key ][3], $value, 'give' ) ) ); ?>
 							</p>
 							<?php
 						}
@@ -348,7 +345,7 @@ if ( ! class_exists( 'Give_Import_Donations' ) ) {
 
 					<p>
 						<a class="button button-large button-secondary"
-						   href="<?php echo add_query_arg( $query_arg, admin_url( 'edit.php' ) ); ?>"><?php echo $text; ?></a>
+						   href="<?php echo esc_url( add_query_arg( $query_arg, admin_url( 'edit.php' ) ) ); ?>"><?php echo esc_html( $text ); ?></a>
 					</p>
 				</th>
 			</tr>
@@ -364,8 +361,8 @@ if ( ! class_exists( 'Give_Import_Donations' ) ) {
 			// Reset the donation form report.
 			give_import_donation_report_reset();
 
-			$csv         = (int) $_REQUEST['csv'];
-			$delimiter   = ( ! empty( $_REQUEST['delimiter'] ) ? give_clean( $_REQUEST['delimiter'] ) : 'csv' );
+			$csv         = isset( $_REQUEST['csv'] ) ? (int) give_clean( $_REQUEST['csv'] ) : 0; // WPCS: Sanitization ok.
+			$delimiter   = ( ! empty( $_REQUEST['delimiter'] ) ? give_clean( $_REQUEST['delimiter'] ) : 'csv' ); // WPCS: Sanitization ok.
 			$index_start = 1;
 			$index_end   = 1;
 			$next        = true;
@@ -380,11 +377,18 @@ if ( ! class_exists( 'Give_Import_Donations' ) ) {
 			}
 			$current_percentage = 100 / ( $total_ajax + 1 );
 
+			$mapto       = isset( $_REQUEST['mapto'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['mapto'] ) ) : '';
+			$csv         = isset( $_REQUEST['csv'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['csv'] ) ) : '';
+			$mode        = isset( $_REQUEST['mode'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['mode'] ) ) : '';
+			$create_user = isset( $_REQUEST['create_user'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['create_user'] ) ) : '';
+			$delete_csv  = isset( $_REQUEST['delete_csv'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['delete_csv'] ) ) : '';
+			$dry_run     = isset( $_REQUEST['dry_run'] ) ? absint( sanitize_text_field( wp_unslash( $_REQUEST['dry_run'] ) ) ) : '';
+
 			?>
 			<tr valign="top" class="give-import-dropdown">
 				<th colspan="2">
-					<h2 id="give-import-title"><?php _e( 'Importing', 'give' ) ?></h2>
-					<p class="give-field-description"><?php _e( 'Your donations are now being imported...', 'give' ) ?></p>
+					<h2 id="give-import-title"><?php esc_html_e( 'Importing', 'give' ) ?></h2>
+					<p class="give-field-description"><?php esc_html_e( 'Your donations are now being imported...', 'give' ) ?></p>
 				</th>
 			</tr>
 
@@ -393,28 +397,25 @@ if ( ! class_exists( 'Give_Import_Donations' ) ) {
 					<span class="spinner is-active"></span>
 					<div class="give-progress"
 					     data-current="1"
-					     data-total_ajax="<?php echo $total_ajax; ?>"
-					     data-start="<?php echo $index_start; ?>"
-					     data-end="<?php echo $index_end; ?>"
-					     data-next="<?php echo $next; ?>"
-					     data-total="<?php echo $total; ?>"
-					     data-per_page="<?php echo self::$per_page; ?>">
+					     data-total_ajax="<?php echo esc_attr( $total_ajax ); ?>"
+					     data-start="<?php echo esc_attr( $index_start ); ?>"
+					     data-end="<?php echo esc_attr( $index_end ); ?>"
+					     data-next="<?php echo esc_attr( $next ); ?>"
+					     data-total="<?php echo esc_attr( $total ); ?>"
+					     data-per_page="<?php echo esc_attr( self::$per_page ); ?>">
 
-						<div style="width: <?php echo $current_percentage; ?>%"></div>
+						<div style="width: <?php echo esc_attr( $current_percentage ); ?>%"></div>
 					</div>
 					<input type="hidden" value="3" name="step">
-					<input type="hidden" value='<?php echo maybe_serialize( $_REQUEST['mapto'] ); ?>' name="mapto"
-					       class="mapto">
-					<input type="hidden" value="<?php echo $_REQUEST['csv']; ?>" name="csv" class="csv">
-					<input type="hidden" value="<?php echo $_REQUEST['mode']; ?>" name="mode" class="mode">
-					<input type="hidden" value="<?php echo $_REQUEST['create_user']; ?>" name="create_user"
-					       class="create_user">
-					<input type="hidden" value="<?php echo $_REQUEST['delete_csv']; ?>" name="delete_csv"
-					       class="delete_csv">
-					<input type="hidden" value="<?php echo $delimiter; ?>" name="delimiter">
-					<input type="hidden" value="<?php echo absint( $_REQUEST['dry_run'] ); ?>" name="dry_run">
+					<input type="hidden" value='<?php echo esc_attr( maybe_serialize( $mapto ) ); ?>' name="mapto" class="mapto">
+					<input type="hidden" value="<?php echo esc_attr( $csv ); ?>" name="csv" class="csv">
+					<input type="hidden" value="<?php echo esc_attr( $mode ); ?>" name="mode" class="mode">
+					<input type="hidden" value="<?php echo esc_attr( $create_user ); ?>" name="create_user" class="create_user">
+					<input type="hidden" value="<?php echo esc_attr( $delete_csv ); ?>" name="delete_csv" class="delete_csv">
+					<input type="hidden" value="<?php echo esc_attr( $delimiter ); ?>" name="delimiter">
+					<input type="hidden" value="<?php echo esc_attr( $dry_run ); ?>" name="dry_run">
 					<input type="hidden"
-					       value='<?php echo maybe_serialize( self::get_importer( $csv, 0, $delimiter ) ); ?>'
+					       value='<?php echo esc_attr( maybe_serialize( self::get_importer( $csv, 0, $delimiter ) ) ); ?>'
 					       name="main_key"
 					       class="main_key">
 				</th>
@@ -430,8 +431,8 @@ if ( ! class_exists( 'Give_Import_Donations' ) ) {
 		public function check_for_dropdown_or_import() {
 			$return = true;
 			if ( isset( $_REQUEST['mapto'] ) ) {
-				$mapto = (array) $_REQUEST['mapto'];
-				if ( false === in_array( 'form_title', $mapto ) && false === in_array( 'form_id', $mapto ) ) {
+				$mapto = (array) give_clean( $_REQUEST['mapto'] ); // WPCS: Sanitization ok.
+				if ( false === in_array( 'form_title', $mapto, true ) && false === in_array( 'form_id', $mapto, true ) ) {
 					Give_Admin_Settings::add_error( 'give-import-csv-form', __( 'In order to import donations, a column must be mapped to either the "Donation Form Title" or "Donation Form ID" field. Please map a column to one of those fields.', 'give' ) );
 					$return = false;
 				}
@@ -458,33 +459,31 @@ if ( ! class_exists( 'Give_Import_Donations' ) ) {
 		 * @since 1.8.14
 		 */
 		public function render_dropdown() {
-			$csv       = (int) $_GET['csv'];
-			$delimiter = ( ! empty( $_GET['delimiter'] ) ? give_clean( $_GET['delimiter'] ) : 'csv' );
+			$csv       = isset( $_GET['csv'] ) ? (int) $_GET['csv'] : 0;
+			$delimiter = ( ! empty( $_GET['delimiter'] ) ? give_clean( $_GET['delimiter'] ) : 'csv' ); // WPCS: Sanitization ok.
 
 			// TO check if the CSV files that is being add is valid or not if not then redirect to first step again
 			if ( ! $this->is_valid_csv( $csv ) ) {
 				$url = give_import_page_url();
 				?>
-				<input type="hidden" name="csv_not_valid" class="csv_not_valid" value="<?php echo $url; ?>"/>
+				<input type="hidden" name="csv_not_valid" class="csv_not_valid" value="<?php echo esc_url( $url ); ?>"/>
 				<?php
 			} else {
 				?>
 				<tr valign="top" class="give-import-dropdown">
 					<th colspan="2">
-						<h2 id="give-import-title"><?php _e( 'Map CSV fields to donations', 'give' ) ?></h2>
+						<h2 id="give-import-title"><?php esc_html_e( 'Map CSV fields to donations', 'give' ) ?></h2>
 
-						<p class="give-import-donation-required-fields-title"><?php _e( 'Required Fields' ); ?></p>
+						<p class="give-import-donation-required-fields-title"><?php esc_html_e( 'Required Fields' ); ?></p>
 
-						<p class="give-field-description"><?php _e( 'These fields are required for the import to submitted' ); ?></p>
+						<p class="give-field-description"><?php esc_html_e( 'These fields are required for the import to submitted' ); ?></p>
 
 						<ul class="give-import-donation-required-fields">
 							<li class="give-import-donation-required-email"
 							    title="Please configure all required fields to start the import process.">
 								<span class="give-import-donation-required-symbol dashicons dashicons-no-alt"></span>
 								<span class="give-import-donation-required-text">
-									<?php
-									_e( 'Email Address', 'give' );
-									?>
+									<?php esc_html_e( 'Email Address', 'give' ); ?>
 								</span>
 							</li>
 
@@ -492,9 +491,7 @@ if ( ! class_exists( 'Give_Import_Donations' ) ) {
 							    title="Please configure all required fields to start the import process.">
 								<span class="give-import-donation-required-symbol dashicons dashicons-no-alt"></span>
 								<span class="give-import-donation-required-text">
-									<?php
-									_e( 'First Name', 'give' );
-									?>
+									<?php esc_html_e( 'First Name', 'give' ); ?>
 								</span>
 							</li>
 
@@ -502,9 +499,7 @@ if ( ! class_exists( 'Give_Import_Donations' ) ) {
 							    title="Please configure all required fields to start the import process.">
 								<span class="give-import-donation-required-symbol dashicons dashicons-no-alt"></span>
 								<span class="give-import-donation-required-text">
-									<?php
-									_e( 'Donation Amount', 'give' );
-									?>
+									<?php esc_html_e( 'Donation Amount', 'give' ); ?>
 								</span>
 							</li>
 
@@ -512,30 +507,28 @@ if ( ! class_exists( 'Give_Import_Donations' ) ) {
 							    title="Please configure all required fields to start the import process.">
 								<span class="give-import-donation-required-symbol dashicons dashicons-no-alt"></span>
 								<span class="give-import-donation-required-text">
-									<?php
-									_e( 'Form Title or ID', 'give' );
-									?>
+									<?php esc_html_e( 'Form Title or ID', 'give' ); ?>
 								</span>
 							</li>
 						</ul>
 
-						<p class="give-field-description"><?php _e( 'Select fields from your CSV file to map against donations fields or to ignore during import.', 'give' ) ?></p>
+						<p class="give-field-description"><?php esc_html_e( 'Select fields from your CSV file to map against donations fields or to ignore during import.', 'give' ) ?></p>
 					</th>
 				</tr>
 
 				<tr valign="top" class="give-import-dropdown">
-					<th><b><?php _e( 'Column name', 'give' ); ?></b></th>
-					<th><b><?php _e( 'Map to field', 'give' ); ?></b></th>
+					<th><b><?php esc_html_e( 'Column name', 'give' ); ?></b></th>
+					<th><b><?php esc_html_e( 'Map to field', 'give' ); ?></b></th>
 				</tr>
 
 				<?php
 				$raw_key = $this->get_importer( $csv, 0, $delimiter );
-				$mapto   = (array) ( isset( $_REQUEST['mapto'] ) ? $_REQUEST['mapto'] : array() );
+				$mapto   = isset( $_REQUEST['mapto'] ) ? (array) give_clean( $_REQUEST['mapto'] ) : array(); // WPCS: Sanitization ok.
 
 				foreach ( $raw_key as $index => $value ) {
 					?>
 					<tr valign="top" class="give-import-option">
-						<th><?php echo $value; ?></th>
+						<th><?php echo esc_html( $value ); ?></th>
 						<th>
 							<?php
 							$this->get_columns( $index, $value, $mapto );
@@ -583,22 +576,22 @@ if ( ! class_exists( 'Give_Import_Donations' ) ) {
 			$default       = give_import_default_options();
 			$current_mapto = (string) ( ! empty( $mapto[ $index ] ) ? $mapto[ $index ] : '' );
 			?>
-			<select name="mapto[<?php echo $index; ?>]">
+			<select name="mapto[<?php echo esc_attr( $index ); ?>]">
 				<?php $this->get_dropdown_option_html( $default, $current_mapto, $value ); ?>
 
-				<optgroup label="<?php _e( 'Donations', 'give' ); ?>">
+				<optgroup label="<?php esc_attr_e( 'Donations', 'give' ); ?>">
 					<?php
 					$this->get_dropdown_option_html( give_import_donations_options(), $current_mapto, $value );
 					?>
 				</optgroup>
 
-				<optgroup label="<?php _e( 'Donors', 'give' ); ?>">
+				<optgroup label="<?php esc_attr_e( 'Donors', 'give' ); ?>">
 					<?php
 					$this->get_dropdown_option_html( give_import_donor_options(), $current_mapto, $value );
 					?>
 				</optgroup>
 
-				<optgroup label="<?php _e( 'Forms', 'give' ); ?>">
+				<optgroup label="<?php esc_attr_e( 'Forms', 'give' ); ?>">
 					<?php
 					$this->get_dropdown_option_html( give_import_donation_form_options(), $current_mapto, $value );
 					?>
@@ -646,10 +639,10 @@ if ( ! class_exists( 'Give_Import_Donations' ) ) {
 
 				echo sprintf(
 					'<option value="%1$s" %2$s >%3$s</option>',
-					$option,
+					esc_attr( $option ),
 					$checked,
-					$option_text
-				);
+					esc_html( $option_text )
+				); // WPCS: XSS ok.
 			}
 		}
 
@@ -756,16 +749,16 @@ if ( ! class_exists( 'Give_Import_Donations' ) ) {
 			?>
 			<ol class="give-progress-steps">
 				<li class="<?php echo( 1 === $step ? 'active' : '' ); ?>">
-					<?php _e( 'Upload CSV file', 'give' ); ?>
+					<?php esc_html_e( 'Upload CSV file', 'give' ); ?>
 				</li>
 				<li class="<?php echo( 2 === $step ? 'active' : '' ); ?>">
-					<?php _e( 'Column mapping', 'give' ); ?>
+					<?php esc_html_e( 'Column mapping', 'give' ); ?>
 				</li>
 				<li class="<?php echo( 3 === $step ? 'active' : '' ); ?>">
-					<?php _e( 'Import', 'give' ); ?>
+					<?php esc_html_e( 'Import', 'give' ); ?>
 				</li>
 				<li class="<?php echo( 4 === $step ? 'active' : '' ); ?>">
-					<?php _e( 'Done!', 'give' ); ?>
+					<?php esc_html_e( 'Done!', 'give' ); ?>
 				</li>
 			</ol>
 			<?php
@@ -779,7 +772,7 @@ if ( ! class_exists( 'Give_Import_Donations' ) ) {
 		 * @return int $step on which step doest the import is on.
 		 */
 		public function get_step() {
-			$step    = (int) ( isset( $_REQUEST['step'] ) ? give_clean( $_REQUEST['step'] ) : 0 );
+			$step    = isset( $_REQUEST['step'] ) ? (int) give_clean( $_REQUEST['step'] ) : 0; // WPCS: Sanitization ok.
 			$on_step = 1;
 
 			if ( empty( $step ) || 1 === $step ) {
@@ -810,19 +803,17 @@ if ( ! class_exists( 'Give_Import_Donations' ) ) {
 		 * @since 2.1
 		 */
 		public function give_import_donation_submit_button_render_media_csv() {
-			$dry_run = isset( $_POST['dry_run'] ) ? absint( $_POST['dry_run'] ) : 1;
+			$dry_run = isset( $_POST['dry_run'] ) ? absint( give_clean( $_POST['dry_run'] ) ) : 1; // WPCS: Sanitization ok.
 			?>
 			<div>
 				<label for="dry_run">
 					<input type="hidden" name="dry_run" value="0"/>
 					<input type="checkbox" name="dry_run" id="dry_run" class="dry_run"
 					       value="1" <?php checked( 1, $dry_run ); ?> >
-					<strong><?php _e( 'Dry Run', 'give' ); ?></strong>
+					<strong><?php esc_html_e( 'Dry Run', 'give' ); ?></strong>
 				</label>
 				<p class="give-field-description">
-					<?php
-					_e( 'Preview what the import would look like without making any default changes to your site or your database.', 'give' );
-					?>
+					<?php esc_html_e( 'Preview what the import would look like without making any default changes to your site or your database.', 'give' ); ?>
 				</p>
 			</div>
 			<?php
@@ -861,29 +852,29 @@ if ( ! class_exists( 'Give_Import_Donations' ) ) {
 			?>
 			<tr valign="top">
 				<th colspan="2">
-					<h2 id="give-import-title"><?php _e( 'Import donations from a CSV file', 'give' ) ?></h2>
-					<p class="give-field-description"><?php _e( 'This tool allows you to import or add donation data to your give form(s) via a CSV file.', 'give' ) ?></p>
+					<h2 id="give-import-title"><?php esc_html_e( 'Import donations from a CSV file', 'give' ) ?></h2>
+					<p class="give-field-description"><?php esc_html_e( 'This tool allows you to import or add donation data to your give form(s) via a CSV file.', 'give' ) ?></p>
 				</th>
 			</tr>
 			<?php
-			$csv         = ( isset( $_POST['csv'] ) ? give_clean( $_POST['csv'] ) : '' );
-			$csv_id      = ( isset( $_POST['csv_id'] ) ? give_clean( $_POST['csv_id'] ) : '' );
-			$delimiter   = ( isset( $_POST['delimiter'] ) ? give_clean( $_POST['delimiter'] ) : 'csv' );
+			$csv         = isset( $_POST['csv'] ) ? give_clean( $_POST['csv'] ) : ''; // WPCS: Sanitization ok.
+			$csv_id      = isset( $_POST['csv_id'] ) ? give_clean( $_POST['csv_id'] ) : ''; // WPCS: Sanitization ok.
+			$delimiter   = isset( $_POST['delimiter'] ) ? give_clean( $_POST['delimiter'] ) : 'csv'; // WPCS: Sanitization ok.
 			$mode        = empty( $_POST['mode'] ) ?
 				'disabled' :
-				( give_is_setting_enabled( give_clean( $_POST['mode'] ) ) ? 'enabled' : 'disabled' );
+				( give_is_setting_enabled( give_clean( $_POST['mode'] ) ) ? 'enabled' : 'disabled' ); // WPCS: Sanitization ok.
 			$create_user = empty( $_POST['create_user'] ) ?
 				'enabled' :
-				( give_is_setting_enabled( give_clean( $_POST['create_user'] ) ) ? 'enabled' : 'disabled' );
+				( give_is_setting_enabled( give_clean( $_POST['create_user'] ) ) ? 'enabled' : 'disabled' ); // WPCS: Sanitization ok.
 			$delete_csv  = empty( $_POST['delete_csv'] ) ?
 				'enabled' :
-				( give_is_setting_enabled( give_clean( $_POST['delete_csv'] ) ) ? 'enabled' : 'disabled' );
+				( give_is_setting_enabled( give_clean( $_POST['delete_csv'] ) ) ? 'enabled' : 'disabled' ); // WPCS: Sanitization ok.
 
 			// Reset csv and csv_id if csv
 			if ( empty( $csv_id ) || ! $this->is_valid_csv( $csv_id, $csv ) ) {
 				$csv_id = $csv = '';
 			}
-			$per_page = isset( $_POST['per_page'] ) ? absint( $_POST['per_page'] ) : self::$per_page;
+			$per_page = isset( $_POST['per_page'] ) ? absint( give_clean( $_POST['per_page'] ) ) : self::$per_page; // WPCS: Sanitization ok.
 
 			$sample_file_text = sprintf(
 					'%s <a href="%s">%s</a>.',
@@ -973,8 +964,7 @@ if ( ! class_exists( 'Give_Import_Donations' ) ) {
 				Give_Admin_Settings::output_fields( $settings, 'give_settings' );
 			} else {
 				?>
-				<input type="hidden" name="is_csv_valid" class="is_csv_valid"
-				       value="<?php echo $this->is_csv_valid; ?>">
+				<input type="hidden" name="is_csv_valid" class="is_csv_valid" value="<?php echo esc_attr( $this->is_csv_valid ); ?>">
 				<?php
 			}
 		}
@@ -990,26 +980,27 @@ if ( ! class_exists( 'Give_Import_Donations' ) ) {
 
 			// Validation for first step.
 			if ( 1 === $step ) {
-				$csv_id = absint( $_POST['csv_id'] );
+				$csv_id  = isset( $_POST['csv_id'] ) ? absint( give_clean( $_POST['csv_id'] ) ) : '';  // WPCS: Sanitization ok.
+				$csv_url = isset( $_POST['csv_url'] ) ? give_clean( $_POST['csv_url'] ) : '';  // WPCS: Sanitization ok.
 
-				if ( $this->is_valid_csv( $csv_id, esc_url( $_POST['csv'] ) ) ) {
+				if ( $this->is_valid_csv( $csv_id, esc_url_raw( $csv_url ) ) ) {
 
 					$url = give_import_page_url( (array) apply_filters( 'give_import_step_two_url', array(
 						'step'          => '2',
 						'importer-type' => $this->importer_type,
 						'csv'           => $csv_id,
-						'delimiter'     => isset( $_REQUEST['delimiter'] ) ? give_clean( $_REQUEST['delimiter'] ) : 'csv',
+						'delimiter'     => isset( $_REQUEST['delimiter'] ) ? give_clean( $_REQUEST['delimiter'] ) : 'csv',  // WPCS: Sanitization ok.
 						'mode'          => empty( $_POST['mode'] ) ?
 							'0' :
-							( give_is_setting_enabled( give_clean( $_POST['mode'] ) ) ? '1' : '0' ),
+							( give_is_setting_enabled( give_clean( $_POST['mode'] ) ) ? '1' : '0' ),  // WPCS: Sanitization ok.
 						'create_user'   => empty( $_POST['create_user'] ) ?
 							'0' :
-							( give_is_setting_enabled( give_clean( $_POST['create_user'] ) ) ? '1' : '0' ),
+							( give_is_setting_enabled( give_clean( $_POST['create_user'] ) ) ? '1' : '0' ),  // WPCS: Sanitization ok.
 						'delete_csv'    => empty( $_POST['delete_csv'] ) ?
 							'1' :
-							( give_is_setting_enabled( give_clean( $_POST['delete_csv'] ) ) ? '1' : '0' ),
-						'per_page'      => isset( $_POST['per_page'] ) ? absint( $_POST['per_page'] ) : self::$per_page,
-						'dry_run'        => isset( $_POST['dry_run'] ) ? absint( $_POST['dry_run'] ) : 0,
+							( give_is_setting_enabled( give_clean( $_POST['delete_csv'] ) ) ? '1' : '0' ), // WPCS: Sanitization ok.
+						'per_page'      => isset( $_POST['per_page'] ) ? absint( wp_unslash( $_POST['per_page'] ) ) : self::$per_page,
+						'dry_run'        => isset( $_POST['dry_run'] ) ? absint( wp_unslash( $_POST['dry_run'] ) ) : 0,
 					) ) );
 
 					$this->is_csv_valid = $url;
@@ -1034,7 +1025,7 @@ if ( ! class_exists( 'Give_Import_Donations' ) ) {
 			if ( $csv ) {
 				$csv_url = wp_get_attachment_url( $csv );
 
-				$delimiter = ( ! empty( $_REQUEST['delimiter'] ) ? give_clean( $_REQUEST['delimiter'] ) : 'csv' );
+				$delimiter = ( ! empty( $_REQUEST['delimiter'] ) ? give_clean( $_REQUEST['delimiter'] ) : 'csv' ); // WPCS: Sanitization ok.
 
 				if (
 					! $csv_url ||
@@ -1075,7 +1066,7 @@ if ( ! class_exists( 'Give_Import_Donations' ) ) {
 		private function is_donations_import_page() {
 			return 'import' === give_get_current_setting_tab() &&
 			       isset( $_GET['importer-type'] ) &&
-			       $this->importer_type === give_clean( $_GET['importer-type'] );
+			       $this->importer_type === give_clean( $_GET['importer-type'] ); // WPCS: Sanitization ok.
 		}
 	}
 

@@ -343,7 +343,7 @@ class Give_Addon_Activation_Banner {
 				printf(
 					/* translators: %s: Add-on name */
 					'%s<span>%s</span>',
-					__( 'New Give Add-on Activated: ', 'give' ),
+					esc_html__( 'New Give Add-on Activated: ', 'give' ),
 					esc_html( $banner_arr['name'] )
 				);
 				?>
@@ -357,7 +357,7 @@ class Give_Addon_Activation_Banner {
 				if ( ! empty( $plugin_data['Description'] ) ) {
 					?>
 					<span class="give-addon-description">
-					<em><?php echo esc_html( strip_tags( $plugin_data['Description'] ) ); ?></em></span><br />
+					<em><?php echo esc_html( wp_strip_all_tags( $plugin_data['Description'] ) ); ?></em></span><br />
 					<?php
 				}
 				if ( isset( $banner_arr['settings_url'] ) ) {

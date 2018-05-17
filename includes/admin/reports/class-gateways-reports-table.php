@@ -231,10 +231,10 @@ class Give_Gateway_Reports_Table extends WP_List_Table {
 	 */
 	public function give_sort_total_donations( $old_value, $new_value ) {
 		// If no sort, default to label.
-		$orderby = ( ! empty( $_REQUEST['orderby'] ) ) ? $_REQUEST['orderby'] : 'label';
+		$orderby = ( ! empty( $_REQUEST['orderby'] ) ) ? sanitize_key( $_REQUEST['orderby'] ) : 'label';
 
 		//If no order, default to asc.
-		$order = ( ! empty( $_REQUEST['order'] ) ) ? $_REQUEST['order'] : 'asc';
+		$order = ( ! empty( $_REQUEST['order'] ) ) ? sanitize_key( $_REQUEST['order'] ) : 'asc';
 
 		//Determine sort order.
 		$result = strcmp( $old_value[ $orderby ], $new_value[ $orderby ] );

@@ -97,7 +97,7 @@ class Give_DB_Log_Meta extends Give_DB_Meta {
 			return false;
 		}
 
-		if ( false === $wpdb->query( $wpdb->prepare( "DELETE FROM $this->table_name WHERE log_id = %d", $log_id ) ) ) {
+		if ( false === $wpdb->query( $wpdb->prepare( "DELETE FROM $this->table_name WHERE log_id = %d", $log_id ) ) ) { // @codingStandardsIgnoreLine
 			return false;
 		}
 

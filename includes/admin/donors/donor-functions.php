@@ -51,11 +51,11 @@ function give_register_default_donor_tabs( $tabs ) {
 	$default_tabs = array(
 		'overview' => array(
 			'dashicon' => 'dashicons-admin-users',
-			'title' => __( 'Donor Profile', 'give' ),
+			'title'    => __( 'Donor Profile', 'give' ),
 		),
 		'notes'    => array(
 			'dashicon' => 'dashicons-admin-comments',
-			'title' => __( 'Donor Notes', 'give' ),
+			'title'    => __( 'Donor Notes', 'give' ),
 		),
 	);
 
@@ -129,7 +129,7 @@ function give_connect_user_donor_profile( $donor, $donor_data, $address ) {
 
 		// Check whether the disconnected user id and the reconnected user id are same or not.
 		// If both are same then delete user id store in donor meta.
-		if( $donor_data['user_id'] === $disconnected_user_id ) {
+		if ( $donor_data['user_id'] === $disconnected_user_id ) {
 			delete_user_meta( $disconnected_user_id, '_give_disconnected_donor_id' );
 			$donor->delete_meta( '_give_disconnected_user_id' );
 		}
@@ -153,7 +153,6 @@ function give_connect_user_donor_profile( $donor, $donor_data, $address ) {
 	 * @since 1.0
 	 */
 	do_action( 'give_post_edit_donor', $donor_id, $donor_data );
-
 
 	return $output;
 }

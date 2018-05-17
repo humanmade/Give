@@ -248,6 +248,7 @@ class Give_Donor {
 		global $wpdb;
 		$meta_type = Give()->donor_meta->meta_type;
 
+		// @codingStandardsIgnoreStart
 		$addresses = $wpdb->get_results(
 			$wpdb->prepare(
 				"
@@ -261,6 +262,7 @@ class Give_Donor {
 			),
 			ARRAY_N
 		);
+		// @codingStandardsIgnoreEnd
 
 		if ( empty( $addresses ) ) {
 			return $this->address;
@@ -1287,6 +1289,7 @@ class Give_Donor {
 		if ( $is_multi_address ) {
 			if ( is_null( $multi_address_id ) ) {
 				// Get latest address key to set multi address id.
+				// @codingStandardsIgnoreStart
 				$multi_address_id = $wpdb->get_var(
 					$wpdb->prepare(
 						"
@@ -1301,6 +1304,7 @@ class Give_Donor {
 						$this->id
 					)
 				);
+				// @codingStandardsIgnoreEnd
 
 				if( ! empty( $multi_address_id ) ) {
 					$multi_address_id = absint( substr( strrchr( $multi_address_id, '_' ), 1 ) );
@@ -1358,6 +1362,7 @@ class Give_Donor {
 		$meta_type = Give()->donor_meta->meta_type;
 
 		// Process query.
+		// @codingStandardsIgnoreStart
 		$row_affected = $wpdb->query(
 			$wpdb->prepare(
 				"
@@ -1370,6 +1375,7 @@ class Give_Donor {
 				$this->id
 			)
 		);
+		// @codingStandardsIgnoreEnd
 
 		$this->setup_address();
 
@@ -1411,6 +1417,7 @@ class Give_Donor {
 		$meta_type = Give()->donor_meta->meta_type;
 
 		// Process query.
+		// @codingStandardsIgnoreStart
 		$row_affected = $wpdb->get_results(
 			$wpdb->prepare(
 				"
@@ -1423,7 +1430,7 @@ class Give_Donor {
 				$this->id
 			)
 		);
-		
+		// @codingStandardsIgnoreEnd
 		// Return result.
 		if( ! count( $row_affected ) ) {
 			return false;

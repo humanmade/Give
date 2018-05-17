@@ -115,7 +115,7 @@ class Give_Welcome {
 	 * @return void
 	 */
 	public function tabs() {
-		$selected = isset( $_GET['page'] ) ? $_GET['page'] : 'give-about';
+		$selected = isset( $_GET['page'] ) ? sanitize_key( $_GET['page'] ) : 'give-about';
 		?>
         <h2 class="nav-tab-wrapper">
             <a class="nav-tab <?php echo $selected == 'give-about' ? 'nav-tab-active' : ''; ?>"
@@ -166,7 +166,7 @@ class Give_Welcome {
 				printf(
 				/* translators: %s: Give version */
 					esc_html__( 'Version %s', 'give' ),
-					$display_version
+					esc_html( $display_version )
 				);
 				?></div>
 
@@ -175,7 +175,7 @@ class Give_Welcome {
             <div class="feature-section clearfix introduction">
 
                 <div class="video feature-section-item">
-                    <img src="<?php echo GIVE_PLUGIN_URL . 'assets/dist/images/give-logo-photo-mashup.png' ?>"
+                    <img src="<?php echo esc_url( GIVE_PLUGIN_URL . 'assets/dist/images/give-logo-photo-mashup.png' ) ?>"
                          alt="<?php esc_attr_e( 'Give', 'give' ); ?>">
                 </div>
 
@@ -212,7 +212,7 @@ class Give_Welcome {
                 </div>
 
                 <div class="content  feature-section-item last-feature">
-                    <img src="<?php echo GIVE_PLUGIN_URL . '/assets/dist/images/admin/give-form-mockup.png' ?>"
+                    <img src="<?php echo esc_url( GIVE_PLUGIN_URL . '/assets/dist/images/admin/give-form-mockup.png' ) ?>"
                          alt="<?php esc_attr_e( 'A Give donation form', 'give' ); ?>">
                 </div>
 
@@ -235,20 +235,20 @@ class Give_Welcome {
 		list( $display_version ) = explode( '-', GIVE_VERSION );
 		?>
         <div class="wrap about-wrap">
-            <h1><?php echo get_admin_page_title(); ?></h1>
+            <h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
 
             <p class="about-text"><?php
 				printf(
 				/* translators: %s: Give version */
 					esc_html__( 'Thank you for updating to the latest version! Give %s is ready to make your online store faster, safer, and better!', 'give' ),
-					$display_version
+					esc_html( $display_version )
 				);
 				?></p>
             <div class="give-badge"><?php
 				printf(
 				/* translators: %s: Give version */
 					esc_html__( 'Version %s', 'give' ),
-					$display_version
+					esc_html( $display_version )
 				);
 				?></div>
 
@@ -258,7 +258,7 @@ class Give_Welcome {
                 <h3><?php esc_html_e( 'Full Changelog', 'give' ); ?></h3>
 
                 <div class="feature-section">
-					<?php echo $this->parse_readme(); ?>
+					<?php echo wp_kses_post( $this->parse_readme() ); ?>
                 </div>
             </div>
 
@@ -294,13 +294,13 @@ class Give_Welcome {
 				printf(
 				/* translators: %s: Give version */
 					esc_html__( 'Version %s', 'give' ),
-					$display_version
+					esc_html( $display_version )
 				);
 				?></div>
 
 			<?php $this->tabs(); ?>
 
-            <p class="about-text"><?php printf( esc_html__( 'Getting started with Give is easy! We put together this quick start guide to help first time users of the plugin. Our goal is to get you up and running in no time. Let\'s begin!', 'give' ), $display_version ); ?></p>
+            <p class="about-text"><?php printf( esc_html__( 'Getting started with Give is easy! We put together this quick start guide to help first time users of the plugin. Our goal is to get you up and running in no time. Let\'s begin!', 'give' ), esc_html( $display_version ) ); ?></p>
 
             <div class="feature-section clearfix">
 
@@ -313,7 +313,7 @@ class Give_Welcome {
                 </div>
 
                 <div class="content feature-section-item last-feature">
-                    <img src="<?php echo GIVE_PLUGIN_URL; ?>assets/dist/images/admin/getting-started-add-new-form.png">
+                    <img src="<?php echo esc_url( GIVE_PLUGIN_URL ); ?>assets/dist/images/admin/getting-started-add-new-form.png">
                 </div>
 
             </div>
@@ -322,7 +322,7 @@ class Give_Welcome {
             <div class="feature-section clearfix">
 
                 <div class="content feature-section-item multi-level-gif">
-                    <img src="<?php echo GIVE_PLUGIN_URL; ?>assets/dist/images/admin/getting-started-new-form-multi-level.gif">
+                    <img src="<?php echo esc_url( GIVE_PLUGIN_URL ); ?>assets/dist/images/admin/getting-started-new-form-multi-level.gif">
                 </div>
 
                 <div class="content feature-section-item last-feature">
@@ -345,7 +345,7 @@ class Give_Welcome {
                 </div>
 
                 <div class="content feature-section-item last-feature">
-                    <img src="<?php echo GIVE_PLUGIN_URL; ?>assets/dist/images/admin/getting-started-add-content.png">
+                    <img src="<?php echo esc_url( GIVE_PLUGIN_URL ); ?>assets/dist/images/admin/getting-started-add-content.png">
                 </div>
 
             </div>
@@ -354,7 +354,7 @@ class Give_Welcome {
             <div class="feature-section clearfix">
 
                 <div class="content feature-section-item display-options">
-                    <img src="<?php echo GIVE_PLUGIN_URL; ?>assets/dist/images/admin/getting-started-display-options.png">
+                    <img src="<?php echo esc_url( GIVE_PLUGIN_URL ); ?>assets/dist/images/admin/getting-started-display-options.png">
                 </div>
 
                 <div class="content feature-section-item last-feature">
@@ -394,7 +394,7 @@ class Give_Welcome {
 				printf(
 				/* translators: %s: Give version */
 					esc_html__( 'Version %s', 'give' ),
-					$display_version
+					esc_html( $display_version )
 				);
 				?></div>
 
@@ -408,7 +408,7 @@ class Give_Welcome {
 				);
 				?></p>
 
-			<?php echo $this->contributors(); ?>
+			<?php echo $this->contributors(); // @codingStandardsIgnoreLine ?>
         </div>
 		<?php
 	}
@@ -519,13 +519,13 @@ class Give_Welcome {
 		// Badge for welcome page
 		$badge_url = GIVE_PLUGIN_URL . 'assets/dist/images/give-badge.png';
 		?>
-        <h1 class="welcome-h1"><?php echo get_admin_page_title(); ?></h1>
+        <h1 class="welcome-h1"><?php echo esc_html( get_admin_page_title() ); ?></h1>
 		<?php $this->social_media_elements(); ?>
 
         <style type="text/css" media="screen">
             /*<![CDATA[*/
             .give-badge {
-                background: url('<?php echo $badge_url; ?>') no-repeat;
+                background: url('<?php echo esc_url( $badge_url ); ?>') no-repeat;
             }
 
             /*]]>*/

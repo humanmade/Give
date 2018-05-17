@@ -226,7 +226,6 @@ if ( ! class_exists( 'Give_Settings_Page' ) ) :
 			}
 
 			$settings = $this->get_settings();
-
 			Give_Admin_Settings::output_fields( $settings, 'give_settings' );
 		}
 

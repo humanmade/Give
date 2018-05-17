@@ -7,14 +7,14 @@
 if ( ! is_user_logged_in() ) {
 
 	if ( ! empty( $_GET['payment_key'] ) ) {
-		$give_login_redirect = add_query_arg( 'payment_key', give_clean( $_GET['payment_key'] ) , give_get_history_page_uri() );
+		$give_login_redirect = add_query_arg( 'payment_key', give_clean( $_GET['payment_key'] ) , give_get_history_page_uri() ); // WPCS: sanitization ok.
 	}
 
 	// Show any error messages after form submission
 	Give()->notices->render_frontend_notices( 0 ); ?>
 	<form id="give-login-form" class="give-form" action="" method="post">
 		<fieldset>
-			<legend><?php _e( 'Log into Your Account', 'give' ); ?></legend>
+			<legend><?php esc_html_e( 'Log into Your Account', 'give' ); ?></legend>
 			<?php
 			/**
 			 * Fires in the login shortcode, before the login fields.
@@ -26,24 +26,24 @@ if ( ! is_user_logged_in() ) {
 			do_action( 'give_login_fields_before' );
 			?>
 			<div class="give-login-username give-login">
-				<label for="give_user_login"><?php _e( 'Username', 'give' ); ?></label>
+				<label for="give_user_login"><?php esc_html_e( 'Username', 'give' ); ?></label>
 				<input name="give_user_login" id="give_user_login" class="give-required give-input" type="text" required aria-required="true" />
 			</div>
 
 			<div class="give-login-password give-login">
-				<label for="give_user_pass"><?php _e( 'Password', 'give' ); ?></label>
+				<label for="give_user_pass"><?php esc_html_e( 'Password', 'give' ); ?></label>
 				<input name="give_user_pass" id="give_user_pass" class="give-password give-required give-input" type="password" required aria-required="true" />
 			</div>
 
 			<div class="give-login-submit give-login">
 				<input type="hidden" name="give_login_redirect" value="<?php echo esc_url( $give_login_redirect ); ?>" />
-				<input type="hidden" name="give_login_nonce" value="<?php echo wp_create_nonce( 'give-login-nonce' ); ?>" />
+				<input type="hidden" name="give_login_nonce" value="<?php echo esc_attr( wp_create_nonce( 'give-login-nonce' ) ); ?>" />
 				<input type="hidden" name="give_action" value="user_login" />
-				<input id="give_login_submit" type="submit" class="give_submit" value="<?php _e( 'Log In', 'give' ); ?>" />
+				<input id="give_login_submit" type="submit" class="give_submit" value="<?php esc_html_e( 'Log In', 'give' ); ?>" />
 			</div>
 
 			<div class="give-lost-password give-login">
-				<a href="<?php echo wp_lostpassword_url(); ?>"><?php _e( 'Reset Password', 'give' ); ?></a>
+				<a href="<?php echo esc_url( wp_lostpassword_url() ); ?>"><?php esc_html_e( 'Reset Password', 'give' ); ?></a>
 			</div>
 			<?php
 			/**

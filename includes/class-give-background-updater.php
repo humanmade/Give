@@ -327,7 +327,7 @@ class Give_Background_Updater extends WP_Background_Process {
 	 */
 	public function maybe_handle() {
 		// Don't lock up other requests while processing
-		session_write_close();
+		session_write_close(); // @codingStandardsIgnoreLine
 
 		if ( $this->is_process_running() || $this->is_paused_process() ) {
 			// Background process already running.

@@ -161,7 +161,7 @@ if ( ! class_exists( 'Give_Donor_Register_Email' ) ) :
 				}
 			}
 
-			$request_url_data = wp_parse_url( $_SERVER['REQUEST_URI'] );
+			$request_url_data = wp_parse_url( sanitize_text_field( $_SERVER['REQUEST_URI'] ) );
 			$query            = $request_url_data['query'];
 
 			// Remove user id query param if set from request url.
@@ -178,7 +178,7 @@ if ( ! class_exists( 'Give_Donor_Register_Email' ) ) :
 						var transactions = document.getElementById("give_preview_email_user_id");
 						var selected_trans = transactions.options[transactions.selectedIndex];
 						if (selected_trans) {
-							var url_string = "<?php echo $request_url; ?>&user_id=" + selected_trans.value;
+							var url_string = "<?php echo esc_url( $request_url ); ?>&user_id=" + selected_trans.value;
 							window.location = url_string;
 						}
 					}
@@ -192,10 +192,10 @@ if ( ! class_exists( 'Give_Donor_Register_Email' ) ) :
 				// The select field with 100 latest transactions
 				echo Give()->html->select( array(
 					'name'             => 'preview_email_user_id',
-					'selected'         => $user_id,
+					'selected'         => $user_id, // @codingStandardsIgnoreLine
 					'id'               => 'give_preview_email_user_id',
 					'class'            => 'give-preview-email-donor-id',
-					'options'          => $options,
+					'options'          => $options, // @codingStandardsIgnoreLine
 					'chosen'           => false,
 					'select_atts'      => 'onchange="change_preview()"',
 					'show_option_all'  => false,

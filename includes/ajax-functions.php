@@ -56,7 +56,7 @@ function give_test_ajax_works() {
 
 	$params = array(
 		'sslverify' => false,
-		'timeout'   => 30,
+		'timeout'   => 30, // @codingStandardsIgnoreLine
 		'body'      => array(
 			'action' => 'give_test_ajax',
 		),
@@ -93,7 +93,7 @@ function give_test_ajax_works() {
 		Give_Cache::set( '_give_ajax_works', '1', DAY_IN_SECONDS, true );
 	}
 
-	return apply_filters( 'give_test_ajax_works', $works );
+	return apply_filters( 'give_test_ajax_works', true );
 }
 
 add_action( 'wp_ajax_nopriv_give_test_ajax', 'give_test_ajax_works' );
@@ -152,7 +152,7 @@ add_action( 'wp_ajax_nopriv_give_checkout_login', 'give_load_checkout_login_fiel
  * @return void
  */
 function give_load_checkout_fields() {
-	$form_id = isset( $_POST['form_id'] ) ? $_POST['form_id'] : '';
+	$form_id = isset( $_POST['form_id'] ) ? absint( $_POST['form_id'] ) : '';
 
 	ob_start();
 
@@ -183,9 +183,9 @@ add_action( 'wp_ajax_nopriv_give_checkout_register', 'give_load_checkout_fields'
  */
 function give_ajax_get_form_title() {
 	if ( isset( $_POST['form_id'] ) ) {
-		$title = get_the_title( $_POST['form_id'] );
+		$title = get_the_title( absint( $_POST['form_id'] ) );
 		if ( $title ) {
-			echo $title;
+			echo esc_html( $title );
 		} else {
 			echo 'fail';
 		}
@@ -352,7 +352,7 @@ function give_ajax_donor_search() {
 	if ( ! current_user_can( 'view_give_reports' ) ) {
 		$donors = array();
 	} else {
-		$donors = $wpdb->get_results( "SELECT id,name,email FROM $wpdb->donors WHERE `name` LIKE '%$search%' OR `email` LIKE '%$search%' LIMIT 50" );
+		$donors = $wpdb->get_results( "SELECT id,name,email FROM $wpdb->donors WHERE `name` LIKE '%$search%' OR `email` LIKE '%$search%' LIMIT 50" ); // @codingStandardsIgnoreLine
 	}
 
 	if ( $donors ) {
@@ -584,7 +584,7 @@ function give_check_for_form_price_variations() {
 				$ajax_response .= '<option value="' . esc_attr( $price['_give_id']['level_id'] ) . '">' . $level_text . '</option>';
 			}
 			$ajax_response .= '</select>';
-			echo $ajax_response;
+			echo $ajax_response; // @codingStandardsIgnoreLine
 		}
 	}
 

@@ -130,7 +130,7 @@ class Give_Sequential_Donation_Number {
 
 			give_update_option( 'sequential-ordering_number', ( $serial_number + 1 ) );
 		} catch ( Exception $e ) {
-			error_log( "Give caught exception: {$e->getMessage()}" );
+			trigger_error( "Give caught exception: {$e->getMessage()}" );
 		}
 	}
 
@@ -300,7 +300,7 @@ class Give_Sequential_Donation_Number {
 			);
 		}
 
-		return $wpdb->get_var(
+		return $wpdb->get_var( // @codingStandardsIgnoreLine
 			$wpdb->prepare(
 				"
 				SELECT ID
@@ -324,16 +324,18 @@ class Give_Sequential_Donation_Number {
 		global $wpdb;
 		$table_name = Give()->sequential_donation_db->table_name;
 
+		// @codingStandardsIgnoreStart
 		return absint(
 			$wpdb->get_var(
 				"
 				SELECT ID
 				FROM {$table_name}
-				ORDER BY id DESC 
+				ORDER BY id DESC
 				LIMIT 1
 				"
 			)
 		);
+		// @codingStandardsIgnoreEnd
 	}
 
 	/**
@@ -348,7 +350,7 @@ class Give_Sequential_Donation_Number {
 		global $wpdb;
 
 		return absint(
-			$wpdb->get_var(
+			$wpdb->get_var(// @codingStandardsIgnoreLine
 				$wpdb->prepare(
 					"
 					SELECT ID

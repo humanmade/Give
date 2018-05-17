@@ -240,18 +240,18 @@ function give_after_install() {
 
 	if ( false === $give_table_check || current_time( 'timestamp' ) > $give_table_check ) {
 
-		if ( ! @Give()->donor_meta->installed() ) {
+		if ( ! @Give()->donor_meta->installed() ) { // @codingStandardsIgnoreLine
 
 			// Create the donor meta database.
 			// (this ensures it creates it on multisite instances where it is network activated).
-			@Give()->donor_meta->create_table();
+			@Give()->donor_meta->create_table(); // @codingStandardsIgnoreLine
 
 		}
 
-		if ( ! @Give()->donors->installed() ) {
+		if ( ! @Give()->donors->installed() ) { // @codingStandardsIgnoreLine
 			// Create the donor database.
 			// (this ensures it creates it on multisite instances where it is network activated).
-			@Give()->donors->create_table();
+			@Give()->donors->create_table(); // @codingStandardsIgnoreLine
 
 			/**
 			 * Fires after plugin installation.

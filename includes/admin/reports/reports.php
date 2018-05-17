@@ -35,7 +35,7 @@ function give_reports_page() {
 	?>
 	<div class="wrap give-settings-page">
 
-		<h1 class="screen-reader-text"><?php echo get_admin_page_title(); ?></h1>
+		<h1 class="screen-reader-text"><?php echo esc_html( get_admin_page_title() ); ?></h1>
 
 		<h2 class="nav-tab-wrapper">
 			<?php foreach ( $views as $tab => $label ) { ?>
@@ -125,7 +125,7 @@ function give_get_reporting_view( $default = 'earnings' ) {
 	if ( ! isset( $_GET['view'] ) || ! in_array( $_GET['view'], array_keys( give_reports_default_views() ) ) ) {
 		$view = $default;
 	} else {
-		$view = $_GET['view'];
+		$view = sanitize_key( $_GET['view'] );
 	}
 
 	return apply_filters( 'give_get_reporting_view', $view );
@@ -147,7 +147,7 @@ function give_reports_tab_reports() {
 	$views        = give_reports_default_views();
 
 	if ( isset( $_GET['tab'] ) && array_key_exists( $_GET['tab'], $views ) ) {
-		$current_view = $_GET['tab'];
+		$current_view = sanitize_key( $_GET['tab'] );
 	}
 
 	/**
@@ -168,7 +168,7 @@ add_action( 'give_reports_tab_reports', 'give_reports_tab_reports' );
  */
 function give_report_views() {
 	$views        = give_reports_default_views();
-	$current_view = isset( $_GET['view'] ) ? $_GET['view'] : 'earnings';
+	$current_view = isset( $_GET['view'] ) ? sanitize_key( $_GET['view'] ) : 'earnings';
 	/**
 	 * Fires before the report page actions form.
 	 *
@@ -180,7 +180,7 @@ function give_report_views() {
 		<select id="give-reports-view" name="view">
 			<option value="-1"><?php esc_html_e( 'Report Type', 'give' ); ?></option>
 			<?php foreach ( $views as $view_id => $label ) : ?>
-				<option value="<?php echo esc_attr( $view_id ); ?>" <?php selected( $view_id, $current_view ); ?>><?php echo $label; ?></option>
+				<option value="<?php echo esc_attr( $view_id ); ?>" <?php selected( $view_id, $current_view ); ?>><?php echo esc_html( $label ); ?></option>
 			<?php endforeach; ?>
 		</select>
 

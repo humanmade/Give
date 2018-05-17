@@ -29,7 +29,7 @@ if ( ! empty( $tabs ) && array_key_exists( give_get_current_setting_tab(), $tabs
 	 *
 	 * @since 1.8
 	 */
-	$form_open_tag  = apply_filters( self::$setting_filter_prefix . '_open_form', '<form method="' . $form_method . '" id="give-mainform" action="" enctype="multipart/form-data">' );
+	$form_open_tag  = apply_filters( self::$setting_filter_prefix . '_open_form', '<form method="' . esc_attr( $form_method ) . '" id="give-mainform" action="" enctype="multipart/form-data">' );
 	$form_close_tag = apply_filters( self::$setting_filter_prefix . '_close_form', '</form>' );
 
 	$wrapper_class = implode( ' ',
@@ -40,16 +40,16 @@ if ( ! empty( $tabs ) && array_key_exists( give_get_current_setting_tab(), $tabs
 		)
 	);
 	?>
-	<div class="wrap give-settings-page <?php echo $wrapper_class; ?>">
+	<div class="wrap give-settings-page <?php echo esc_attr( $wrapper_class ); ?>">
 		<?php
-		echo $form_open_tag;
+		echo $form_open_tag; // @codingStandardsIgnoreLine
 
 		/* @var Give_Settings_Page $current_setting_obj */
 		if (
 			! empty( $current_setting_obj ) &&
 			method_exists( $current_setting_obj, 'get_heading_html' )
 		) {
-			echo $current_setting_obj->get_heading_html();
+			echo $current_setting_obj->get_heading_html(); // @codingStandardsIgnoreLine
 		} else {
 
 			// Backward compatibility.
@@ -59,12 +59,12 @@ if ( ! empty( $tabs ) && array_key_exists( give_get_current_setting_tab(), $tabs
 			);
 		}
 
-		self::show_messages();
+		self::show_messages(); // @codingStandardsIgnoreLine
 		?>
 		<div class="nav-tab-wrapper give-nav-tab-wrapper">
 			<?php
 			foreach ( $tabs as $name => $label ) {
-				echo '<a href="' . admin_url( "edit.php?post_type=give_forms&page=" . self::$setting_filter_prefix . "&tab={$name}" ) . '" class="nav-tab ' . ( $current_tab === $name ? 'nav-tab-active' : 'give-mobile-hidden' ) . '">' . $label . '</a>';
+				echo '<a href="' . esc_url( admin_url( "edit.php?post_type=give_forms&page=" . self::$setting_filter_prefix . "&tab={$name}" ) ) . '" class="nav-tab ' . ( $current_tab === $name ? 'nav-tab-active' : 'give-mobile-hidden' ) . '">' . esc_html( $label ) . '</a>';
 			}
 
 			/**
@@ -114,7 +114,7 @@ if ( ! empty( $tabs ) && array_key_exists( give_get_current_setting_tab(), $tabs
 				<input name="save" class="button-primary give-save-button" type="submit" value="<?php _e( 'Save changes', 'give' ); ?>"/>
 			</div>
 		<?php endif; ?>
-		<?php echo $form_close_tag; ?>
+		<?php echo $form_close_tag; // @codingStandardsIgnoreLine ?>
 	</div>
 <?php else : echo '<div class="error"><p>' . __( 'Oops, this settings page does not exist.', 'give' ) . '</p></div>'; ?>
 <?php endif; ?>

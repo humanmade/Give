@@ -84,13 +84,13 @@ class Give_Email_Notification_Table extends WP_List_Table {
 
 		ob_start();
 		?>
-		<a class="row-title" href="<?php echo $edit_url; ?>"><?php echo $email->config['label']; ?></a>
+		<a class="row-title" href="<?php echo esc_url( $edit_url ); ?>"><?php echo esc_html( $email->config['label'] ); ?></a>
 
 		<?php if ( $desc = $email->config['description'] ) : ?>
 			<?php echo Give()->tooltips->render_help( esc_attr( $desc ) ); ?>
 		<?php endif; ?>
 
-		<?php echo $this->row_actions( $actions ); ?>
+		<?php echo $this->row_actions( $actions ); // @codingStandardsIgnoreLine ?>
 		<?php
 		return ob_get_clean();
 	}
@@ -111,13 +111,13 @@ class Give_Email_Notification_Table extends WP_List_Table {
 		if( Give_Email_Notification_Util::has_recipient_field( $email ) ) {
 			$recipients = $email->get_recipient();
 			if ( is_array( $recipients ) ) {
-				$recipients = implode( '<br>', $recipients );
+				$recipients = implode( '<br>', array_map( 'esc_html', $recipients ) );
 			}
 
-			echo $recipients;
+			echo $recipients; // @codingStandardsIgnoreLine
 
 		} elseif ( ! empty( $email->config['recipient_group_name'] ) ) {
-			echo $email->config['recipient_group_name'];
+			echo esc_html( $email->config['recipient_group_name'] );
 		}
 
 		return ob_get_clean();

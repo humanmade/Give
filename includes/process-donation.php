@@ -281,7 +281,7 @@ function give_donation_form_validate_fields() {
 		return false;
 	}
 
-	$form_id = ! empty( $_POST['give-form-id'] ) ? $_POST['give-form-id'] : '';
+	$form_id = ! empty( $_POST['give-form-id'] ) ? absint( $_POST['give-form-id'] ) : '';
 
 	// Start an array to collect valid data.
 	$valid_data = array(
@@ -346,7 +346,7 @@ function give_donation_form_validate_fields() {
 function give_is_spam_donation() {
 	$spam = false;
 
-	$user_agent = (string) isset( $_SERVER['HTTP_USER_AGENT'] ) ? $_SERVER['HTTP_USER_AGENT'] : '';
+	$user_agent = (string) isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( $_SERVER['HTTP_USER_AGENT'] ) : '';
 
 	if ( strlen( $user_agent ) < 2 ) {
 		$spam = true;
@@ -367,7 +367,7 @@ function give_is_spam_donation() {
  */
 function give_donation_form_validate_gateway() {
 
-	$form_id = isset( $_REQUEST['give-form-id'] ) ? $_REQUEST['give-form-id'] : 0;
+	$form_id = isset( $_REQUEST['give-form-id'] ) ? absint( $_REQUEST['give-form-id'] ) : 0;
 	$amount  = isset( $_REQUEST['give-amount'] ) ? give_maybe_sanitize_amount( $_REQUEST['give-amount'] ) : 0;
 	$gateway = give_get_default_gateway( $form_id );
 
@@ -436,8 +436,8 @@ function give_donation_form_validate_gateway() {
 function give_verify_minimum_price( $amount_range = 'minimum' ) {
 
 	$amount          = give_maybe_sanitize_amount( $_REQUEST['give-amount'] );
-	$form_id         = isset( $_REQUEST['give-form-id'] ) ? $_REQUEST['give-form-id'] : 0;
-	$price_id        = isset( $_REQUEST['give-price-id'] ) ? $_REQUEST['give-price-id'] : null;
+	$form_id         = isset( $_REQUEST['give-form-id'] ) ? absint( $_REQUEST['give-form-id'] ) : 0;
+	$price_id        = isset( $_REQUEST['give-price-id'] ) ? sanitize_text_field( $_REQUEST['give-price-id'] ) : null;
 	$variable_prices = give_has_variable_prices( $form_id );
 
 	if ( $variable_prices && in_array( $price_id, give_get_variable_price_ids( $form_id ) ) ) {
@@ -615,7 +615,7 @@ function give_require_billing_address( $payment_mode ) {
 function give_donation_form_validate_logged_in_user() {
 	global $user_ID;
 
-	$form_id = isset( $_POST['give-form-id'] ) ? $_POST['give-form-id'] : '';
+	$form_id = isset( $_POST['give-form-id'] ) ? absint( $_POST['give-form-id'] ) : '';
 
 	// Start empty array to collect valid user data.
 	$valid_user_data = array(
@@ -738,12 +738,12 @@ function give_donation_form_validate_user_login() {
 	}
 
 	// Get the user by login.
-	$user_data = get_user_by( 'login', strip_tags( $_POST['give_user_login'] ) );
+	$user_data = get_user_by( 'login', sanitize_text_field( $_POST['give_user_login'] ) );
 
 	// Check if user exists.
 	if ( $user_data ) {
 		// Get password.
-		$user_pass = isset( $_POST['give_user_pass'] ) ? $_POST['give_user_pass'] : false;
+		$user_pass = isset( $_POST['give_user_pass'] ) ? $_POST['give_user_pass'] : false; // @codingStandardsIgnoreLine
 
 		// Check user_pass.
 		if ( $user_pass ) {
@@ -755,7 +755,7 @@ function give_donation_form_validate_user_login() {
 					sprintf(
 						'%1$s <a href="%2$s">%3$s</a>',
 						__( 'The password you entered is incorrect.', 'give' ),
-						wp_lostpassword_url( "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]" ),
+						wp_lostpassword_url( esc_url_raw( "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]" ) ), // @codingStandardsIgnoreLine
 						__( 'Reset Password', 'give' )
 					)
 				);
@@ -793,7 +793,7 @@ function give_donation_form_validate_user_login() {
  */
 function give_donation_form_validate_guest_user() {
 
-	$form_id = isset( $_POST['give-form-id'] ) ? $_POST['give-form-id'] : '';
+	$form_id = isset( $_POST['give-form-id'] ) ? absint( $_POST['give-form-id'] ) : '';
 
 	// Start an array to collect valid user data.
 	$valid_user_data = array(
@@ -804,7 +804,7 @@ function give_donation_form_validate_guest_user() {
 	give_donation_form_validate_name_fields();
 
 	// Get the guest email.
-	$guest_email = isset( $_POST['give_email'] ) ? $_POST['give_email'] : false;
+	$guest_email = isset( $_POST['give_email'] ) ? sanitize_email( $_POST['give_email'] ) : false;
 
 	// Check email.
 	if ( $guest_email && strlen( $guest_email ) > 0 ) {
@@ -945,7 +945,7 @@ function give_get_donation_form_user( $valid_data = array() ) {
 	}
 
 	// Check guest checkout.
-	if ( false === $user && false === give_logged_in_only( $_POST['give-form-id'] ) ) {
+	if ( false === $user && false === give_logged_in_only( absint( $_POST['give-form-id'] ) ) ) {
 		// Set user
 		$user = $valid_data['guest_user_data'];
 	}
@@ -958,12 +958,12 @@ function give_get_donation_form_user( $valid_data = array() ) {
 
 	// Get user first name.
 	if ( ! isset( $user['user_first'] ) || strlen( trim( $user['user_first'] ) ) < 1 ) {
-		$user['user_first'] = isset( $_POST['give_first'] ) ? strip_tags( trim( $_POST['give_first'] ) ) : '';
+		$user['user_first'] = isset( $_POST['give_first'] ) ? strip_tags( trim( sanitize_text_field( $_POST['give_first'] ) ) ) : '';
 	}
 
 	// Get user last name.
 	if ( ! isset( $user['user_last'] ) || strlen( trim( $user['user_last'] ) ) < 1 ) {
-		$user['user_last'] = isset( $_POST['give_last'] ) ? strip_tags( trim( $_POST['give_last'] ) ) : '';
+		$user['user_last'] = isset( $_POST['give_last'] ) ? strip_tags( trim( sanitize_text_field( $_POST['give_last'] ) ) ) : '';
 	}
 
 	// Get the user's billing address details.

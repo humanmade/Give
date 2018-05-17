@@ -1012,7 +1012,7 @@ class Give_API {
 			$form_list = get_posts( array(
 				'post_type'        => 'give_forms',
 				'posts_per_page'   => $this->per_page(),
-				'suppress_filters' => true,
+				'suppress_filters' => true, // @codingStandardsIgnoreLine
 				'paged'            => $this->get_paged(),
 			) );
 
@@ -1242,7 +1242,7 @@ class Give_API {
 			} elseif ( $args['form'] == 'all' ) {
 				$forms = get_posts( array(
 					'post_type' => 'give_forms',
-					'nopaging'  => true,
+					'nopaging'  => true, // @codingStandardsIgnoreLine
 				) );
 				$i     = 0;
 				foreach ( $forms as $form_info ) {
@@ -1361,7 +1361,7 @@ class Give_API {
 			} elseif ( $args['form'] == 'all' ) {
 				$forms = get_posts( array(
 					'post_type' => 'give_forms',
-					'nopaging'  => true,
+					'nopaging'  => true, // @codingStandardsIgnoreLine
 				) );
 
 				$i = 0;
@@ -1706,7 +1706,7 @@ class Give_API {
 
 				require_once GIVE_PLUGIN_DIR . 'includes/libraries/array2xml.php';
 				$xml = Array2XML::createXML( 'give', $this->data );
-				echo $xml->saveXML();
+				echo $xml->saveXML(); // @codingStandardsIgnoreLine
 
 				break;
 
@@ -1840,12 +1840,12 @@ class Give_API {
 
 		if ( $user_id == get_current_user_id() && ! give_get_option( 'allow_user_api_keys' ) && ! current_user_can( 'manage_give_settings' ) ) {
 			wp_die( sprintf( /* translators: %s: process */
-				__( 'You do not have permission to %s API keys for this user.', 'give' ), $process ), __( 'Error', 'give' ), array(
+				__( 'You do not have permission to %s API keys for this user.', 'give' ), esc_html( $process ) ), __( 'Error', 'give' ), array(
 				'response' => 403,
 			) );
 		} elseif ( ! current_user_can( 'manage_give_settings' ) ) {
 			wp_die( sprintf( /* translators: %s: process */
-				__( 'You do not have permission to %s API keys for this user.', 'give' ), $process ), __( 'Error', 'give' ), array(
+				__( 'You do not have permission to %s API keys for this user.', 'give' ), esc_html( $process ) ), __( 'Error', 'give' ), array(
 				'response' => 403,
 			) );
 		}

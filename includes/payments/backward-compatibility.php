@@ -291,7 +291,7 @@ function _give_20_bc_get_old_payment_meta( $check, $object_id, $meta_key, $singl
 				$meta_value = ! empty( $meta_value ) ?
 					current( $meta_value ) :
 					(array) maybe_unserialize(
-						$wpdb->get_var(
+						$wpdb->get_var( // @codingStandardsIgnoreLine
 							$wpdb->prepare(
 								"
 								SELECT meta_value
@@ -403,7 +403,7 @@ function _give_20_bc_get_new_payment_meta( $check, $object_id, $meta_key, $singl
 
 			// Handle new meta keys.
 			case '_give_payment_donor_id':
-				$check = $wpdb->get_var(
+				$check = $wpdb->get_var(// @codingStandardsIgnoreLine
 					$wpdb->prepare(
 						"SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id=%d AND meta_key=%s",
 						$object_id,

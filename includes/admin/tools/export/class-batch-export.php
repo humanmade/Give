@@ -125,7 +125,7 @@ class Give_Batch_Export extends Give_Export {
 		$this->filename = 'give-' . $this->export_type . $this->filetype;
 		$this->file     = trailingslashit( $upload_dir['basedir'] ) . $this->filename;
 
-		if ( ! is_writeable( $upload_dir['basedir'] ) ) {
+		if ( ! is_writeable( $upload_dir['basedir'] ) ) { // @codingStandardsIgnoreLine
 			$this->is_writable = false;
 		}
 
@@ -304,7 +304,7 @@ class Give_Batch_Export extends Give_Export {
 
 		@unlink( $this->file );
 
-		echo $file;
+		echo $file; // @codingStandardsIgnoreLine
 
 		/**
 		 * Fire action after file output.
